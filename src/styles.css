@@ -1,5 +1,19 @@
-* {
+html {
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+}
+
+:root {
+  --primary: #2d3e51; /*647fa0*/
+  --secondary: #c35b64; /*c23340*/
 }
