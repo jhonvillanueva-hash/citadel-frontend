@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ScrollAnimationService } from '../../../services/scroll-animation.service';
 
 @Component({
   selector: 'app-info-landing',
@@ -6,6 +7,16 @@ import { Component } from '@angular/core';
   styleUrl: './info-landing.css'
 })
 
-export class InfoLanding {
+export class InfoLanding implements OnInit {
+  constructor(private scrollAnimationService: ScrollAnimationService) {}
 
+  ngOnInit() {
+
+    setTimeout(() => {
+      this.scrollAnimationService.init();
+    }, 100);
+  }
 }
+
+
+

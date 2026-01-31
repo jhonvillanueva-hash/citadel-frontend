@@ -1,463 +1,8 @@
-.info-container {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.info-container .unique-container {
-  margin: 0;
-  width: 100%;
-  height: 350px;
-  padding: 10px;
-  background-color: var(--background);
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-}
-
-.info-container .unique-container .content {
-  width: 300px;
-  height: 300px;
-  margin: 0;
-  background-color: transparent;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 5px 20px;
-}
-
-.info-container .unique-container .content .icon {
-  width: 90px;
-  height: 90px;
-  margin: 0;
-  background-color: var(--secondary);
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: var(--text);
-}
-
-.info-container .unique-container .content .icon i {
-  font-size: 35px
-}
-
-.info-container .unique-container .content .icon:hover {
-  background-color: var(--text);
-  color: var(--secondary);
-}
-
-.info-container .unique-container .content h4 {
-  font-size: 20px;
-  font-family: Poppins;
-  color: var(--text);
-  text-align: center;
-  margin: 30px 0 0 0;
-}
-
-.info-container .unique-container .content p {
-  font-size: 14px;
-  font-family: Poppins;
-  font-weight: 300;
-  color: var(--text);
-  margin: 10px 0;
-  text-align: center;
-}
-
-/* Seccion de Historia */
-.info-container .history-container {
-  margin: 0;
-  width: 100%;
-  height: 750px;
-  background-color: var(--background);
-  padding: 10px 50px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.info-container .history-container strong {
-  font-family: Poppins;
-  font-size: 18px;
-  margin-top: 50px;
-  color: var(--secondary);
-}
-
-.info-container .history-container h2 {
-  font-family: Poppins;
-  font-size: 50px;
-  color: var(--text);
-  margin: 0;
-  margin-top: 10px;
-}
-
-.info-container .history-container p {
-  font-family: Poppins;
-  font-size: 14px;
-  color: var(--text);
-  margin: 10px 0 40px 0;
-}
-
-.info-container .history-container .history-grid {
-  margin: 0;
-  padding: 10px;
-  width: 100%;
-  height: 450px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.info-container .history-container .history-grid .history-image {
-  width: 100%;
-  height: 430px;
-  background-color: var(--background-two);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 7px;
-}
-
-.info-container .history-container .history-grid .history-image .first-image {
-  width: 50%;
-  height: 100%;
-  padding: 20px 10px 20px 20px;
-}
-
-.info-container .history-container .history-grid .history-image .first-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.info-container .history-container .history-grid .history-image .second-image {
-  width: 50%;
-  height: 100%;
-  padding: 20px 20px 20px 10px;
-}
-
-.info-container .history-container .history-grid .history-image .second-image img {
-  width: 100%;
-  height: 47%;
-  object-fit: cover;
-  margin-bottom: 6%;
-}
-
-.info-container .history-container .history-grid .history-image .second-image img:last-child {
-  margin: 0;
-  width: 100%;
-  height: 47%;
-}
-
-.info-container .history-container .history-grid .history-content {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: start;
-  align-items: center;
-  padding: 10px 70px 10px 40px;
-}
-
-.info-container .history-container .history-grid .history-content .content-title {
-  margin: 0;
-  padding: 0;
-  font-family: Poppins;
-  font-size: 26px;
-  color: var(--text);
-  line-height: 1.6;
-  font-weight: 600;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
-.info-container .history-container .history-grid .history-content .content-description {
-  margin: 0;
-  padding: 0;
-  font-family: Poppins;
-  font-size: 14px;
-  color: var(--text);
-  line-height: 1.6;
-  font-weight: 300;
-  margin-top: 10px;
-}
-
-.info-container .history-container .history-grid .history-content .action-details {
-  margin-top: 20px;
-  width: 140px;
-  height: 40px;
-  background-color: transparent;
-  border: 1px solid var(--secondary);
-  border-radius: 5px;
-  color: var(--secondary);
-  font-family: Poppins;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.info-container .history-container .history-grid .history-content .action-details:hover {
-  background-color: var(--secondary);
-  color: var(--text);
-}
-
-/* Seccion de Vinos Destacados */
-.info-container .products-container {
-  margin: 0;
-  width: 100%;
-  height: 850px;
-  background-color: var(--background-two);
-  padding: 10px 50px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.info-container .products-container strong {
-  font-family: Poppins;
-  font-size: 18px;
-  margin-top: 50px;
-  color: var(--secondary);
-}
-
-.info-container .products-container h2 {
-  font-family: Poppins;
-  font-size: 50px;
-  color: var(--text);
-  margin: 0;
-  margin-top: 10px;
-}
-
-.info-container .products-container p {
-  font-family: Poppins;
-  font-size: 14px;
-  color: var(--text);
-  margin: 10px 0 40px 0;
-}
-
-.info-container .products-container .products-grid {
-  margin: 0;
-  width: 100%;
-  height: 550px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 40px;
-  background-color: transparent;
-  padding: 0 20px;
-}
-
-.info-container .products-container .products-grid .product-item {
-  width: 100%;
-  height: 540px;
-  background-color: transparent;
-  border-radius: 7px;
-}
-
-.info-container .products-container .products-grid .product-item .background-image {
-  width: 100%;
-  height: 300px;
-  background-color: var(--background-three);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 7px 7px 0 0;
-}
-
-.info-container .products-container .products-grid .product-item .background-image img {
-  width: 190px;
-  height: 240px;
-  object-fit: cover;
-}
-
-.info-container .products-container .products-grid .product-item .product-content {
-  padding: 10px 15px;
-  width: 100%;
-  height: 230px;
-  background-color: var(--background-four);
-  border-radius: 0 0 7px 7px;
-}
-
-.info-container .products-container .products-grid .product-item .product-content .product-type {
-  font-family: Poppins;
-  font-size: 16px;
-  color: var(--secondary);
-}
-
-.info-container .products-container .products-grid .product-item .product-content .product-title {
-  font-family: Poppins;
-  font-size: 20px;
-  color: var(--text);
-  margin: 10px 0;
-}
-
-.info-container .products-container .products-grid .product-item .product-content .product-description {
-  font-family: Poppins;
-  font-size: 14px;
-  color: var(--text);
-  margin: 10px 0;
-  font-weight: 300;
-}
-
-.info-container .products-container .products-grid .product-item .product-content .product-details {
-  width: 100%;
-  height: 50px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.info-container .products-container .products-grid .product-item .product-content .product-details .price {
-  color: var(--text);
-  font-family: Poppins;
-  font-size: 16px
-}
-
-.info-container .products-container .products-grid .product-item .product-content .product-details .action-details {
-  width: 150px;
-  height: 50px;
-  background-color: transparent;
-  border: 1px solid var(--secondary);
-  border-radius: 5px;
-  color: var(--secondary);
-  font-family: Poppins;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 5px 15px;
-}
-
-.info-container .products-container .products-grid .product-item .product-content .product-details .action-details:hover {
-  background-color: var(--secondary);
-  color: var(--text);
-}
-
-.info-container .collections-container {
-  margin: 0;
-  width: 100%;
-  height: 600px;
-  background-color: var(--background-two);
-  padding: 10px 50px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.info-container .collections-container strong {
-  font-family: Poppins;
-  font-size: 18px;
-  margin-top: 50px;
-  color: var(--secondary);
-}
-
-.info-container .collections-container h2 {
-  font-family: Poppins;
-  font-size: 50px;
-  color: var(--text);
-  margin: 0;
-  margin-top: 10px;
-}
-
-.info-container .collections-container p {
-  font-family: Poppins;
-  font-size: 14px;
-  color: var(--text);
-  margin: 10px 0 40px 0;
-}
-
-.info-container .collections-container .collections-grid {
-  margin: 0;
-  width: 100%;
-  height: 250px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 40px;
-  padding: 0 20px;
-}
-
-.info-container .collections-container .collections-grid .collections-content {
-  width: 100%;
-  border-radius: 7px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: left;
-  padding: 10px 20px;
-
-  background-image:
-    linear-gradient(to right, rgba(0, 0, 0, 0.792), rgba(0, 0, 0, 0.168)),
-    url('/img/landing/hero/carousel/1-fondo.webp');
-
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.info-container .collections-container .collections-grid .collections-content:nth-child(2) {
-  background-image:
-    linear-gradient(to right, rgba(0, 0, 0, 0.792), rgba(0, 0, 0, 0.168)),
-    url('/img/landing/hero/carousel/2-fondo.webp');
-}
-
-.info-container .collections-container .collections-grid .collections-content:nth-child(3) {
-  background-image:
-    linear-gradient(to right, rgba(0, 0, 0, 0.792), rgba(0, 0, 0, 0.168)),
-    url('/img/landing/hero/carousel/3-fondo.webp');
-}
-
-.info-container .collections-container .collections-grid .collections-content:nth-child(4) {
-  background-image:
-    linear-gradient(to right, rgba(0, 0, 0, 0.792), rgba(0, 0, 0, 0.168)),
-    url('/img/landing/hero/carousel/4-fondo.webp');
-}
-
-.info-container .collections-container .collections-grid .collections-content .collections-details {
-  margin: 0;
-  color: var(--secondary);
-  font-family: Poppins;
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.info-container .collections-container .collections-grid .collections-content .collections-title {
-  margin: 10px 0 0 0;
-  color: var(--text);
-  font-family: Poppins;
-  font-size: 22px;
-  font-weight: 600;
-}
-
-.info-container .collections-container .collections-grid .collections-content .collections-description {
-  margin: 5px 0 0 0;
-  color: var(--text);
-  font-family: Poppins;
-  font-size: 14px;
-  font-weight: 300;
-}
-
-.info-container .collections-container .collections-grid .collections-content .action-details {
-  margin: 20px 0 0 0;
-  width: 140px;
-  height: 40px;
-  background-color: transparent;
-  border: 1px solid var(--secondary);
-  border-radius: 5px;
-  color: var(--secondary);
-  font-family: Poppins;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.info-container .collections-container .collections-grid .collections-content .action-details:hover {
-  background-color: var(--secondary);
-  color: var(--text);
-}
-
-/* === ANIMACIONES PARA SCROLL === */
-
-/* Clases base para elementos que se animan al scroll */
+/* Clase base para elementos que se animarán */
 .animate-on-scroll {
   opacity: 0;
-  transform: translateY(40px);
-  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
 .animate-on-scroll.animated {
@@ -465,94 +10,117 @@
   transform: translateY(0);
 }
 
-/* Animaciones específicas para cada sección cuando se activan */
-
-/* 1. UNIQUE CONTAINER - Elementos individuales aparecen escalonados */
-.unique-container.animated .content {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.6s ease-out forwards;
-}
-
-.unique-container.animated .content:nth-child(1) { animation-delay: 0.1s; }
-.unique-container.animated .content:nth-child(2) { animation-delay: 0.2s; }
-.unique-container.animated .content:nth-child(3) { animation-delay: 0.3s; }
-.unique-container.animated .content:nth-child(4) { animation-delay: 0.4s; }
-
-/* 2. HISTORY CONTAINER - Elementos aparecen desde diferentes direcciones */
-.history-container.animated strong,
-.history-container.animated h2,
-.history-container.animated p {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.6s ease-out forwards;
-}
-
-.history-container.animated strong { animation-delay: 0.1s; }
-.history-container.animated h2 { animation-delay: 0.2s; }
-.history-container.animated p { animation-delay: 0.3s; }
-
-.history-container.animated .history-image {
-  opacity: 0;
-  transform: translateX(-30px);
-  animation: slideInLeft 0.8s ease-out 0.4s forwards;
-}
-
-.history-container.animated .history-content {
-  opacity: 0;
-  transform: translateX(30px);
-  animation: slideInRight 0.8s ease-out 0.5s forwards;
-}
-
-/* 3. PRODUCTS CONTAINER - Productos aparecen escalonados */
-.products-container.animated strong,
-.products-container.animated h2,
-.products-container.animated p {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.6s ease-out forwards;
-}
-
-.products-container.animated strong { animation-delay: 0.1s; }
-.products-container.animated h2 { animation-delay: 0.2s; }
-.products-container.animated p { animation-delay: 0.3s; }
-
-.products-container.animated .product-item {
+.animate-on-scroll.fade-up {
   opacity: 0;
   transform: translateY(30px);
-  animation: fadeInUp 0.7s ease-out forwards;
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
 
-.products-container.animated .product-item:nth-child(1) { animation-delay: 0.4s; }
-.products-container.animated .product-item:nth-child(2) { animation-delay: 0.5s; }
-.products-container.animated .product-item:nth-child(3) { animation-delay: 0.6s; }
-.products-container.animated .product-item:nth-child(4) { animation-delay: 0.7s; }
+.animate-on-scroll.fade-up.animated {
+  opacity: 1;
+  transform: translateY(0);
+}
 
-/* 4. COLLECTIONS CONTAINER - Colecciones aparecen escalonadas */
-.collections-container.animated strong,
-.collections-container.animated h2,
-.collections-container.animated p {
+.animate-on-scroll.fade-down {
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(-30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.animate-on-scroll.fade-down.animated {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.animate-on-scroll.slide-left {
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.animate-on-scroll.slide-left.animated {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.animate-on-scroll.slide-right {
+  opacity: 0;
+  transform: translateX(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.animate-on-scroll.slide-right.animated {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Animaciones escalonadas para elementos en grid */
+.animate-on-scroll.delay-100 {
+  transition-delay: 0.1s;
+}
+
+.animate-on-scroll.delay-200 {
+  transition-delay: 0.2s;
+}
+
+.animate-on-scroll.delay-300 {
+  transition-delay: 0.3s;
+}
+
+.animate-on-scroll.delay-400 {
+  transition-delay: 0.4s;
+}
+
+/* ANIMACIÓN DE LEVITACIÓN SIMPLE - SIN BRILLO */
+@keyframes levitate {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+.animate-on-scroll.icon-float-aura.animated {
+  animation: levitate 3.5s ease-in-out infinite;
+}
+
+.animate-on-scroll.icon-float-aura.animated:hover {
+  animation: levitate 1.8s ease-in-out infinite;
+}
+
+/* ANIMACION DE APARICION */
+.animate-on-load {
+  opacity: 0;
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.6s ease-out forwards;
+}
+
+.animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out forwards;
 }
 
-.collections-container.animated strong { animation-delay: 0.1s; }
-.collections-container.animated h2 { animation-delay: 0.2s; }
-.collections-container.animated p { animation-delay: 0.3s; }
-
-.collections-container.animated .collections-content {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.7s ease-out forwards;
+.animate-slide-in-left {
+  animation: slideInLeft 0.6s ease-out forwards;
 }
 
-.collections-container.animated .collections-content:nth-child(1) { animation-delay: 0.4s; }
-.collections-container.animated .collections-content:nth-child(2) { animation-delay: 0.5s; }
-.collections-container.animated .collections-content:nth-child(3) { animation-delay: 0.6s; }
-.collections-container.animated .collections-content:nth-child(4) { animation-delay: 0.7s; }
+.animate-slide-in-right {
+  animation: slideInRight 0.6s ease-out forwards;
+}
 
-/* KEYFRAMES PARA LAS ANIMACIONES */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -586,119 +154,63 @@
   }
 }
 
-/* EFECTOS HOVER PARA ELEMENTOS */
-.unique-container .icon {
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+/* ANIMACIONES ESPECÍFICAS PARA TEXTOS - IZQUIERDA A DERECHA */
+.text-scroll-animate {
+  opacity: 0;
+  transform: translateX(-100px);
+  transition: opacity 1s ease-out, transform 1s ease-out;
 }
 
-.unique-container .content:hover .icon {
-  transform: rotateY(180deg);
-  background-color: var(--text);
-  color: var(--secondary);
+.text-scroll-slow {
+  opacity: 0;
+  transform: translateX(-120px);
+  transition: opacity 1.2s ease-out, transform 1.2s ease-out;
 }
 
-.products-grid .product-item {
-  transition: transform 0.3s ease-out;
+.text-scroll-fast {
+  opacity: 0;
+  transform: translateX(-80px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
-.products-grid .product-item:hover {
-  transform: translateY(-5px);
+.text-scroll-animate.visible,
+.text-scroll-slow.visible,
+.text-scroll-fast.visible {
+  opacity: 1;
+  transform: translateX(0);
 }
 
-.products-grid .product-item .background-image img {
-  transition: transform 0.5s ease-out;
+/* Delays específicos para textos */
+.text-delay-100 {
+  transition-delay: 0.1s;
 }
 
-.products-grid .product-item:hover .background-image img {
-  transform: scale(1.05);
+.text-delay-200 {
+  transition-delay: 0.2s;
 }
 
-.collections-grid .collections-content {
-  transition: transform 0.3s ease-out;
+.text-delay-300 {
+  transition-delay: 0.3s;
 }
 
-.collections-grid .collections-content:hover {
-  transform: translateY(-5px);
+.text-delay-400 {
+  transition-delay: 0.4s;
 }
 
-/* EFECTOS PARA BOTONES */
-.action-details {
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease-out;
+.text-delay-500 {
+  transition-delay: 0.5s;
 }
 
-.action-details::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
-  transition: left 0.6s ease;
+.text-delay-600 {
+  transition-delay: 0.6s;
 }
 
-.action-details:hover::before {
-  left: 100%;
+.text-delay-700 {
+  transition-delay: 0.7s;
 }
 
-.action-details:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(195, 91, 100, 0.4);
+.text-delay-800 {
+  transition-delay: 0.8s;
 }
 
-/* RESPONSIVE PARA ANIMACIONES */
-@media (max-width: 768px) {
-  .animate-on-scroll {
-    transform: translateY(20px);
-    transition: all 0.6s ease-out;
-  }
 
-  .products-container .products-grid,
-  .collections-container .collections-grid {
-    grid-template-columns: 1fr;
-    height: auto;
-    gap: 20px;
-  }
-
-  .history-container .history-grid {
-    grid-template-columns: 1fr;
-    height: auto;
-  }
-}
-
-/* ACCESIBILIDAD - RESPETA PREFERS-REDUCED-MOTION */
-@media (prefers-reduced-motion: reduce) {
-  .animate-on-scroll,
-  .animate-on-scroll.animated,
-  .unique-container.animated .content,
-  .history-container.animated strong,
-  .history-container.animated h2,
-  .history-container.animated p,
-  .history-container.animated .history-image,
-  .history-container.animated .history-content,
-  .products-container.animated strong,
-  .products-container.animated h2,
-  .products-container.animated p,
-  .products-container.animated .product-item,
-  .collections-container.animated strong,
-  .collections-container.animated h2,
-  .collections-container.animated p,
-  .collections-container.animated .collections-content {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-  }
-
-  .unique-container .icon,
-  .products-grid .product-item,
-  .collections-grid .collections-content {
-    transition: none !important;
-  }
-}
