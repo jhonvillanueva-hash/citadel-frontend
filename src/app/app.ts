@@ -1,10 +1,9 @@
-import { Component, signal, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Landing } from "./pages/landing/landing";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Landing],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
