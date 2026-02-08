@@ -5,8 +5,9 @@ import { FooterLanding } from '../../components/landing/footer-landing/footer-la
 
 @Component({
   selector: 'app-landing',
+  standalone: true,
   templateUrl: './landing.html',
-  styleUrl: './landing.css',
+  styleUrls: ['./landing.css'],
   imports: [HeroLanding, InfoLanding, FooterLanding ]
 })
 

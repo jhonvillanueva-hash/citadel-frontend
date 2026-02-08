@@ -1,0 +1,61 @@
+<header class="shadow-lg relative z-50">
+  <!-- Top bar -->
+  <div
+    class="flex items-center gap-4 px-4 lg:px-10 h-[60px] lg:h-[70px] bg-[#515255]">
+
+    <!-- Logo -->
+    <a href="/" class="shrink-0">
+      <img src="/img/logo.png" alt="Logo" class="h-8">
+    </a>
+
+    <!-- Search -->
+    <input
+      type="text"
+      placeholder="Buscar..."
+      class="hidden md:block lg:w-80 bg-white/90 border border-white/40 px-4 h-10 rounded text-sm outline-none focus:bg-white transition">
+
+    <!-- Right actions -->
+    <div class="ml-auto flex items-center gap-4 text-white">
+      <!-- Cart -->
+      <button class="relative text-xl hover:text-[#c35b64] transition">
+        <i class="bi bi-cart3"></i>
+        <span
+          class="absolute -top-2 -right-2 bg-[#c35b64] text-white text-xs rounded-full px-1">
+          3
+        </span>
+      </button>
+
+      <!-- Auth buttons -->
+      <div class="hidden lg:flex gap-2">
+        <button
+          class="px-4 py-2 text-sm border border-white text-white hover:bg-[#c35b64] hover:border-[#c35b64] transition">
+          Iniciar sesión
+        </button>
+        <button
+          class="px-4 py-2 text-sm border border-white text-white hover:bg-[#c35b64] hover:border-[#c35b64] transition">
+          Registrarse
+        </button>
+      </div>
+
+      <!-- Mobile menu button -->
+      <button class="lg:hidden text-white text-2xl hover:text-[#c35b64] transition">
+        <i class="bi bi-list"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="bg-[#5d5e5f]">
+  <ul class="hidden lg:flex justify-center gap-6 py-3 text-sm">
+    <li
+      *ngFor="let nav of internalNavs; trackBy: trackById">
+      <a
+        href="#"
+        class="text-white hover:text-[#c35b64] transition">
+        {{ nav.name }}
+      </a>
+    </li>
+  </ul>
+</nav>
+
+</header>

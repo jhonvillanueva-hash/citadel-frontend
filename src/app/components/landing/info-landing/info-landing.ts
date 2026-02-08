@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ScrollAnimationService } from '../../../services/scroll-animation.service';
 
 @Component({
   selector: 'app-info-landing',
+  standalone: true,
   templateUrl: './info-landing.html',
-  styleUrl: './info-landing.css'
+  styleUrls: ['./info-landing.css'],
+  imports: [CommonModule]
 })
 
 export class InfoLanding implements OnInit {

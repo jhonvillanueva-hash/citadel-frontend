@@ -24,7 +24,7 @@ body {
 
 :root {
   --text: #ffffff;
-  --primary: #2d3e51; /*647fa0*/
+  --primary: #2d3e51;
   --secondary: #c35b64; /*c23340*/
   --background: #0d1b22;
   --background-two: #12242d;
@@ -33,4 +33,7 @@ body {
 
   --animation-speed: 0.5s;
   --animation-easing: ease-out;
+
+  --xd: #647fa0;
+  --xd2: #f13847;
 }

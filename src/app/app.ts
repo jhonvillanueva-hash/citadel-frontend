@@ -1,20 +1,21 @@
-import { Component, signal, OnInit, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Landing } from "./pages/landing/landing";
 import { ScrollAnimationService } from './services/scroll-animation.service';
+import { RouterModule } from '@angular/router';
+
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Landing],
+  standalone: true,
+  imports: [RouterOutlet, RouterModule],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css']
 })
 
 export class App implements OnInit, OnDestroy {
   constructor(private scrollAnimationService: ScrollAnimationService) {}
 
   ngOnInit() {
-    // Inicializar el servicio de animaciones al scroll
     this.scrollAnimationService.init();
   }
 
