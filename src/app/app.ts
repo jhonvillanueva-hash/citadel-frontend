@@ -5,7 +5,7 @@ import { ScrollAnimationService } from './services/scroll-animation.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Landing],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
