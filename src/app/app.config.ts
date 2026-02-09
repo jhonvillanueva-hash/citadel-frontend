@@ -1,21 +1,36 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter, withInMemoryScrolling } from '@angular/router';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-
+import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
+import { provideHttpClient, withFetch, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { provideAppInitializer, inject } from '@angular/core';
+import { AuthService } from './core/services/auth.service';
+import { catchError, of } from 'rxjs';
+
+function initializeApp() {
+  const authService = inject(AuthService);
+
+  if (authService.hasLoggedInFlag()) {
+    return authService.refreshToken().pipe(
+      catchError((err) => {
+        console.error('Refresh falló: ', err);
+        return of(null);
+      })
+    );
+  }
+
+  return of(null);
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
-
-    provideRouter(
-      routes,
-      withInMemoryScrolling({
-        anchorScrolling: 'enabled',
-        scrollPositionRestoration: 'enabled'
-      })
+    provideZonelessChangeDetection(),
+    provideRouter(routes),
+    provideHttpClient(
+      withInterceptors([authInterceptor]),
+      withXsrfConfiguration({ cookieName: 'XSRF-TOKEN', headerName: 'X-XSRF-TOKEN' }),
+      withFetch(),
     ),
-
-    provideClientHydration(withEventReplay())
+    provideAppInitializer(() => initializeApp())
   ]
 };
