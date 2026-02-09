@@ -1,197 +1,216 @@
-.info-container {
-  margin: 0;
-  width: 100%;
-  height: 2000px;
-  background-color: #eee;
+/* Clase base para elementos que se animarán */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
-.info-container .unique-container {
-  margin: 0;
-  width: 100%;
-  height: 350px;
-  padding: 10px;
-  background-color: var(--background);
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
+.animate-on-scroll.animated {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.info-container .unique-container .content {
-  width: 300px;
-  height: 300px;
-  margin: 0;
-  background-color: transparent;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 5px 20px;
+.animate-on-scroll.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
 
-.info-container .unique-container .content .icon {
-  width: 90px;
-  height: 90px;
-  margin: 0;
-  background-color: var(--secondary);
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #ffffff;
+.animate-on-scroll.fade-up.animated {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.info-container .unique-container .content .icon i {
-  font-size: 35px
+.animate-on-scroll.fade-down {
+  opacity: 0;
+  transform: translateY(-30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
 
-.info-container .unique-container .content .icon:hover {
-  background-color: #ffffff;
-  color: var(--secondary);
+.animate-on-scroll.fade-down.animated {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.info-container .unique-container .content h4 {
-  font-size: 20px;
-  font-family: Poppins;
-  color: #ffffff;
-  text-align: center;
-  margin: 30px 0 0 0;
+.animate-on-scroll.slide-left {
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
 
-.info-container .unique-container .content p {
-  font-size: 14px;
-  font-family: Poppins;
-  font-weight: 300;
-  color: #ffffff;
-  margin: 10px 0;
-  text-align: center;
+.animate-on-scroll.slide-left.animated {
+  opacity: 1;
+  transform: translateX(0);
 }
 
-/* Seccion de Vinos Destacados */
-.info-container .products-container {
-  margin: 0;
-  width: 100%;
-  height: 850px;
-  background-color: #12242d;
-  padding: 10px 50px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.animate-on-scroll.slide-right {
+  opacity: 0;
+  transform: translateX(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
 
-.info-container .products-container strong {
-  font-family: Poppins;
-  font-size: 18px;
-  margin-top: 50px;
-  color: var(--secondary);
+.animate-on-scroll.slide-right.animated {
+  opacity: 1;
+  transform: translateX(0);
 }
 
-.info-container .products-container h2 {
-  font-family: Poppins;
-  font-size: 50px;
-  color: #ffffff;
-  margin: 0;
-  margin-top: 10px;
+/* Animaciones escalonadas para elementos en grid */
+.animate-on-scroll.delay-100 {
+  transition-delay: 0.1s;
 }
 
-.info-container .products-container p {
-  font-family: Poppins;
-  font-size: 14px;
-  color: #ffffff;
-  margin: 10px 0 40px 0;
+.animate-on-scroll.delay-200 {
+  transition-delay: 0.2s;
 }
 
-.info-container .products-container .products-grid {
-  margin: 0;
-  width: 100%;
-  height: 550px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 40px;
-  background-color: transparent;
-  padding: 0 20px;
+.animate-on-scroll.delay-300 {
+  transition-delay: 0.3s;
 }
 
-.info-container .products-container .products-grid .product-item {
-  width: 100%;
-  height: 540px;
-  background-color: transparent;
-  border-radius: 7px;
+.animate-on-scroll.delay-400 {
+  transition-delay: 0.4s;
 }
 
-.info-container .products-container .products-grid .product-item .background-image {
-  width: 100%;
-  height: 300px;
-  background-color: #162b36;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 7px 7px 0 0;
+/* ANIMACIÓN DE LEVITACIÓN SIMPLE - SIN BRILLO */
+@keyframes levitate {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
 }
 
-.info-container .products-container .products-grid .product-item .background-image img {
-  width: 190px;
-  height: 240px;
-  object-fit: cover;
+.animate-on-scroll.icon-float-aura.animated {
+  animation: levitate 3.5s ease-in-out infinite;
 }
 
-.info-container .products-container .products-grid .product-item .product-content {
-  padding: 10px 15px;
-  width: 100%;
-  height: 230px;
-  background-color: #11212a;
-  border-radius: 0 0 7px 7px;
+.animate-on-scroll.icon-float-aura.animated:hover {
+  animation: levitate 1.8s ease-in-out infinite;
 }
 
-.info-container .products-container .products-grid .product-item .product-content .product-type {
-  font-family: Poppins;
-  font-size: 16px;
-  color: var(--secondary);
+/* ANIMACION DE APARICION */
+.animate-on-load {
+  opacity: 0;
 }
 
-.info-container .products-container .products-grid .product-item .product-content .product-title {
-  font-family: Poppins;
-  font-size: 20px;
-  color: #ffffff;
-  margin: 10px 0;
+.animate-fade-in-down {
+  animation: fadeInDown 0.6s ease-out forwards;
 }
 
-.info-container .products-container .products-grid .product-item .product-content .product-description {
-  font-family: Poppins;
-  font-size: 14px;
-  color: #eee;
-  margin: 10px 0;
-  font-weight: 300;
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
 }
 
-.info-container .products-container .products-grid .product-item .product-content .product-details {
-  width: 100%;
-  height: 50px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.animate-slide-in-left {
+  animation: slideInLeft 0.6s ease-out forwards;
 }
 
-.info-container .products-container .products-grid .product-item .product-content .product-details .price {
-  color: #eee;
-  font-family: Poppins;
-  font-size: 16px
+.animate-slide-in-right {
+  animation: slideInRight 0.6s ease-out forwards;
 }
 
-.info-container .products-container .products-grid .product-item .product-content .product-details .action-details {
-  width: 150px;
-  height: 50px;
-  background-color: transparent;
-  border: 1px solid var(--secondary);
-  border-radius: 5px;
-  color: var(--secondary);
-  font-family: Poppins;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 5px 15px;
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.info-container .products-container .products-grid .product-item .product-content .product-details .action-details:hover {
-  background-color: var(--secondary);
-  color: #ffffff;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ANIMACIONES ESPECÍFICAS PARA TEXTOS - IZQUIERDA A DERECHA */
+.text-scroll-animate {
+  opacity: 0;
+  transform: translateX(-100px);
+  transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+.text-scroll-slow {
+  opacity: 0;
+  transform: translateX(-120px);
+  transition: opacity 1.2s ease-out, transform 1.2s ease-out;
+}
+
+.text-scroll-fast {
+  opacity: 0;
+  transform: translateX(-80px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.text-scroll-animate.visible,
+.text-scroll-slow.visible,
+.text-scroll-fast.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Delays específicos para textos */
+.text-delay-100 {
+  transition-delay: 0.1s;
+}
+
+.text-delay-200 {
+  transition-delay: 0.2s;
+}
+
+.text-delay-300 {
+  transition-delay: 0.3s;
+}
+
+.text-delay-400 {
+  transition-delay: 0.4s;
+}
+
+.text-delay-500 {
+  transition-delay: 0.5s;
+}
+
+.text-delay-600 {
+  transition-delay: 0.6s;
+}
+
+.text-delay-700 {
+  transition-delay: 0.7s;
+}
+
+.text-delay-800 {
+  transition-delay: 0.8s;
+}
+
 
