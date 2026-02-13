@@ -1,77 +1,52 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, PLATFORM_ID, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { Router, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformServer } from '@angular/common';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule, RouterLink],
-  template: `
-    <div class="container">
-      <h2>Registro</h2>
-      
-      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-        <div>
-          <label>Nombres:</label>
-          <input type="text" formControlName="nombres">
-        </div>
-        
-        <div>
-          <label>Apellidos:</label>
-          <input type="text" formControlName="apellidos">
-        </div>
-
-        <div>
-          <label>Email:</label>
-          <input type="email" formControlName="email">
-        </div>
-        
-        <div>
-          <label>Contraseña:</label>
-          <input type="password" formControlName="hash_contrasena">
-        </div>
-
-        @if (errorMessage(); as message) {
-          <div class="error">
-            {{ message }}
-          </div>
-        }
-
-        <button type="submit" [disabled]="registerForm.invalid || isLoading()">
-          {{ isLoading() ? 'Registrando...' : 'Crear Cuenta' }}
-        </button>
-      </form>
-      
-      <p>¿Ya tienes cuenta? <a routerLink="/login">Ingresa aquí</a></p>
-    </div>
-  `,
-  styles: [`
-    .container { max-width: 400px; margin: 2rem auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
-    div { margin-bottom: 10px; }
-    input { width: 100%; padding: 8px; box-sizing: border-box; }
-    button { width: 100%; padding: 10px; background: #28a745; color: white; border: none; cursor: pointer; }
-    .error { color: red; }
-  `]
+  templateUrl: './register.html'
 })
 export class RegisterComponent {
   private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
+  currentUser = this.authService.currentUser;
   private router = inject(Router);
+  errorMessage = signal<string | null>(null);
+  isLoading = signal(false);
+  private platformId = inject(PLATFORM_ID);
+  public isServer = isPlatformServer(this.platformId);
 
   registerForm = this.fb.group({
     nombres: ['', Validators.required],
     apellidos: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    hash_contrasena: ['', Validators.required]
+    hash_contrasena: ['', [Validators.required, Validators.minLength(6)]]
   });
 
-  errorMessage = signal<string | null>(null);
-  isLoading = signal(false);
+  get hasLocalSession(): boolean {
+    return this.authService.hasLoggedInFlag();
+  }
+
+  isInvalid(controlName: string): boolean {
+    const control = this.registerForm.get(controlName);
+    return !!(control && control.invalid && control.touched);
+  }
+
+  inputClasses(controlName: string) {
+    return this.isInvalid(controlName)
+      ? 'border-red-500 ring-1 ring-red-500 focus:ring-red-500'
+      : 'border-gray-300 focus:ring-secondary focus:border-secondary';
+  }
 
   onSubmit() {
-    if (this.registerForm.invalid) return;
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
+      return;
+    }
 
     this.isLoading.set(true);
     this.authService.register(this.registerForm.getRawValue()).subscribe({
@@ -79,7 +54,7 @@ export class RegisterComponent {
         alert('Registro exitoso. Ahora inicia sesión.');
         this.router.navigate(['/login']);
       },
-      error: (err) => {
+      error: () => {
         this.isLoading.set(false);
         this.errorMessage.set('Error al registrar usuario.');
       }

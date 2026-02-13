@@ -6,8 +6,13 @@ import { AdminDashboardComponent } from './pages/admin/admin-dashboard.component
 import { authGuard } from './core/guards/auth.guard';
 import { publicGuard } from './core/guards/public.guard';
 import { adminGuard } from './core/guards/role.guard';
+import { Landing } from './pages/landing/landing';
 
 export const routes: Routes = [
+  { 
+    path: '', 
+    component: Landing
+  },
   {
     path: 'login',
     component: LoginComponent,
@@ -28,6 +33,5 @@ export const routes: Routes = [
     component: AdminDashboardComponent,
     canActivate: [authGuard, adminGuard]
   },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' }
 ];

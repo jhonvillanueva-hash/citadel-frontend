@@ -1,0 +1,98 @@
+@if (isServer || authService.isInitializing() || hasLocalSession) {
+  <p>Cargando...</p>
+}
+@else if (!currentUser()) {
+  <div class="max-w-md mx-auto mt-12 bg-white shadow-lg rounded-xl p-8 border border-gray-200">
+
+    <h2 class="text-2xl font-semibold text-center mb-6 text-gray-800">
+      Iniciar Sesión - CITADEL
+    </h2>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Email
+        </label>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="correo@gmail.com"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition"
+        >
+        @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+          <p class="text-red-500 text-sm mt-1">
+            @if (loginForm.get('email')?.errors?.['required']) {
+              El email es obligatorio
+            }
+            @if (loginForm.get('email')?.errors?.['email']) {
+              Debe ingresar un email válido
+            }
+          </p>
+        }
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Contraseña
+        </label>
+        <input
+          type="password"
+          formControlName="contrasena"
+          placeholder="****"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition"
+        >
+        @if (loginForm.get('contrasena')?.invalid && loginForm.get('contrasena')?.touched) {
+          <p class="text-red-500 text-sm mt-1">
+            @if (loginForm.get('contrasena')?.errors?.['required']) {
+              La contraseña es obligatoria
+            }
+          </p>
+        }
+      </div>
+
+      @if (errorMessage(); as message) {
+        <div class="bg-red-100 text-red-600 text-sm px-3 py-2 rounded-lg border border-red-200">
+          {{ message }}
+        </div>
+      }
+
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid || isLoading()"
+        class="w-full py-2.5 rounded-lg bg-secondary text-white font-medium transition hover:opacity-90 disabled:bg-gray-300 disabled:cursor-not-allowed"
+      >
+        {{ isLoading() ? 'Cargando...' : 'Ingresar' }}
+      </button>
+    </form>
+
+    <!--
+    <div class="mt-10 pt-6 border-t border-dashed border-gray-300">
+      <h3 class="text-lg font-medium text-gray-700 mb-3">
+        Test Público
+      </h3>
+
+      <button
+        type="button"
+        (click)="testPublicApi()"
+        class="w-full py-2 rounded-lg border border-secondary text-secondary hover:bg-secondary hover:text-white transition"
+      >
+        Obtener Vinos (GET /public/vinos)
+      </button>
+
+      @if (publicData()) {
+        <div class="bg-gray-100 p-4 mt-4 rounded-lg text-sm overflow-auto">
+          <pre>{{ publicData() | json }}</pre>
+        </div>
+      }
+    </div>-->
+
+    <p class="text-center text-sm text-gray-600 mt-6">
+      ¿No tienes cuenta?
+      <a routerLink="/register" class="text-secondary font-medium hover:underline">
+        Regístrate aquí
+      </a>
+    </p>
+
+  </div>
+}

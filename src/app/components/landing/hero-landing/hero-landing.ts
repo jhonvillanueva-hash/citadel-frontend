@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-hero-landing',
@@ -11,6 +12,11 @@ import { RouterLink } from '@angular/router';
 
 
 export class HeroLanding {
+  private authService = inject(AuthService);
+  currentUser = this.authService.currentUser;  
 
+  logout() {
+    this.authService.logout();
+  }
 }
 

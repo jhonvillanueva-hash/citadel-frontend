@@ -9,48 +9,79 @@ import { CartService } from '../../core/services/models/cart.service';
   imports: [CommonModule],
   template: `
     @if (authService.isInitializing() || !currentUser()) {
-      <div class="loading-container">
-        <p>Verificando permisos...</p>
+      <div class="flex justify-center items-center mt-16">
+        <p class="text-lg text-gray-600 font-medium">
+          Verificando permisos...
+        </p>
       </div>
     } 
     
     @else if (currentUser()?.tipo === 'A') {
-      <div class="admin-panel">
-        <header>
-          <h1>Panel de Administración</h1>
-          <button (click)="logout()">Salir</button>
+      <div class="max-w-5xl mx-auto px-6 py-8 font-sans">
+        
+        <header class="flex justify-between items-center border-b-2 border-gray-800 pb-4">
+          <h1 class="text-3xl font-bold text-gray-800">
+            Panel de Administración
+          </h1>
+          <button 
+            (click)="logout()"
+            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
+          >
+            Salir
+          </button>
         </header>
         
-        <div class="content">
-          <p>Bienvenido, Administrador <strong>{{ currentUser()?.nombres }}</strong></p>
-          <div class="stats">
-            <div class="card">Usuarios: 150</div>
-            <div class="card">Ventas: $5000</div>
-            <div class="card">Alertas: 0</div>
+        <div class="mt-8">
+          <p class="text-lg text-gray-700">
+            Bienvenido, Administrador 
+            <strong>{{ currentUser()?.nombres }}</strong>
+          </p>
+
+          <div class="flex flex-wrap gap-6 mt-6">
+            <div class="bg-gray-900 text-white px-6 py-6 rounded-xl w-40 text-center shadow-md">
+              <p class="text-sm text-gray-400">Usuarios</p>
+              <p class="text-2xl font-bold mt-2">150</p>
+            </div>
+
+            <div class="bg-gray-900 text-white px-6 py-6 rounded-xl w-40 text-center shadow-md">
+              <p class="text-sm text-gray-400">Ventas</p>
+              <p class="text-2xl font-bold mt-2">$5000</p>
+            </div>
+
+            <div class="bg-gray-900 text-white px-6 py-6 rounded-xl w-40 text-center shadow-md">
+              <p class="text-sm text-gray-400">Alertas</p>
+              <p class="text-2xl font-bold mt-2">0</p>
+            </div>
           </div>
         </div>
 
-        <div class="test-area" style="margin-top: 20px; padding: 20px; border: 1px solid red;">
-          <h3>Tests</h3>
-          <p>Prueba de borrado (DELETE /admin/carritos/:id)</p>
+        <div class="mt-10 p-6 border border-red-500 rounded-lg bg-red-50">
+          <h3 class="text-lg font-semibold text-red-700 mb-2">
+            Tests
+          </h3>
+          <p class="text-sm text-red-600 mb-4">
+            Prueba de borrado (DELETE /admin/carritos/:id)
+          </p>
           
-          <div style="display: flex; gap: 10px;">
-             <input #idInput type="number" placeholder="ID Carrito">
-             <button (click)="borrarCarrito(idInput.value)">Borrar Carrito</button>
+          <div class="flex flex-wrap gap-3">
+            <input 
+              #idInput 
+              type="number" 
+              placeholder="ID Carrito"
+              class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400"
+            >
+            <button 
+              (click)="borrarCarrito(idInput.value)"
+              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
+            >
+              Borrar Carrito
+            </button>
           </div>
         </div>
         
       </div>
     }
-  `,
-  styles: [`
-    .admin-panel { padding: 20px; font-family: sans-serif; }
-    header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 10px; }
-    .content { margin-top: 20px; }
-    .stats { display: flex; gap: 20px; margin-top: 20px; }
-    .card { background: #333; color: white; padding: 20px; border-radius: 8px; width: 150px; text-align: center; }
-    button { background: #d9534f; color: white; border: none; padding: 8px 16px; cursor: pointer; border-radius: 4px; }
-  `]
+  `
 })
 export class AdminDashboardComponent {
   authService = inject(AuthService);
