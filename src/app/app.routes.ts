@@ -7,6 +7,9 @@ import { authGuard } from './core/guards/auth.guard';
 import { publicGuard } from './core/guards/public.guard';
 import { adminGuard } from './core/guards/role.guard';
 import { Landing } from './pages/landing/landing';
+import { Statistics } from './pages/admin/statistics/statistics';
+import { Users } from './pages/admin/users/users';
+import { AIComponent } from './pages/admin/ai/ai';
 
 export const routes: Routes = [
   { 
@@ -31,7 +34,27 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: AdminDashboardComponent,
-    canActivate: [authGuard, adminGuard]
+    canActivate: [authGuard, adminGuard],
+    title: 'Panel Admin',
+    children: [
+      {
+        path: 'statistics',
+        component: Statistics
+      },
+      {
+        path: 'users',
+        component: Users
+      },
+      {
+        path: 'ai',
+        component: AIComponent
+      },
+      {
+        path: '',
+        redirectTo: 'statistics',
+        pathMatch: 'full'
+      }
+    ],
   },
   { path: '**', redirectTo: 'login' }
 ];

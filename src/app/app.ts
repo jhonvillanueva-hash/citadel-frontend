@@ -1,12 +1,12 @@
 import { Component, signal, OnInit, OnDestroy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ScrollAnimationService } from './services/scroll-animation.service';
-import { RouterModule } from '@angular/router';
+import { ToastContainerComponent } from './components/error/toast-container.component';
 
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, ToastContainerComponent],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
