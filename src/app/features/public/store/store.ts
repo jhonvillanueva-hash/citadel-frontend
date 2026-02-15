@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HeaderStore } from './header-store/header-store';
-import { HeroStore } from './hero-store/hero-store';
-import { Category } from './category/category';
-import { ProductStore } from './product-store/product-store';
+import { HeaderStore } from './components/header-store/header-store';
+import { HeroStore } from './components/hero-store/hero-store';
+import { Category } from './components/category/category';
+import { ProductStore } from './components/product-store/product-store';
 
 @Component({
   selector: 'app-store',

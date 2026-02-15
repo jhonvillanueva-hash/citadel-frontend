@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './features/auth/login/login.component';
-import { RegisterComponent } from './features/auth/register/register.component';
-import { HomeComponent } from './features/public/home/home.component';
-import { AdminDashboardComponent } from './features/admin/admin-dashboard.component';
+import { LoginComponent } from './features/auth/login/login';
+import { RegisterComponent } from './features/auth/register/register';
+import { HomeComponent } from './features/public/home/home';
+import { AdminDashboardComponent } from './features/admin/admin-dashboard';
 import { authGuard } from './core/guards/auth.guard';
 import { publicGuard } from './core/guards/public.guard';
 import { adminGuard } from './core/guards/admin.guard';

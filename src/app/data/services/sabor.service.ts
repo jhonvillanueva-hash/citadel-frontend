@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BaseHttpService, PathConfig } from '../../../core/services/base-http.service';
-import { Sabor } from '../../models/api.models';
+import { BaseHttpService, PathConfig } from '../../core/services/base-http.service';
+import { Sabor } from '../models/api.models';
 
 @Injectable({ providedIn: 'root' })
 export class SaborService extends BaseHttpService<Sabor> {

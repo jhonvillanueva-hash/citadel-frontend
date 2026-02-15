@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
-import { CartService } from '../../../data/services/models/cart.service';
+import { CartService } from '../../../data/services/cart.service';
 import { CommonModule } from '@angular/common';
 import { Carrito } from '../../../data/models/api.models';
 import { RouterLink } from "@angular/router";

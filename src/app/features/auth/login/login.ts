@@ -1,7 +1,7 @@
 import { Component, effect, inject, signal, PLATFORM_ID } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
-import { VinoService } from '../../../data/services/models/vino.service';
+import { VinoService } from '../../../data/services/vino.service';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule, isPlatformServer } from '@angular/common';
 

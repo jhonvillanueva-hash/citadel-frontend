@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { UsuarioService } from '../../../data/services/models/usuario.service';
+import { UsuarioService } from '../../../data/services/usuario.service';
 import { Usuario } from '../../../data/models/api.models';
 import { JsonPipe } from '@angular/common';
 import { ToastService } from '../../../shared/components/toast/toast.service';
