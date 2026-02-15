@@ -1,15 +1,16 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './pages/login/login.component';
-import { RegisterComponent } from './pages/register/register.component';
-import { HomeComponent } from './pages/home/home.component';
-import { AdminDashboardComponent } from './pages/admin/admin-dashboard.component';
+import { LoginComponent } from './features/auth/login/login.component';
+import { RegisterComponent } from './features/auth/register/register.component';
+import { HomeComponent } from './features/public/home/home.component';
+import { AdminDashboardComponent } from './features/admin/admin-dashboard.component';
 import { authGuard } from './core/guards/auth.guard';
 import { publicGuard } from './core/guards/public.guard';
-import { adminGuard } from './core/guards/role.guard';
-import { Landing } from './pages/landing/landing';
-import { Statistics } from './pages/admin/statistics/statistics';
-import { Users } from './pages/admin/users/users';
-import { AIComponent } from './pages/admin/ai/ai';
+import { adminGuard } from './core/guards/admin.guard';
+import { Landing } from './features/public/landing/landing';
+import { Statistics } from './features/admin/statistics/statistics';
+import { Users } from './features/admin/users/users';
+import { AIComponent } from './features/admin/ai/ai';
+import { Store } from './features/public/store/store';
 
 export const routes: Routes = [
   { 
@@ -30,6 +31,10 @@ export const routes: Routes = [
     path: 'home',
     component: HomeComponent,
     canActivate: [authGuard]
+  },
+  {
+    path: 'store',
+    component: Store
   },
   {
     path: 'admin',
