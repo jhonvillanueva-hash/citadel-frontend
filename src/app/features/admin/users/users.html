@@ -1,0 +1,5 @@
+@for (usuario of dataUsers(); track usuario.id_usuario) {
+  <pre>{{ usuario | json }}</pre>
+} @empty {
+  <p>Cargando usuarios o no hay usuarios registrados...</p>
+}

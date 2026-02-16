@@ -4,7 +4,14 @@ import { Observable, tap, catchError, throwError, finalize, BehaviorSubject } fr
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../../environments/environment';
-import { User } from '../models/auth.models';
+
+export interface User {
+  id_usuario: number;
+  nombres: string;
+  apellidos: string;
+  email: string;
+  tipo: 'A' | 'U';
+}
 
 export interface LoginResponse {
   accessToken: string;
@@ -105,7 +112,7 @@ export class AuthService {
   getRedirectUrl(): string {
     const user = this._currentUser();
     if (!user) return '/login';
-    return user.tipo === 'A' ? '/admin' : '/home';
+    return user.tipo === 'A' ? '/admin' : '/store';
   }
 
   //Lógica Interna de Sesión
@@ -121,7 +128,7 @@ export class AuthService {
     if (this.isBrowser()) {
       localStorage.removeItem(this.LOGGED_IN_KEY);
     }
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
   private setSession(token: string): void {
