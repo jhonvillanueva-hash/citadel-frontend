@@ -1,22 +1,18 @@
 <header class="shadow-lg relative z-50">
-  <!-- Top bar -->
-  <div
-    class="flex items-center gap-4 px-4 lg:px-10 h-[60px] lg:h-[70px] bg-[#515255]">
 
-    <!-- Logo -->
+  <div
+    class="flex items-center gap-4 px-4 lg:px-10 h-[60px] lg:h-[70px] bg-[#202125]">
+
     <a href="/" class="shrink-0">
       <img src="/img/logo.png" alt="Logo" class="h-8">
     </a>
 
-    <!-- Search -->
     <input
       type="text"
       placeholder="Buscar..."
-      class="hidden md:block lg:w-80 bg-white/90 border border-white/40 px-4 h-10 rounded text-sm outline-none focus:bg-white transition">
+      class="hidden md:block lg:w-80 bg-transparent border border-white/90 px-4 h-10 rounded text-sm text-white placeholder:text-white/50 outline-none focus:border-white/60 transition">
 
-    <!-- Right actions -->
     <div class="ml-auto flex items-center gap-4 text-white">
-      <!-- Cart -->
       <button class="relative text-xl hover:text-[#c35b64] transition">
         <i class="bi bi-cart3"></i>
         <span
@@ -25,7 +21,6 @@
         </span>
       </button>
 
-      <!-- Auth buttons -->
       <div class="hidden lg:flex gap-2">
         <button
           class="px-4 py-2 text-sm border border-white text-white hover:bg-[#c35b64] hover:border-[#c35b64] transition">
@@ -37,15 +32,13 @@
         </button>
       </div>
 
-      <!-- Mobile menu button -->
       <button class="lg:hidden text-white text-2xl hover:text-[#c35b64] transition">
         <i class="bi bi-list"></i>
       </button>
     </div>
   </div>
 
-  <!-- Navigation -->
-  <nav class="bg-[#5d5e5f]">
+  <nav class="bg-[#0e0d12]">
     <ul class="hidden lg:flex justify-center gap-6 py-3 text-sm">
 
       @for (nav of internalNavs; track trackById($index, nav)) {
