@@ -11,10 +11,11 @@ import { Statistics } from './features/admin/statistics/statistics';
 import { Users } from './features/admin/users/users';
 import { AIComponent } from './features/admin/ai/ai';
 import { Store } from './features/public/store/store';
+import { DetailsStore } from './features/public/store/pages/details-store/details-store';
 
 export const routes: Routes = [
-  { 
-    path: '', 
+  {
+    path: '',
     component: Landing
   },
   {
@@ -34,7 +35,11 @@ export const routes: Routes = [
   },
   {
     path: 'store',
-    component: Store
+    component: Store,
+  },
+  {
+    path: 'store/products/:id',
+    component: DetailsStore
   },
   {
     path: 'admin',

@@ -1,26 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
-interface Flavor {
-  id: number;
-  name: string;
-}
+import { VinoService } from '../../../../../data/services/vino.service';
+import { SaborService } from '../../../../../data/services/sabor.service';
+import { PresentacionService } from '../../../../../data/services/presentacion.service';
+import { PrecioService } from '../../../../../data/services/precio.service';
 
-interface Category {
-  id: number;
-  name: string;
-}
-
-interface ProductWine {
-  id: number;
-  idFlavor: number;
-  idCategory: number;
-  name: string;
-  description: string;
-  volumen: string;
-  state: string;
-  image: string;
-}
+import { Precio, Vino } from '../../../../../data/models/api.models';
+import { forkJoin } from 'rxjs';
 
 export interface InternalProduct {
   id: number;
@@ -33,81 +21,103 @@ export interface InternalProduct {
   image: string;
   iconoFlavor?: string;
   iconoCategory?: string;
+  prices?: Precio[];
 }
-
-const flavors: Flavor[] = [
-  { id: 1, name: 'Frambuesas' },
-  { id: 2, name: 'Zarzamoras' },
-  { id: 3, name: 'Arandanos' }
-];
-
-const categories: Category[] = [
-  { id: 1, name: 'Dulce' },
-  { id: 2, name: 'Seco' },
-  { id: 3, name: 'Semiseco' }
-];
-
-const productsPullApi: ProductWine[] = [
-  {id: 1, idFlavor: 1, idCategory: 1, name: 'Vino Tinto', description: "Vinos deliciosos con notas de frutas rojas y especias.", volumen: '750 ml', state: 'Disponible', image: '/img/store/one.jpg'},
-  {id: 2, idFlavor: 1, idCategory: 2, name: 'Vino Tinto', description: "Vinos deliciosos con notas de frutas rojas y especias.", volumen: '750 ml', state: 'Disponible', image: '/img/store/one.jpg'},
-  {id: 3, idFlavor: 1, idCategory: 3, name: 'Vino Tinto', description: "Vinos deliciosos con notas de frutas rojas y especias.", volumen: '550 ml', state: 'Disponible', image: '/img/store/one.jpg'},
-  {id: 4, idFlavor: 2, idCategory: 1, name: 'Vino Tinto', description: "Vinos deliciosos con notas de frutas rojas y especias.", volumen: '750 ml', state: 'Disponible', image: '/img/store/one.jpg'},
-  {id: 5, idFlavor: 3, idCategory: 1, name: 'Vino Tinto', description: "Vinos deliciosos con notas de frutas rojas y especias.", volumen: '750 ml', state: 'Disponible', image: '/img/store/one.jpg'},
-  {id: 6, idFlavor: 3, idCategory: 2, name: 'Vino Tinto', description: "Vinos deliciosos con notas de frutas rojas y especias.", volumen: '650 ml', state: 'Disponible', image: '/img/store/one.jpg'},
-  {id: 7, idFlavor: 2, idCategory: 3, name: 'Vino Tinto', description: "Vinos deliciosos con notas de frutas rojas y especias.", volumen: '750 ml', state: 'Disponible', image: '/img/store/one.jpg'},
-  {id: 8, idFlavor: 3, idCategory: 3, name: 'Vino Tinto', description: "Vinos deliciosos con notas de frutas rojas y especias.", volumen: '750 ml', state: 'Disponible', image: '/img/store/one.jpg'},
-  {id: 9, idFlavor: 2, idCategory: 2, name: 'Vino Tinto', description: "Vinos deliciosos con notas de frutas rojas y especias.", volumen: '850 ml', state: 'Disponible', image: '/img/store/one.jpg'},
-];
 
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './product-store.html',
-  styles: ``
 })
-export class ProductStore {
 
-  private flavorMap = new Map(flavors.map(f => [f.id, f.name]));
-  private categoryMap = new Map(categories.map(c => [c.id, c.name]));
+export class ProductStore implements OnInit {
 
-  products: InternalProduct[] = this.mapProducts(productsPullApi);
+  private vinoService = inject(VinoService);
+  private saborService = inject(SaborService);
+  private presentacionService = inject(PresentacionService);
+  private precioService = inject(PrecioService);
 
-  private mapProducts(products: ProductWine[]): InternalProduct[] {
-    return products.map(product => {
+  products: InternalProduct[] = [];
 
-      const flavorName = this.flavorMap.get(product.idFlavor) ?? 'Desconocido';
-      const categoryName = this.categoryMap.get(product.idCategory) ?? 'Desconocido';
+  private flavorMap = new Map<number, string>();
+  private categoryMap = new Map<number, string>();
+
+  ngOnInit(): void {
+    this.loadCatalogs();
+  }
+
+  private loadCatalogs(): void {
+    this.saborService.getAll().subscribe(sabores => {
+      sabores.forEach(s => this.flavorMap.set(s.id_sabor, s.nombre));
+
+      this.presentacionService.getAll().subscribe(presentaciones => {
+        presentaciones.forEach(p =>
+          this.categoryMap.set(p.id_presentacion, p.nombre)
+        );
+
+        this.loadVinosYPrecios();
+      });
+    });
+  }
+
+  private loadVinosYPrecios(): void {
+    forkJoin({
+      vinos: this.vinoService.getAll(),
+      precios: this.precioService.getAll()
+    }).subscribe(({ vinos, precios }) => {
+      this.products = this.mapProducts(vinos, precios);
+    });
+  }
+
+private mapProducts(vinos: Vino[], precios: Precio[]): InternalProduct[] {
+    return vinos.map(vino => {
+
+      const flavorName = this.flavorMap.get(vino.id_sabor) ?? 'Desconocido';
+      const categoryName = this.categoryMap.get(vino.id_presentacion) ?? 'Desconocido';
+
+      const preciosDelVino = precios.filter(p => p.id_vino === vino.id_vino);
 
       return {
-        id: product.id,
+        id: vino.id_vino,
         flavor: flavorName,
         category: categoryName,
-        name: product.name,
-        description: product.description,
-        volumen: product.volumen,
-        state: product.state,
-        image: product.image,
+        name: vino.nombre,
+        description: vino.descripcion,
+        volumen: `${vino.volumen_ml} ml`,
+        state: vino.estado === 'D' ? 'Disponible' : 'No disponible',
+        image: vino.url_img_principal,
+        prices: preciosDelVino,
 
-        iconoCategory:
-          categoryName.toLowerCase() === 'dulce'
-            ? '/img/store/icons/droplet-fill.svg'
-            : categoryName.toLowerCase() === 'seco'
-            ? '/img/store/icons/droplet.svg'
-            : categoryName.toLowerCase() === 'semiseco'
-            ? '/img/store/icons/droplet-half.svg'
-            : '',
-
-        iconoFlavor:
-          flavorName.toLowerCase() === 'frambuesas'
-            ? '/img/store/icons/baya.svg'
-            : flavorName.toLowerCase() === 'zarzamoras'
-            ? '/img/store/icons/mora-de-los-pantanos.svg'
-            : flavorName.toLowerCase() === 'arandanos'
-            ? '/img/store/icons/arandanos.svg'
-            : '',
+        iconoCategory: this.getCategoryIcon(categoryName),
+        iconoFlavor: this.getFlavorIcon(flavorName),
       };
     });
+  }
+
+  private getCategoryIcon(category: string): string {
+    const lowerCat = category.toLowerCase();
+    if (lowerCat.includes('dulce')) return '/img/store/icons/droplet-fill.svg';
+    if (lowerCat.includes('seco')) return '/img/store/icons/droplet.svg';
+    if (lowerCat.includes('semiseco')) return '/img/store/icons/droplet-half.svg';
+    return '';
+  }
+
+  private getFlavorIcon(flavor: string): string {
+    const lowerFlavor = flavor.toLowerCase();
+    if (lowerFlavor.includes('frambuesas')) return '/img/store/icons/baya.svg';
+    if (lowerFlavor.includes('zarzamoras')) return '/img/store/icons/mora-de-los-pantanos.svg';
+    if (lowerFlavor.includes('arandanos')) return '/img/store/icons/arandanos.svg';
+    return '';
+  }
+
+  getMainPrice(prices: Precio[] | undefined): Precio | null {
+    if (!prices || prices.length === 0) {
+      return null;
+    }
+
+    const unitPrice = prices.find(p => p.cantidad_minima === 1);
+    return unitPrice || prices[0];
   }
 
   trackById(index: number, item: InternalProduct) {
