@@ -7,7 +7,6 @@ import { ToastContainerComponent } from './shared/components/toast/toast-contain
   selector: 'app-root',
   imports: [RouterOutlet, ToastContainerComponent],
   templateUrl: './app.html',
-  styleUrls: ['./app.css']
 })
 
 export class App implements OnInit, OnDestroy {

@@ -46,6 +46,8 @@ export interface Vino {
   estado: 'D' | 'A' | 'P';
   url_img_principal: string;
   fecha_creacion: Date;
+  sabor?: Sabor;
+  presentacion?: Presentacion;
 }
 
 export interface Precio {

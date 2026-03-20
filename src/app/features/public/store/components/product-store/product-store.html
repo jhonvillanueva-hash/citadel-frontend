@@ -70,11 +70,11 @@
                    lg:group-hover:opacity-100
                    max-lg:bottom-20 max-lg:py-3 max-lg:bg-white/60">
           <button class="bg-transparent border-0 cursor-pointer" [routerLink]="['/store/products', wine.id]">
-            <i class="bi bi-eye-fill text-[#515255] text-[18px]"></i>
+            <fa-icon [icon]="icons.faEye" class="text-[#515255] text-[18px]"/>
           </button>
 
           <button class="bg-transparent border-0 cursor-pointer">
-            <i class="bi bi-cart-fill text-[#515255] text-[18px]"></i>
+            <fa-icon [icon]="icons.faCartShopping" class="text-[#515255] text-[18px]"/>
           </button>
         </div>
 

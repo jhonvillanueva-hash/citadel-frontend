@@ -9,6 +9,8 @@ import { PrecioService } from '../../../../../data/services/precio.service';
 
 import { Precio, Vino } from '../../../../../data/models/api.models';
 import { forkJoin } from 'rxjs';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faCartShopping, faEye } from '@fortawesome/free-solid-svg-icons';
 
 export interface InternalProduct {
   id: number;
@@ -27,11 +29,16 @@ export interface InternalProduct {
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FontAwesomeModule],
   templateUrl: './product-store.html',
 })
 
 export class ProductStore implements OnInit {
+
+  icons = {
+    faEye,
+    faCartShopping
+  }
 
   private vinoService = inject(VinoService);
   private saborService = inject(SaborService);

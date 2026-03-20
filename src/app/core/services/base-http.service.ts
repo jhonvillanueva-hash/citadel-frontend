@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 
@@ -18,6 +18,9 @@ export abstract class BaseHttpService<T> {
     protected apiUrl = environment.apiUrl;
 
     protected abstract pathConfig: PathConfig;
+
+    private cache = new Map<string, { data: any; expiry: number }>();
+    private ttl = 60000;
 
     protected get fullUrl(): string {
         return `${this.apiUrl}${this.getPath()}`;
@@ -49,36 +52,57 @@ export abstract class BaseHttpService<T> {
         offset?: number;
         [key: string]: any;
     }): Observable<T[]> {
+        const key = `${this.fullUrl}?${JSON.stringify(params || {})}`;
+        const cached = this.cache.get(key);
+
+        if (cached && cached.expiry > Date.now()) {
+            return of(cached.data);
+        }
+
         return this.http.get<T[]>(this.fullUrl, {
             params: this.createParams(params),
-        });
+            withCredentials: true,
+        }).pipe(
+            tap(data => {
+            this.cache.set(key, {
+                data,
+                expiry: Date.now() + this.ttl
+            });
+            })
+        );
     }
 
     getById(id: number | string): Observable<T> {
-        return this.http.get<T>(`${this.fullUrl}/${id}`);
+        return this.http.get<T>(`${this.fullUrl}/${id}`, { withCredentials: true });
     }
 
     create(data: Partial<T>): Observable<T> {
-        return this.http.post<T>(this.fullUrl, data);
+        return this.http.post<T>(this.fullUrl, data, {
+            withCredentials: true
+        }).pipe(
+            tap(() => {
+            this.cache.clear();
+            })
+        );
     }
 
     update(id: number | string, data: Partial<T>): Observable<T> {
-        return this.http.put<T>(`${this.fullUrl}/${id}`, data);
+        return this.http.put<T>(`${this.fullUrl}/${id}`, data, { withCredentials: true });
     }
 
     patch(id: number | string, data: Partial<T>): Observable<T> {
-        return this.http.patch<T>(`${this.fullUrl}/${id}`, data);
+        return this.http.patch<T>(`${this.fullUrl}/${id}`, data, { withCredentials: true });
     }
 
     delete(id: number | string): Observable<void> {
-        return this.http.delete<void>(`${this.fullUrl}/${id}`);
+        return this.http.delete<void>(`${this.fullUrl}/${id}`, { withCredentials: true });
     }
 
     findByField(campo: string, valor: any): Observable<T[]> {
         return this.http.post<T[]>(`${this.fullUrl}/buscar`, {
             campo,
             valor,
-        });
+        }, { withCredentials: true });
     }
 
     private createParams(queryParams: any): HttpParams {
@@ -92,5 +116,4 @@ export abstract class BaseHttpService<T> {
         }
         return params;
     }
-
 }

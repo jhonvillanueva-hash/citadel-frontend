@@ -1,6 +1,6 @@
 import { Injectable, signal, inject, computed, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, catchError, throwError, finalize, BehaviorSubject } from 'rxjs';
+import { Observable, tap, catchError, throwError, finalize, BehaviorSubject, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../../environments/environment';
@@ -62,8 +62,10 @@ export class AuthService {
     this.refreshTokenSubject.next(token);
   }
 
-  public notifyRefreshTokenError(): void {
+  public notifyRefreshTokenError(error: any): void {
     this.isRefreshing = false;
+    this.refreshTokenSubject.error(error);
+    this.refreshTokenSubject = new BehaviorSubject<string | null>(null);
     this.handleLogout();
   }
 
@@ -89,20 +91,29 @@ export class AuthService {
 
   logout(): void {
     this.http
-      .post(`${this.apiUrl}/logout`, {})
-      .pipe(finalize(() => this.handleLogout()))
+      .post(`${this.apiUrl}/logout`, {}, {
+        withCredentials: true
+      })
+      .pipe(
+        catchError(() => of(null)),
+        finalize(() => this.handleLogout())
+      )
       .subscribe();
   }
 
   refreshToken(): Observable<LoginResponse> {
     return this.http
-      .post<LoginResponse>(`${this.apiUrl}/refresh`, {})
+      .post<LoginResponse>(`${this.apiUrl}/refresh`, {}, {
+        withCredentials: true
+      })
       .pipe(
         tap(res => {
           this.handleLoginSuccess(res.accessToken);
         }),
         catchError(err => {
-          this.handleLogout();
+          if (err.status === 401 || err.status === 403) {
+            this.handleLogout();
+          }
           return throwError(() => err);
         }),
         finalize(() => this.isInitializing.set(false))

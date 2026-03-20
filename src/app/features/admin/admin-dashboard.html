@@ -1,0 +1,161 @@
+@if (authService.isInitializing() || !currentUser()) {
+  <div class="flex items-center justify-center mt-20 space-x-3">
+    <svg class="animate-spin h-5 w-5 text-[var(--admin-bg-icon)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+    </svg>
+
+    <p class="text-[var(--admin-bg-icon)] text-lg font-medium">
+      Verificando permisos...
+    </p>
+  </div>
+} @else {
+  @if (currentUser()?.tipo === 'A') {
+    <div class="min-h-screen flex bg-[var(--admin-bg)] relative">
+      <aside class="sidebar fixed z-30 inset-y-0 left-0 bg-[var(--admin-bg-aside)] text-white flex flex-col
+              transition-all duration-300
+              md:translate-x-0
+              -translate-x-full md:translate-x-0"
+        [class.w-16]="!sidebarOpen"
+        [class.w-52]="sidebarOpen"
+        [class.translate-x-0]="sidebarOpen"
+        [class.-translate-x-full]="!sidebarOpen"
+        role="navigation"
+        aria-label="Menú lateral administración">
+      
+        <div class="flex items-center gap-2 px-4 border-b border-[var(--admin-bg-aside-light)] min-h-[64px] overflow-hidden"
+            [class.justify-center]="!sidebarOpen"
+            [class.px-0]="!sidebarOpen">
+          <span class="w-8 h-8 shrink-0 rounded-lg bg-[var(--admin-bg-icon)] flex items-center justify-center shadow-md">
+            <fa-icon [icon]="icons.faShieldVirus" class="text-white text-sm"/>
+          </span>
+          <span class="brand-name text-base font-bold tracking-tight whitespace-nowrap" [class.hidden]="!sidebarOpen">
+            CITADEL
+          </span>
+        </div>
+      
+        <nav class="flex-1 px-2 py-5 flex flex-col gap-1">
+      
+          <p
+            class="nav-section text-[10px] font-semibold uppercase tracking-widest text-[color:var(--admin-bg-icon)]/70 px-3 mb-2 whitespace-nowrap" [class.hidden]="!sidebarOpen">
+            General
+          </p>
+      
+          <app-admin-sidebar-item
+            [icon]="icons.faChartLine"
+            label="Estadísticas"
+            route="/admin/statistics"
+            title="Estadísticas"
+            [sidebarOpen]="sidebarOpen"
+            (linkClicked)="sidebarOpen = false">
+          </app-admin-sidebar-item>
+
+          <app-admin-sidebar-item
+            [icon]="icons.faWineBottle"
+            label="Vinos"
+            title="Menú de vinos"
+            [sidebarOpen]="sidebarOpen"
+            [children]="[
+              { label:'Ver vinos', route:'/admin/wines' },
+              { label:'Registrar vinos', route:'/admin/wines/create' }
+            ]"
+            menuKey="vinos"
+            [(expandedMenu)]="expandedMenu"
+            (linkClicked)="sidebarOpen = false">
+          </app-admin-sidebar-item>
+      
+
+          <app-admin-sidebar-item
+            [icon]="icons.faUser"
+            label="Usuarios"
+            title="Menú de Usuarios"
+            [sidebarOpen]="sidebarOpen"
+            [children]="[
+              { label:'Ver usuarios', route:'/admin/users', title:'Listado de usuarios' },
+              { label:'Roles y permisos', route:'/admin/roles', title:'Gestión de roles' }
+            ]"
+            menuKey="usuarios"
+            [(expandedMenu)]="expandedMenu"
+            (linkClicked)="sidebarOpen = false">
+          </app-admin-sidebar-item>
+      
+          <p
+            class="nav-section text-[10px] font-semibold uppercase tracking-widest text-[color:var(--admin-bg-icon)]/70 px-3 mt-4 mb-2 whitespace-nowrap" [class.hidden]="!sidebarOpen">
+            Configuración
+          </p>
+
+          <app-admin-sidebar-item
+            [icon]="icons.faRobot"
+            label="IA"
+            route="/admin/ai"
+            title="IA"
+            [sidebarOpen]="sidebarOpen">
+          </app-admin-sidebar-item>
+
+      
+        </nav>
+      
+        <div class="px-2 py-4 border-t border-[var(--admin-bg-aside-light)] mt-auto">
+          <button (click)="logout()"
+                  class="nav-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[var(--admin-bg-aside-light)] hover:text-[var(--admin-bg-icon)] transition-all duration-150 text-sm font-medium"
+                  [class.justify-center]="!sidebarOpen"
+                  [class.px-0]="!sidebarOpen"
+                  aria-label="Cerrar sesión" title="Cerrar sesión">
+            <fa-icon [icon]="icons.faArrowRightFromBracket" class="shrink-0 w-4 text-center text-base"/>
+            <span class="logout-label whitespace-nowrap" [class.hidden]="!sidebarOpen">
+              Cerrar sesión
+            </span>
+          </button>
+        </div>
+      </aside>
+      <div class="fixed inset-0 bg-black/50 z-20 backdrop-blur-sm transition-opacity duration-300 md:hidden"
+        [class.opacity-0]="!sidebarOpen" [class.pointer-events-none]="!sidebarOpen" (click)="sidebarOpen = false"
+        aria-hidden="true">
+      </div>
+
+      <div
+        class="main-content flex-1 min-h-screen flex flex-col
+              transition-all duration-300
+              ml-0 md:ml-52"
+        [class.md:ml-16]="!sidebarOpen"
+        [class.md:ml-52]="sidebarOpen">
+        <header class="bg-white border-b border-[var(--admin-bg-light)] px-4 flex items-center gap-3 sticky top-0 z-10 shadow-sm min-h-[64px]">
+          <button
+            class="p-2 rounded-lg border border-[var(--admin-bg-light)] hover:bg-[var(--admin-bg)] text-[color:var(--admin-bg-icon)] transition-all active:scale-95"
+            (click)="sidebarOpen = !sidebarOpen" [attr.aria-label]="sidebarOpen ? 'Colapsar menú' : 'Expandir menú'">
+            <fa-icon
+              [icon]="sidebarOpen ? icons.faBarsStaggered : icons.faBars"
+              class="text-base transition-all duration-200"/>
+          </button>
+          <div class="h-5 w-px bg-[var(--admin-bg-light)]"></div>
+          <h1 class="text-sm font-semibold text-[color:var(--admin-bg-icon)]">
+            Panel de Administración
+          </h1>
+          <div class="flex-1"></div>
+          <div class="flex items-center gap-2 bg-[var(--admin-bg)] rounded-full px-3 py-1.5">
+            <span class="w-6 h-6 rounded-full bg-[var(--admin-bg-icon)] flex items-center justify-center shrink-0">
+              <fa-icon [icon]="icons.faUser" class="text-white text-xs"/>
+            </span>
+            <span class="text-xs font-medium text-gray-700 hidden sm:inline">
+              Admin
+            </span>
+          </div>
+        </header>
+
+        <main class="flex-1 p-6">
+          <router-outlet></router-outlet>
+        </main>
+      </div>
+    </div>
+  } @else {
+    <div class="flex items-center justify-center min-h-screen bg-[var(--admin-bg)]">
+      <div class="bg-white rounded-xl p-8 shadow text-center max-w-sm">
+        <fa-icon [icon]="icons.faShield" class="text-4xl text-[color:var(--admin-bg-icon)]"/>
+        <p class="mt-3 text-gray-700 font-medium">Sin permisos de acceso</p>
+        <p class="mt-1 text-sm text-gray-400">
+          No tiene permisos para acceder a esta sección.
+        </p>
+      </div>
+    </div>
+  }
+}

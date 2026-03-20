@@ -36,6 +36,12 @@ body {
 
   --xd: #647fa0;
   --xd2: #f13847;
+
+  --admin-bg: #f8ecee;
+  --admin-bg-icon: #c35b64;
+  --admin-bg-aside: #2a1f21;
+  --admin-bg-aside-light: #3a2a2d;
+  --admin-bg-light: #f1d6d9;
 }
 
 @keyframes toast-in {

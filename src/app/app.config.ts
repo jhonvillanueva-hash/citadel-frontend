@@ -35,7 +35,7 @@ export const appConfig: ApplicationConfig = {
       })
     ),
     provideHttpClient(
-      withInterceptors([authInterceptor, errorInterceptor]),
+      withInterceptors([errorInterceptor, authInterceptor]),
       withXsrfConfiguration({ cookieName: 'XSRF-TOKEN', headerName: 'X-XSRF-TOKEN' }),
       withFetch(),
     ),
