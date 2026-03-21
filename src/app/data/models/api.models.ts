@@ -82,3 +82,9 @@ export interface Pago {
   monto: number;
   estado: string;
 }
+
+export interface Banner {
+  id_imagen: number;
+  url_img: string;
+  fecha_expiracion?: Date;
+}

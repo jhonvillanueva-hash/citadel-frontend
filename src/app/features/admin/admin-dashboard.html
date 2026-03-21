@@ -63,7 +63,20 @@
             [(expandedMenu)]="expandedMenu"
             (linkClicked)="sidebarOpen = false">
           </app-admin-sidebar-item>
-      
+
+          <app-admin-sidebar-item
+            [icon]="icons.faImage"
+            label="Banners"
+            title="Menú de banners"
+            [sidebarOpen]="sidebarOpen"
+            [children]="[
+              { label:'Ver banners', route:'/admin/banners' },
+              { label:'Registrar banners', route:'/admin/banners/create' }
+            ]"
+            menuKey="banners"
+            [(expandedMenu)]="expandedMenu"
+            (linkClicked)="sidebarOpen = false">
+          </app-admin-sidebar-item>
 
           <app-admin-sidebar-item
             [icon]="icons.faUser"

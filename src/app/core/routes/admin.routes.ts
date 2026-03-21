@@ -5,6 +5,8 @@ import { Statistics } from '../../features/admin/statistics/statistics';
 import { Users } from '../../features/admin/users/users';
 import { WinesCreateComponent } from '../../features/admin/wines/wines-create/wines-create';
 import { WinesListComponent } from '../../features/admin/wines/wines-list/wines-list';
+import { BannersCreateComponent } from '../../features/admin/banners/banners-create/banners-create';
+import { BannersListComponent } from '../../features/admin/banners/banners-list/banners-list';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -31,6 +33,14 @@ export const ADMIN_ROUTES: Routes = [
       {
         path: 'ai',
         component: AIComponent
+      },
+      {
+        path: 'banners',
+        component: BannersListComponent
+      },
+      {
+        path: 'banners/create',
+        component: BannersCreateComponent
       },
       {
         path: '',

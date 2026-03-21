@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable, of, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 
@@ -19,8 +19,6 @@ export abstract class BaseHttpService<T> {
 
     protected abstract pathConfig: PathConfig;
 
-    private cache = new Map<string, { data: any; expiry: number }>();
-    private ttl = 60000;
 
     protected get fullUrl(): string {
         return `${this.apiUrl}${this.getPath()}`;
@@ -52,24 +50,9 @@ export abstract class BaseHttpService<T> {
         offset?: number;
         [key: string]: any;
     }): Observable<T[]> {
-        const key = `${this.fullUrl}?${JSON.stringify(params || {})}`;
-        const cached = this.cache.get(key);
-
-        if (cached && cached.expiry > Date.now()) {
-            return of(cached.data);
-        }
-
         return this.http.get<T[]>(this.fullUrl, {
             params: this.createParams(params),
-            withCredentials: true,
-        }).pipe(
-            tap(data => {
-            this.cache.set(key, {
-                data,
-                expiry: Date.now() + this.ttl
-            });
-            })
-        );
+        });
     }
 
     getById(id: number | string): Observable<T> {
@@ -77,13 +60,7 @@ export abstract class BaseHttpService<T> {
     }
 
     create(data: Partial<T>): Observable<T> {
-        return this.http.post<T>(this.fullUrl, data, {
-            withCredentials: true
-        }).pipe(
-            tap(() => {
-            this.cache.clear();
-            })
-        );
+        return this.http.post<T>(this.fullUrl, data);
     }
 
     update(id: number | string, data: Partial<T>): Observable<T> {

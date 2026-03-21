@@ -1,0 +1,98 @@
+<form 
+  [formGroup]="bannerForm" 
+  (ngSubmit)="onSubmit()"
+  class="mx-auto flex w-full max-w-2xl flex-col gap-8 rounded-2xl border border-admin-bg-light/30 bg-white p-6 shadow-apple-soft sm:p-10"
+>
+  <div class="flex flex-col gap-1.5">
+    <h2 class="text-xl font-semibold tracking-tight text-admin-bg-aside">Nuevo Banner para la Landing Page</h2>
+    <p class="text-sm text-admin-bg-aside/60">
+      Suba una imagen y configura su disponibilidad en la página.
+    </p>
+  </div>
+
+  <div class="flex flex-col gap-6">
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium text-admin-bg-aside">
+        Imagen del Banner
+        <span class="text-admin-bg-icon">*</span>
+      </label>
+      
+      <div 
+        class="group relative flex cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-admin-bg-light/70 bg-admin-bg/30 px-6 py-12 transition-all duration-300 ease-out hover:border-admin-bg-icon/50 hover:bg-admin-bg-light/20 bg-cover bg-center"
+        [style.backgroundImage]="imagePreview ? 'url(' + imagePreview + ')' : ''"
+      >
+        
+        @if (imagePreview) {
+          <div class="absolute inset-0 bg-white/60 backdrop-blur-[2px] transition-opacity group-hover:bg-white/40"></div>
+        }
+
+        <input
+          id="imagen"
+          type="file"
+          (change)="onFileChange($event)"
+          accept="image/*"
+          class="absolute inset-0 z-30 h-full w-full cursor-pointer opacity-0"
+        />
+
+        <div class="relative z-20 flex flex-col items-center">
+          <div class="flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-sm transition-colors duration-300 group-hover:text-admin-bg-icon text-admin-bg-aside/40">
+            <fa-icon [icon]="icons.faUpload" class="text-xl" />
+          </div>
+
+          <div class="mt-4 text-center">
+            <p class="text-sm font-medium text-admin-bg-aside">
+              {{ imagePreview ? 'Haz clic para cambiar la imagen' : 'Haz clic para buscar o arrastra un archivo' }}
+            </p>
+            <p class="mt-1 text-xs text-admin-bg-aside/50">
+              Recomendado: JPG, PNG o WEBP de alta calidad
+            </p>
+          </div>
+        </div>
+      </div>
+
+      @if (bannerForm.get('imagen')?.touched && bannerForm.get('imagen')?.invalid) {
+        <div class="flex animate-in slide-in-from-top-1 items-center gap-1.5 pl-1 pt-1 text-sm font-medium text-admin-bg-icon">
+          <fa-icon [icon]="icons.faCircleExclamation" class="text-xs" />
+          <span>La imagen es obligatoria para continuar.</span>
+        </div>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="fecha_expiracion" class="flex items-center gap-1 text-sm font-medium text-admin-bg-aside">
+        Fecha de expiración
+        <span class="text-xs font-normal text-admin-bg-aside/40">(Opcional)</span>
+      </label>
+      
+      <div class="relative">
+        <input
+          id="fecha_expiracion"
+          type="date"
+          formControlName="fecha_expiracion"
+          [min]="minDate"
+          class="w-full rounded-xl border border-admin-bg-light/60 bg-admin-bg/20 px-4 py-3 text-sm text-admin-bg-aside transition-all duration-300 hover:border-admin-bg-light focus:border-admin-bg-icon focus:bg-white focus:outline-none focus:ring-4 focus:ring-admin-bg-icon/10"
+        />
+      </div>
+    </div>
+  </div>
+
+  <hr class="border-admin-bg-light/40" />
+
+  <div class="flex justify-end">
+    <button 
+      type="submit" 
+      [disabled]="bannerForm.invalid || loading"
+      class="group inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--admin-bg-icon)] px-6 py-3 text-sm font-medium text-white transition-all duration-300 ease-out hover:bg-admin-bg-aside-light focus:outline-none focus:ring-4 focus:ring-admin-bg-aside/20 disabled:cursor-not-allowed disabled:bg-admin-bg-aside/30 disabled:text-white/70 active:scale-[0.98]"
+    >
+      <span>
+        {{ loading ? 'Cargando...' : 'Crear Banner' }}
+      </span>
+      @if (!loading) {
+        <fa-icon [icon]="icons.faCheck" class="text-xs transition-transform group-hover:scale-110" />
+      }
+      @if (loading) {
+        <fa-icon [icon]="icons.faSpinner" class="text-xs animate-spin" />
+      }
+    </button>
+  </div>
+</form>
