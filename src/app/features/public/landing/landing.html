@@ -1,5 +1,17 @@
-<app-hero-landing></app-hero-landing>
+<app-hero-landing />
+<app-info-landing />
 
-<app-info-landing></app-info-landing>
+<app-fab-stack>
+  <app-ai-button 
+    (toggle)="toggleAi()"
+    class="relative z-[110]" 
+  />
+<app-whatsapp-button class="relative z-[100]" />
+</app-fab-stack>
 
-<app-footer-landing></app-footer-landing>
+<app-ai-chat-widget
+  [open]="aiOpen"
+  (close)="closeAi()"
+/>
+
+<app-footer-landing />

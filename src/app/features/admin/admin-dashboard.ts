@@ -32,6 +32,14 @@ export class AdminDashboardComponent {
     faImage,
   };
 
+  toggleSidebar() {
+    this.sidebarOpen = !this.sidebarOpen;
+    const triggerResize = () => window.dispatchEvent(new Event('resize'));
+    triggerResize();
+    setTimeout(triggerResize, 150);
+    setTimeout(triggerResize, 310);
+  }
+
   logout() {
     this.authService.logout();
   }

@@ -1,0 +1,94 @@
+@if(open) {
+  <div class="
+      fixed bottom-0 right-0 sm:bottom-4 sm:right-4
+      w-full sm:w-[360px]
+      h-[60vh] sm:h-[420px]
+      max-h-[90vh]
+      bg-white
+      rounded-t-xl sm:rounded-xl
+      shadow-xl
+      border border-gray-400
+      overflow-hidden
+      flex flex-col
+      z-[150]
+      animate-[fadeIn_0.2s_ease-out]
+    ">
+
+    <div class="p-3 border-b-2 border-gray-400 flex justify-between items-center">
+      <span class="font-semibold text-sm text-gray-900">
+        Asistente de IA de Citadel
+      </span>
+      <button (click)="close.emit()" class="text-gray-700 hover:text-gray-900 text-lg leading-none transition">
+        ✕
+      </button>
+    </div>
+
+    <div class="flex-1 p-3 overflow-y-auto text-sm text-gray-900">
+      @if(messages().length === 0) {
+        <p class="text-gray-700">
+          Hola, ¡Puedes preguntarme lo que desees sobre Vinos Citadel!
+        </p>
+      }
+
+      @for(msg of messages(); track msg.id) {
+        <app-ai-user-message
+          [text]="msg.text"
+          [role]="msg.role"
+          [status]="msg.status">
+        </app-ai-user-message>
+      }
+    </div>
+
+    <div class="p-3 border-t-2 border-gray-400">
+      <div class="relative">
+        <textarea id="aiInput" rows="1" placeholder="Escribe..." [(ngModel)]="text" (input)="onInput($event)"
+          (focus)="isFocused = true" (blur)="isFocused = false" (keydown)="onKeyDown($event)" [ngClass]="!isFocused ? 'animate-borderFlow' : ''"
+          class="
+            w-full resize-none
+            border-2 border-gray-400
+            rounded
+            px-3 pt-2
+            pb-7
+            text-sm text-gray-900
+            bg-white
+            outline-none
+            placeholder:text-gray-500
+            focus:border-[var(--admin-bg-icon)]
+            transition-all duration-300
+            max-h-[120px]
+            overflow-hidden
+        ">
+        </textarea>
+
+        <div class="absolute bottom-3 right-2 flex items-center gap-1.5">
+          <span
+            class="text-[10px] leading-none"
+            [ngClass]="{
+              'text-gray-600': !isNearLimit,
+              'text-yellow-900': isNearLimit && !isAtLimit,
+              'text-red-500': isAtLimit,
+              'font-semibold': isNearLimit
+            }"
+          >
+            {{ charCount }}/{{ MAX_LENGTH }}
+          </span>
+          <button 
+            class="
+              w-7 h-7
+              flex items-center justify-center
+              bg-[var(--admin-bg-icon)] text-white
+              rounded-full
+              hover:bg-[var(--admin-bg-icon-dark)]
+              active:scale-95
+              transition
+              disabled:opacity-50 disabled:cursor-not-allowed"
+              [disabled]="!text.trim()"
+              (click)="sendMessage()">
+            <fa-icon [icon]="icons.faPaperPlane" class="text-sm" />
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+}

@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBasketShopping, faCalculator, faCircleCheck, faSackDollar, faUserPlus, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { NgApexchartsModule } from 'ng-apexcharts';
-import { ApexChart, ApexXAxis, ApexAxisChartSeries } from 'ng-apexcharts';
+import { ApexChart, ApexXAxis, ApexAxisChartSeries,  } from 'ng-apexcharts';
 
 @Component({
   selector: 'app-statistics',
@@ -24,7 +24,8 @@ export class Statistics {
     type: "line",
     height: 350,
     toolbar: { show: false },
-    zoom: { enabled: false }
+    zoom: { enabled: false },
+    redrawOnParentResize: true
   };
 
   xaxis: ApexXAxis = {
@@ -35,7 +36,8 @@ export class Statistics {
 
   topProductosGrafico: ApexChart = {
     type: "pie",
-    height: 350
+    height: 350,
+    redrawOnParentResize: true
   };
 
   topProductosLabels: string[] = [
@@ -49,7 +51,8 @@ export class Statistics {
 
   estadosPedidosGrafico: ApexChart = {
     type: "pie",
-    height: 350
+    height: 350,
+    redrawOnParentResize: true
   };
 
   estadosPedidosLabels: string[] = ["Completados", "Pendientes", "Cancelados"];
@@ -58,7 +61,8 @@ export class Statistics {
 
   metodosPagoGrafico: ApexChart = {
     type: "pie",
-    height: 350
+    height: 350,
+    redrawOnParentResize: true
   };
 
   metodosPagoLabels: string[] = ["Tarjeta", "Efectivo", "Transferencia"];
@@ -67,7 +71,8 @@ export class Statistics {
 
   tiposProductosGrafico: ApexChart = {
     type: "pie",
-    height: 350
+    height: 350,
+    redrawOnParentResize: true
   };
 
   tiposProductosLabels: string[] = ["Vinos", "Cervezas", "Licores"];
@@ -82,7 +87,8 @@ export class Statistics {
   departamentosVentasGrafico: ApexChart = {
     type: "bar",
     height: 350,
-    toolbar: { show: false }
+    toolbar: { show: false },
+    redrawOnParentResize: true
   };
 
   departamentosVentasCategorias: string[] = ["Departamento A", "Departamento B", "Departamento C", "Departamento D", "Departamento E"];
@@ -97,7 +103,8 @@ export class Statistics {
   productosBajoStockGrafico: ApexChart = {
     type: "bar",
     height: 350,
-    toolbar: { show: false }
+    toolbar: { show: false },
+    redrawOnParentResize: true
   };
 
   productosBajoStockCategorias: string[] = ["Producto A", "Producto B", "Producto C", "Producto D", "Producto E"];
