@@ -19,6 +19,7 @@ export abstract class BaseHttpService<T> {
 
     protected abstract pathConfig: PathConfig;
 
+
     protected get fullUrl(): string {
         return `${this.apiUrl}${this.getPath()}`;
     }
@@ -55,7 +56,7 @@ export abstract class BaseHttpService<T> {
     }
 
     getById(id: number | string): Observable<T> {
-        return this.http.get<T>(`${this.fullUrl}/${id}`);
+        return this.http.get<T>(`${this.fullUrl}/${id}`, { withCredentials: true });
     }
 
     create(data: Partial<T>): Observable<T> {
@@ -63,22 +64,22 @@ export abstract class BaseHttpService<T> {
     }
 
     update(id: number | string, data: Partial<T>): Observable<T> {
-        return this.http.put<T>(`${this.fullUrl}/${id}`, data);
+        return this.http.put<T>(`${this.fullUrl}/${id}`, data, { withCredentials: true });
     }
 
     patch(id: number | string, data: Partial<T>): Observable<T> {
-        return this.http.patch<T>(`${this.fullUrl}/${id}`, data);
+        return this.http.patch<T>(`${this.fullUrl}/${id}`, data, { withCredentials: true });
     }
 
     delete(id: number | string): Observable<void> {
-        return this.http.delete<void>(`${this.fullUrl}/${id}`);
+        return this.http.delete<void>(`${this.fullUrl}/${id}`, { withCredentials: true });
     }
 
     findByField(campo: string, valor: any): Observable<T[]> {
         return this.http.post<T[]>(`${this.fullUrl}/buscar`, {
             campo,
             valor,
-        });
+        }, { withCredentials: true });
     }
 
     private createParams(queryParams: any): HttpParams {
@@ -92,5 +93,4 @@ export abstract class BaseHttpService<T> {
         }
         return params;
     }
-
 }

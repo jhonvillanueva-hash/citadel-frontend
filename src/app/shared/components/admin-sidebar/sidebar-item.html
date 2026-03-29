@@ -1,0 +1,94 @@
+<div
+  class="relative group"
+  routerLinkActive
+  #rla="routerLinkActive"
+  [routerLinkActiveOptions]="{ exact:false }"
+  >
+
+  @if (!children.length) {
+    <a
+      class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-[#3a2a2d] hover:text-white transition-all duration-150 text-sm font-medium"
+      [routerLink]="route"
+      routerLinkActive="!bg-[#c35b64] !text-white"
+      [class.justify-center]="!sidebarOpen"
+      [class.px-0]="!sidebarOpen"
+      [class.gap-0]="!sidebarOpen"
+      [title]="title"
+      (click)="onLinkClick()">
+
+      <span class="w-4 flex items-center justify-center shrink-0">
+        <fa-icon [icon]="icon"/>
+      </span>
+
+      <span class="nav-label whitespace-nowrap" [class.hidden]="!sidebarOpen">
+        {{ label }}
+      </span>
+
+    </a>
+  }
+
+  @if (children.length) {
+    <div
+      class="nav-link flex items-center w-full px-3 py-2.5 rounded-lg text-gray-300 hover:bg-[#3a2a2d] hover:text-white transition-all duration-150 cursor-pointer text-sm font-medium"
+      [class.!bg-[#c35b64]]="rla.isActive"
+      [class.!text-white]="rla.isActive"
+      [class.justify-center]="!sidebarOpen"
+      [class.px-0]="!sidebarOpen"
+      [class.gap-0]="!sidebarOpen"
+      [class.gap-3]="sidebarOpen"
+      (click)="toggle()"
+      [title]="title">
+
+      <span class="w-4 flex items-center justify-center shrink-0">
+        <fa-icon [icon]="icon"/>
+      </span>
+
+      <span
+        class="nav-label whitespace-nowrap flex-1 text-left"
+        [class.hidden]="!sidebarOpen">
+        {{ label }}
+      </span>
+
+      <fa-icon
+        class="text-[10px] transition-transform duration-200 md:hidden"
+        [icon]="icons.faChevronDown"
+        [class.hidden]="!sidebarOpen"
+        [class.rotate-180]="expandedMenu === menuKey"
+      />
+
+    </div>
+
+  }
+
+  @if (children.length) {
+    <div
+      class="flex-col gap-1 pl-10 mt-1
+      md:absolute md:left-[calc(100%+0.5rem)] md:top-0 md:w-44 md:bg-[#2a1f21]
+      md:rounded-lg md:border md:border-[#3a2a2d] md:shadow-xl md:p-2 md:pl-2
+      md:opacity-0 md:invisible md:group-hover:opacity-100 md:group-hover:visible
+      md:z-[60] md:flex md:transition-all md:duration-200"
+      [class.hidden]="expandedMenu !== menuKey"
+      [class.flex]="expandedMenu === menuKey">
+
+      <div
+        class="hidden md:block absolute -left-2 top-3 w-0 h-0
+        border-t-[6px] border-t-transparent
+        border-r-[8px] border-r-[#3a2a2d]
+        border-b-[6px] border-b-transparent">
+      </div>
+
+      @for (child of children; track child.route) {
+        <a
+          class="text-xs text-gray-300 hover:text-white hover:bg-[#3a2a2d] px-3 py-2 rounded-md transition-colors whitespace-nowrap"
+          [routerLink]="child.route"
+          routerLinkActive="text-white"
+          (click)="onLinkClick()">
+          {{ child.label }}
+        </a>
+      }
+
+    </div>
+
+  }
+
+</div>

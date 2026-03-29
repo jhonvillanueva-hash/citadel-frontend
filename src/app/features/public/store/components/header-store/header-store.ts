@@ -1,5 +1,7 @@
 import { Component } from '@angular/core'
 import { CommonModule } from '@angular/common'
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faCartShopping, faList } from '@fortawesome/free-solid-svg-icons';
 
 export interface FlavorWine {
   id: number
@@ -27,12 +29,17 @@ export const internalNavs: InternalNav[] = [
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FontAwesomeModule],
   templateUrl: './header-store.html',
   styles: ``,
 })
 
 export class HeaderStore {
+
+  icons = {
+    faCartShopping,
+    faList
+  }
 
   internalNavs: InternalNav[] = internalNavs
 

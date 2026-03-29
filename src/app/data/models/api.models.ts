@@ -46,6 +46,8 @@ export interface Vino {
   estado: 'D' | 'A' | 'P';
   url_img_principal: string;
   fecha_creacion: Date;
+  sabor?: Sabor;
+  presentacion?: Presentacion;
 }
 
 export interface Precio {
@@ -79,4 +81,10 @@ export interface Pago {
   metodo: 'E' | 'T';
   monto: number;
   estado: string;
+}
+
+export interface Banner {
+  id_imagen: number;
+  url_img: string;
+  fecha_expiracion?: Date;
 }

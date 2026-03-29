@@ -1,1 +1,136 @@
-<p>statistics works</p>
+<div class="min-h-screen">
+
+  <div class="max-w-7xl mx-auto space-y-6 md:space-y-8">
+
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl md:text-3xl font-bold text-slate-800">Resumen General</h1>
+    </div>
+
+    <div class="mx-auto">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-6 justify-content-center">
+
+        <div
+          class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
+          <div class="flex-shrink-0 p-2 sm:p-3 rounded-full bg-indigo-50 text-indigo-600">
+            <fa-icon [icon]="icons.faSackDollar" class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"/>
+          </div>
+          <div class="min-w-0">
+            <h3 class="text-xs sm:text-sm font-medium text-slate-500">Ventas Totales</h3>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">
+              {{ kpiData.totalSales | currency }}
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
+          <div class="flex-shrink-0 p-2 sm:p-3 rounded-full bg-emerald-50 text-emerald-600">
+            <fa-icon [icon]="icons.faBasketShopping" class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"/>
+          </div>
+          <div>
+            <h3 class="text-xs sm:text-sm font-medium text-slate-500">Productos Vendidos</h3>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">
+              {{ kpiData.productsSold }}
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
+          <div class="flex-shrink-0 p-2 sm:p-3 rounded-full bg-blue-50 text-blue-600">
+            <fa-icon [icon]="icons.faUsers" class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"/>
+          </div>
+          <div>
+            <h3 class="text-xs sm:text-sm font-medium text-slate-500">Total Usuarios</h3>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">
+              {{ kpiData.totalUsers }}
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
+          <div class="flex-shrink-0 p-2 sm:p-3 rounded-full bg-rose-50 text-rose-600">
+            <fa-icon [icon]="icons.faCircleCheck" class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"/>
+          </div>
+          <div>
+            <h3 class="text-xs sm:text-sm font-medium text-slate-500">Compraron</h3>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">
+              {{ kpiData.usersPurchased }}
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
+          <div class="flex-shrink-0 p-2 sm:p-3 rounded-full bg-amber-50 text-amber-600">
+            <fa-icon [icon]="icons.faUserPlus" class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"/>
+          </div>
+          <div>
+            <h3 class="text-xs sm:text-sm font-medium text-slate-500">Clientes Nuevos</h3>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">
+              {{ kpiData.newClients }}
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
+          <div class="flex-shrink-0 p-2 sm:p-3 rounded-full bg-slate-100 text-slate-600">
+            <fa-icon [icon]="icons.faCalculator" class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"/>
+          </div>
+          <div>
+            <h3 class="text-xs sm:text-sm font-medium text-slate-500">Costo Promedio</h3>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">
+              {{ kpiData.avgSaleCost | currency }}
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <div class="bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 lg:col-span-2 min-w-0 overflow-hidden">
+        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-4">Total de Ventas (Últimos 12 meses)</h3>
+        <apx-chart [series]="datos" [chart]="grafico" [xaxis]="xaxis"></apx-chart>
+      </div>
+
+      <div class="bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
+        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-4">Top Productos</h3>
+        <apx-chart [series]="topProductosDatos" [chart]="topProductosGrafico" [labels]="topProductosLabels"></apx-chart>
+      </div>
+
+      <div class="bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
+        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-4">Estados de Pedidos</h3>
+        <apx-chart [series]="estadosPedidosDatos" [chart]="estadosPedidosGrafico"
+          [labels]="estadosPedidosLabels"></apx-chart>
+      </div>
+
+      <div class="bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
+        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-4">Métodos de Pago</h3>
+        <apx-chart [series]="metodosPagoDatos" [chart]="metodosPagoGrafico" [labels]="metodosPagoLabels"></apx-chart>
+      </div>
+
+      <div class="bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
+        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-4">Tipos de Productos Vendidos</h3>
+        <apx-chart [series]="tiposProductosDatos" [chart]="tiposProductosGrafico"
+          [labels]="tiposProductosLabels"></apx-chart>
+      </div>
+
+      <div class="bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
+        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-4">Departamentos con Más Ventas</h3>
+        <apx-chart [series]="departamentosVentasDatos" [chart]="departamentosVentasGrafico"
+          [xaxis]="{ categories: departamentosVentasCategorias }"></apx-chart>
+      </div>
+
+      <div class="bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
+        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-4">Productos con Menos Stock</h3>
+        <apx-chart [series]="productosBajoStockDatos" [chart]="productosBajoStockGrafico"
+          [xaxis]="{ categories: productosBajoStockCategorias }"></apx-chart>
+      </div>
+
+    </div>
+  </div>
+</div>

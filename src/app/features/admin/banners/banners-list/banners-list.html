@@ -1,0 +1,95 @@
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+
+  @if (dataBanners() === null) {
+    <div class="col-span-full flex min-h-[40vh] flex-col items-center justify-center gap-4 text-[color:var(--admin-bg-aside)]/60">
+      <fa-icon [icon]="icons.faSpinner" class="animate-spin text-3xl text-[color:var(--admin-bg-icon)]" />
+      <p class="text-sm font-medium tracking-wide">Cargando banners...</p>
+    </div>
+  }
+  
+  @else if (dataBanners()!.length === 0) {
+    <div class="col-span-full flex min-h-[40vh] flex-col items-center justify-center gap-3 rounded-2xl border border-[var(--admin-bg-light)] border-dashed px-6 py-12 text-center">
+      <div class="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--admin-bg-light)]/30 text-[color:var(--admin-bg-aside)]/40">
+        <fa-icon [icon]="icons.faImage" class="text-2xl" />
+      </div>
+      <p class="text-base font-medium text-[color:var(--admin-bg-aside)]">Actualmente no hay banners</p>
+      <p class="text-sm text-[color:var(--admin-bg-aside)]/60">Los banners que registres aparecerán aquí.</p>
+    </div>
+  }
+  
+  @else {
+    @for (banner of dataBanners(); let i = $index; track banner.id_imagen) {
+      <div class="group relative flex h-[320px] flex-col overflow-hidden rounded-2xl border border-[var(--admin-bg-light)]/40 bg-white shadow-apple-soft transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-apple-hover">
+
+        <div class="relative flex-1 overflow-hidden bg-[var(--admin-bg-light)]/30 animate-pulse">
+          <img
+            #img
+            [src]="banner.url_img" 
+            alt="Banner {{ banner.id_imagen }}" 
+            (load)="img.parentElement && img.parentElement.classList.remove('animate-pulse'); img.classList.remove('opacity-0')"
+            class="h-full w-full object-cover opacity-0 transition-all duration-700 ease-out group-hover:scale-105" 
+          />
+
+          <div class="pointer-events-none absolute inset-0 flex items-start justify-between p-2">
+            
+            <span class="pointer-events-auto inline-flex items-center rounded-full bg-black/60 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur-sm">
+              Banner {{ i + 1 }}
+            </span>
+
+            <button 
+              (click)="deleteBanner(banner.id_imagen)"
+              class="pointer-events-auto flex h-7 w-7 items-center justify-center rounded-full 
+                    bg-red-600 text-white ring-2 ring-white/80 
+                    transition hover:bg-red-500/80 focus:outline-none">
+              <fa-icon [icon]="icons.faTrash" class="text-xs" />
+            </button>
+
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2 p-3">
+          <label class="text-[10px] font-medium uppercase tracking-wider text-[color:var(--admin-bg-aside)]/50">
+            Expiración
+          </label>
+          
+          <div class="min-h-[36px]">
+            @if (editingBannerId() === banner.id_imagen) {
+              <div class="flex flex-wrap items-center gap-2 animate-in fade-in duration-200">
+                <input
+                  type="date"
+                  [value]="editedDate()"
+                  [min]="minDate"
+                  (input)="editedDate.set($any($event.target).value)"
+                  class="flex-1 rounded-lg border border-[var(--admin-bg-light)]/60 bg-[var(--admin-bg)]/50 px-2 py-1 text-xs text-[color:var(--admin-bg-aside)] focus:border-[var(--admin-bg-icon)] focus:ring-1 focus:ring-[var(--admin-bg-icon)]/20"
+                />
+                <button 
+                  (click)="saveEdit(banner)"
+                  class="rounded-lg bg-[var(--admin-bg-aside)] px-2 py-1 text-xs font-medium text-white hover:bg-[var(--admin-bg-aside-light)]">
+                  Guardar
+                </button>
+                <button 
+                  (click)="cancelEdit()"
+                  class="rounded-lg bg-[var(--admin-bg-light)]/50 px-2 py-1 text-xs text-[color:var(--admin-bg-aside)]">
+                  <fa-icon [icon]="icons.faXmark" />
+                </button>
+              </div>
+            } @else {
+              <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-[color:var(--admin-bg-aside)]">
+                  {{ banner.fecha_expiracion ? (banner.fecha_expiracion | date:'dd MMM, yyyy') : 'No definida' }}
+                </p>
+                <button 
+                  (click)="startEdit(banner)"
+                  class="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-[color:var(--admin-bg-aside)]/70 transition hover:bg-[var(--admin-bg)] hover:text-[color:var(--admin-bg-icon)]">
+                  <fa-icon [icon]="icons.faPen" class="text-[10px]" />
+                  <span>Editar</span>
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+    }
+  }
+</div>
