@@ -60,7 +60,7 @@ export class ProductStore implements OnInit {
 
       this.presentacionService.getAll().subscribe(presentaciones => {
         presentaciones.forEach(p =>
-          this.categoryMap.set(p.id_presentacion, p.nombre)
+          this.categoryMap.set(p.id_presentacion, '')
         );
 
         this.loadVinosYPrecios();
@@ -91,7 +91,7 @@ private mapProducts(vinos: Vino[], precios: Precio[]): InternalProduct[] {
         category: categoryName,
         name: vino.nombre,
         description: vino.descripcion,
-        volumen: `${vino.volumen_ml} ml`,
+        volumen: `ml`,
         state: vino.estado === 'D' ? 'Disponible' : 'No disponible',
         image: vino.url_img_principal,
         prices: preciosDelVino,

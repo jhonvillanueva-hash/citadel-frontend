@@ -7,7 +7,7 @@
 - **Framework:** Angular 21 (Zoneless)
 - **Styling:** Tailwind CSS (Custom theme with Poppins font and extensive color palette)
 - **State & Data:** RxJS for reactive programming; domain-specific services in `src/app/data/services`.
-- **Icons:** FontAwesome (@fortawesome/angular-fontawesome)
+- **Icons:** FontAwesome (@fortawesome/angular-fontawesome), use this style: icons = {faPlus}, <fa-icon [icon]="icons.faPlus" />
 - **Charts:** ApexCharts (ng-apexcharts) for data visualization.
 - **Backend Integration:** HttpClient with custom interceptors for Auth and Error handling.
 - **Server:** Express.js for SSR.

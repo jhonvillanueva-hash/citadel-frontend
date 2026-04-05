@@ -30,43 +30,50 @@ export interface Carrito {
 export interface CarritoProducto {
   id_carrito_producto: number;
   id_carrito: number;
-  id_vino: number;
+  id_precio: number;
   cantidad: number;
   precio_venta: number;
 }
 
 export interface Vino {
   id_vino: number;
-  id_sabor: number;
-  id_presentacion: number;
+  sku: string;
   nombre: string;
   descripcion: string;
-  volumen_ml: number;
   stock: number;
-  estado: 'D' | 'A' | 'P';
   url_img_principal: string;
+  estado: 'D' | 'A' | 'P';
+  id_sabor: number;
+  id_dulzor: number;
+  id_presentacion: number;
   fecha_creacion: Date;
-  sabor?: Sabor;
-  presentacion?: Presentacion;
-}
-
-export interface Precio {
-  id_precio: number;
-  id_vino: number;
-  tipo_venta: 'my' | 'mn';
-  cantidad_minima: number;
-  precio: number;
+  Sabor?: Sabor;
+  Dulzor?: Dulzor;
+  Presentacion?: Presentacion;
+  Precios?: Precio[];
 }
 
 export interface Sabor {
   id_sabor: number;
   nombre: string;
-  descripcion: string;
+}
+
+export interface Dulzor {
+  id_dulzor: number;
+  nombre: string;
 }
 
 export interface Presentacion {
   id_presentacion: number;
-  nombre: string;
+  volumen_ml: number;
+  botellas_por_caja: number;
+}
+
+export interface Precio {
+  id_precio: number;
+  id_vino: number;
+  cantidad_minima: number;
+  precio: number;
 }
 
 export interface ImagenAdicionalVino {
