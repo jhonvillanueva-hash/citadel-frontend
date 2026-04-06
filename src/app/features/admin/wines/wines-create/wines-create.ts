@@ -1,171 +1,237 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import { SaborService } from '../../../../data/services/sabor.service';
+import { FormsModule } from '@angular/forms';
+import { Sabor, Dulzor, Presentacion } from '../../../../data/models/api.models';
+import { forkJoin } from 'rxjs';
+import { DulzorService } from '../../../../data/services/dulzor.service';
 import { PresentacionService } from '../../../../data/services/presentacion.service';
+import { SaborService } from '../../../../data/services/sabor.service';
+import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { VinoService } from '../../../../data/services/vino.service';
-import { PrecioService } from '../../../../data/services/precio.service';
-import { Precio, Sabor } from '../../../../data/models/api.models';
-import { Presentacion } from '../../../../data/models/api.models';
+import { VinoForm } from '../../../../data/models/forms.models';
+import { Router } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faCircleXmark, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-admin-wines-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './wines-create.html',
   styles: [''],
 })
 export class WinesCreateComponent implements OnInit {
-  private fb = inject(FormBuilder);
-  private vinoService = inject(VinoService);
-  private saborService = inject(SaborService);
-  private presentacionService = inject(PresentacionService);
-  private precioService = inject(PrecioService);
-  private cdr = inject(ChangeDetectorRef);
+  private flavorService = inject(SaborService);
+  private sweetService = inject(DulzorService);
+  private presentationService = inject(PresentacionService);
+  private wineService = inject(VinoService);
+  private toastService = inject(ToastService);
+  private router = inject(Router);
+  flavors = signal<Sabor[]>([]);
+  sweets = signal<Dulzor[]>([]);
+  presentations = signal<Presentacion[]>([]);
+  isLoading = signal(false);
+  isAddingFlavor = signal(false);
+  newFlavorName = signal('');
+  isAddingSweet = signal(false);
+  newSweetName = signal('');
+  isAddingPresentation = signal(false);
+  imgPrincipal = signal<File | null>(null);
+  principalImagePreview = signal<string | null>(null);
+  imgsAdicionales = signal<(File | null)[]>([null]);
+  additionalImagesPreviews = signal<(string | null)[]>([null]);
 
-  sabores: Sabor[] = [];
-  presentaciones: Presentacion[] = [];
-
-  vinoForm!: FormGroup;
-
-  loading = false;
-  errorMessage: string | null = null;
-  successMessage: string | null = null;
-
-  selectedFile: File | null = null;
+  precioBase = 12;
+  precios = [
+    { cantidad: null as number | null, precio: null as number | null }
+  ];
+  newPresentation = { volumen_ml: 0, botellas_por_caja: 0 };
+  
+  wineData: VinoForm = {
+    sku: '',
+    nombre: '',
+    descripcion: '',
+    stock: 0,
+    estado: 'D',
+    id_sabor: null,
+    id_dulzor: null,
+    id_presentacion: null
+  };
 
   ngOnInit(): void {
-    this.initForm();
-    this.cargarSabores();
-    this.cargarPresentaciones();
+    this.loadData();
   }
 
-  private initForm(): void {
-    this.vinoForm = this.fb.group({
-      nombre: ['', Validators.required],
-      descripcion: ['', Validators.required],
-      volumen_ml: [750, [Validators.required, Validators.min(1)]],
-      stock: [0, [Validators.required, Validators.min(0)]],
-      estado: ['D', Validators.required],
-      id_sabor: ['', Validators.required],
-      id_presentacion: ['', Validators.required],
-      precioMenor: this.fb.group({
-        cantidad_minima: [1, [Validators.required, Validators.min(1)]],
-        precio: ['', [Validators.required, Validators.min(0)]],
-      }),
-      precioMayor: this.fb.group({
-        cantidad_minima: [24, [Validators.required, Validators.min(1)]],
-        precio: ['', [Validators.required, Validators.min(0)]],
-      }),
-    });
-  }
-
-  private cargarSabores(): void {
-    this.saborService.getAll().subscribe({
-      next: (data) => (this.sabores = data),
-      error: (err) => console.error('Error al cargar sabores', err),
-    });
-  }
-
-  private cargarPresentaciones(): void {
-    this.presentacionService.getAll().subscribe({
-      next: (data) => (this.presentaciones = data),
-      error: (err) => console.error('Error al cargar presentaciones', err),
-    });
-  }
-
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.selectedFile = input.files[0];
-    }
-  }
-
-  onSubmit(): void {
-    if (this.vinoForm.invalid) {
-      this.vinoForm.markAllAsTouched();
-      return;
-    }
-
-    if (!this.selectedFile) {
-      this.errorMessage = 'Debes seleccionar una imagen principal.';
-      this.cdr.detectChanges();
-      return;
-    }
-
-    this.loading = true;
-    this.errorMessage = null;
-    this.successMessage = null;
-
-    const formData = new FormData();
-    formData.append('nombre', this.vinoForm.value.nombre);
-    formData.append('descripcion', this.vinoForm.value.descripcion);
-    formData.append('volumen_ml', this.vinoForm.value.volumen_ml.toString());
-    formData.append('stock', this.vinoForm.value.stock.toString());
-    formData.append('estado', this.vinoForm.value.estado);
-    formData.append('id_sabor', this.vinoForm.value.id_sabor.toString());
-    formData.append(
-      'id_presentacion',
-      this.vinoForm.value.id_presentacion.toString()
-    );
-    formData.append('url_img_principal', this.selectedFile);
-
-    this.vinoService.createWithImage(formData).subscribe({
-      next: (vinoCreado) => {
-        const precioMenor: Partial<Precio> = {
-          id_vino: vinoCreado.id_vino,
-          tipo_venta: 'mn',
-          cantidad_minima: this.vinoForm.value.precioMenor.cantidad_minima,
-          precio: this.vinoForm.value.precioMenor.precio,
-        };
-        const precioMayor: Partial<Precio> = {
-          id_vino: vinoCreado.id_vino,
-          tipo_venta: 'my',
-          cantidad_minima: this.vinoForm.value.precioMayor.cantidad_minima,
-          precio: this.vinoForm.value.precioMayor.precio,
-        };
-
-        this.precioService.create(precioMenor).subscribe({
-          next: () => {
-            this.precioService.create(precioMayor).subscribe({
-              next: () => {
-                this.successMessage = 'Vino y precios registrados con éxito.';
-                this.vinoForm.reset({
-                  volumen_ml: 750,
-                  stock: 0,
-                  estado: 'D',
-                  precioMenor: { cantidad_minima: 1, precio: 100 },
-                  precioMayor: { cantidad_minima: 24, precio: 90 },
-                });
-                this.selectedFile = null;
-                this.loading = false;
-              },
-              error: (err) => {
-                this.errorMessage = 'Error al crear el precio al por mayor: ' + err.message;
-                this.loading = false;
-                this.cdr.detectChanges();
-              },
-            });
-          },
-          error: (err) => {
-            this.errorMessage = 'Error al crear el precio al por menor: ' + err.message;
-            this.loading = false;
-            this.cdr.detectChanges();
-          },
-        });
+  loadData() {
+    this.isLoading.set(true);
+    forkJoin({
+      flavors: this.flavorService.getAll(),
+      sweets: this.sweetService.getAll(),
+      presentations: this.presentationService.getAll(),
+    }).subscribe({
+      next: ({ flavors, sweets, presentations }) => {
+        this.flavors.set(flavors);
+        this.sweets.set(sweets);
+        this.presentations.set(presentations);
+        this.isLoading.set(false);
       },
       error: (err) => {
-        setTimeout(() => {
-          this.errorMessage = 'Error al crear el vino: ' + err.message;
-          this.loading = false;
-          this.cdr.detectChanges();
-        });
-      },
+        this.toastService.showError('Error cargando configuraciones', err);
+        this.isLoading.set(false);
+      }
     });
+  }
+
+  onPrincipalFileChange(event: any) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    this.imgPrincipal.set(file);
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.principalImagePreview.set(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  onAdditionalFileChange(event: any, index: number) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const imgs = [...this.imgsAdicionales()];
+    const previews = [...this.additionalImagesPreviews()];
+
+    imgs[index] = file;
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      previews[index] = e.target.result;
+      this.additionalImagesPreviews.set([...previews]);
+    };
+    reader.readAsDataURL(file);
+
+    if (index === imgs.length - 1) {
+      imgs.push(null);
+      previews.push(null);
+    }
+
+    this.imgsAdicionales.set(imgs);
+  }
+
+  removeAdditionalImage(index: number): void {
+    this.additionalImagesPreviews()[index] = null;
+    this.imgsAdicionales()[index] = null;
+  }
+
+  removeAdditionalImageRow(index: number): void {
+    this.imgsAdicionales().splice(index, 1);
+    this.additionalImagesPreviews().splice(index, 1);
+  }
+
+  saveNewFlavor() {
+    if (!this.newFlavorName()) return;
+    this.flavorService.create({ nombre: this.newFlavorName() }).subscribe({
+      next: (flavor) => {
+        this.flavors.update(prev => [...prev, flavor]);
+        this.wineData.id_sabor = flavor.id_sabor;
+        this.isAddingFlavor.set(false);
+        this.newFlavorName.set('');
+        this.toastService.showSuccess('Sabor añadido');
+      },
+      error: (err) => this.toastService.showError('Error al añadir sabor', err.message)
+    });
+  }
+
+  saveNewSweet() {
+    if (!this.newSweetName()) return;
+    this.sweetService.create({ nombre: this.newSweetName() }).subscribe({
+      next: (sweet) => {
+        this.sweets.update(prev => [...prev, sweet]);
+        this.wineData.id_dulzor = sweet.id_dulzor;
+        this.isAddingSweet.set(false);
+        this.newSweetName.set('');
+        this.toastService.showSuccess('Dulzor añadido');
+      },
+      error: (err) => this.toastService.showError('Error al añadir dulzor', err.message)
+    });
+  }
+
+  saveNewPresentation() {
+    if (!this.newPresentation.volumen_ml || !this.newPresentation.botellas_por_caja) return;
+    this.presentationService.create(this.newPresentation).subscribe({
+      next: (presentation) => {
+        this.presentations.update(prev => [...prev, presentation]);
+        this.wineData.id_presentacion = presentation.id_presentacion;
+        this.isAddingPresentation.set(false);
+        this.newPresentation = { volumen_ml: 0, botellas_por_caja: 0 };
+        this.toastService.showSuccess('Presentación añadida');
+      },
+      error: (err) => this.toastService.showError('Error al añadir presentación', err.message)
+    });
+  }
+
+  agregarFilaPrecio() {
+    const ultima = this.precios[this.precios.length - 1];
+    if (!ultima.cantidad || !ultima.precio) {
+      this.toastService.showWarning('Completa la última fila antes de añadir otra');
+      return;
+    }
+    this.precios.push({ cantidad: null, precio: null });
+  }
+
+  onSubmit() {
+    if (!this.wineData.sku || !this.wineData.nombre || !this.imgPrincipal()) {
+      this.toastService.showError('Error', 'Por favor, completa todos los campos');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('sku', this.wineData.sku);
+    formData.append('nombre', this.wineData.nombre);
+    formData.append('descripcion', this.wineData.descripcion);
+    formData.append('stock', this.wineData.stock.toString());
+    formData.append('estado', this.wineData.estado);
+    formData.append('id_sabor', this.wineData.id_sabor?.toString() || '');
+    formData.append('id_dulzor', this.wineData.id_dulzor?.toString() || '');
+    formData.append('id_presentacion', this.wineData.id_presentacion?.toString() || '');
+    formData.append('url_img_principal', this.imgPrincipal()!);
+    this.imgsAdicionales()
+      .filter((file): file is File => file !== null)
+      .forEach((file) => {
+        formData.append('imagen_adicionales', file);
+      });
+
+    const selectedPresentation = this.presentations().find(p => p.id_presentacion == this.wineData.id_presentacion);
+    const bottlesPerBox = selectedPresentation?.botellas_por_caja || 1;
+
+    const preciosBackend = [
+      { cantidad_minima: 1, precio: this.precioBase },
+      ...this.precios
+        .filter(p => p.cantidad !== null && p.precio !== null)
+        .map(p => ({ 
+          cantidad_minima: p.cantidad! * bottlesPerBox, 
+          precio: p.precio! 
+        }))
+    ];
+    formData.append('precios', JSON.stringify(preciosBackend));
+
+    this.isLoading.set(true);
+    this.wineService.createWithImage(formData).subscribe({
+      next: () => {
+        this.isLoading.set(false);
+        this.toastService.showSuccess('Vino registrado correctamente');
+        this.router.navigate(['/admin/wines/create']);
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        this.toastService.showError('Error al registrar el vino', err.message);
+      }
+    });
+  }
+
+  icons = {
+    faPlus,
+    faCircleXmark
   }
 }

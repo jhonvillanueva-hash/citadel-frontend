@@ -37,6 +37,13 @@ module.exports = {
         sans: ['Poppins', ...defaultTheme.fontFamily.sans]
       },
       colors: {
+        admin: {
+          "pink-light": "rgb(248 236 238 / <alpha-value>)",
+          "pink": "rgb(195 91 100 / <alpha-value>)",
+          "pink-dark": "rgb(167 78 85 / <alpha-value>)",
+          "brown": "rgb(42 31 33 / <alpha-value>)",
+          "brown-light": "rgb(58 42 45 / <alpha-value>)",
+        },
         primary: "var(--primary)",
         secondary: "var(--secondary)",
         bg: "var(--background)",

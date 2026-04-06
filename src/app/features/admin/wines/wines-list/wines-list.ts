@@ -1,42 +1,57 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, Signal, signal } from '@angular/core';
 import { VinoService } from '../../../../data/services/vino.service';
-import { SaborService } from '../../../../data/services/sabor.service';
-import { PresentacionService } from '../../../../data/services/presentacion.service';
 import { Vino } from '../../../../data/models/api.models';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
-import { forkJoin } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { catchError, of } from 'rxjs';
+import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-admin-wines-list',
   templateUrl: './wines-list.html',
+  imports: [FontAwesomeModule, RouterLink]
 })
-export class WinesListComponent implements OnInit {
+export class WinesListComponent {
   wineService = inject(VinoService);
-  saborService = inject(SaborService);
-  presentacionService = inject(PresentacionService);
   toastService = inject(ToastService);
 
-  dataWines = signal<Vino[] | null>(null);
+  dataWines: Signal<Vino[] | null>;
+  loading = signal(true);
+  error = signal<string | null>(null);
 
-  ngOnInit(): void {
-    this.loadWines();
+  constructor() {
+    this.dataWines = toSignal(
+      this.wineService.getAll().pipe(
+        catchError(err => {
+          this.toastService.showError('Error cargando vinos', err);
+          return of(null);
+        })
+      ),
+      { initialValue: null }
+    );
   }
 
-  loadWines() {
-    forkJoin({
-      vinos: this.wineService.getAll(),
-      sabores: this.saborService.getAll(),
-      presentaciones: this.presentacionService.getAll(),
-    }).subscribe({
-      next: ({ vinos, sabores, presentaciones }) => {
-        const winesWithRelations = vinos.map(vino => ({
-          ...vino,
-          sabor: sabores.find(s => s.id_sabor === vino.id_sabor),
-          presentacion: presentaciones.find(p => p.id_presentacion === vino.id_presentacion),
-        }));
-        this.dataWines.set(winesWithRelations);
-      },
-      error: (err) => this.toastService.showError('Error cargando vinos', err),
-    });
+  groupedBySabor() {
+    const wines = this.dataWines();
+    if (!wines) return {};
+    return wines.reduce((acc: Record<string, Vino[]>, wine) => {
+      const sabor = wine.Sabor?.nombre || 'Sin sabor';
+      if (!acc[sabor]) {
+        acc[sabor] = [];
+      }
+      acc[sabor].push(wine);
+      return acc;
+    }, {});
+  }
+
+  groupedEntries() {
+    return Object.entries(this.groupedBySabor());
+  }
+
+  icons = {
+    faPen,
+    faTrash
   }
 }

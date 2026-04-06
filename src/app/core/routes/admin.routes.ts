@@ -7,6 +7,8 @@ import { WinesCreateComponent } from '../../features/admin/wines/wines-create/wi
 import { WinesListComponent } from '../../features/admin/wines/wines-list/wines-list';
 import { BannersCreateComponent } from '../../features/admin/banners/banners-create/banners-create';
 import { BannersListComponent } from '../../features/admin/banners/banners-list/banners-list';
+import { WinesConfigComponent } from '../../features/admin/wines/wines-config/wines-config';
+import { WinesEditComponent } from '../../features/admin/wines/wines-edit/wines-edit';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -23,8 +25,16 @@ export const ADMIN_ROUTES: Routes = [
         component: WinesListComponent
       },
       {
+        path: 'wines/config',
+        component: WinesConfigComponent
+      },
+      {
         path: 'wines/create',
         component: WinesCreateComponent
+      },
+      {
+        path: 'wines/edit/:id',
+        component: WinesEditComponent
       },
       {
         path: 'users',

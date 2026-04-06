@@ -1,41 +1,111 @@
 @if (dataWines() === null) {
-  <p class="text-gray-500 text-center py-4">Cargando vinos...</p>
+<p class="text-gray-500 text-center py-4">Cargando vinos...</p>
 } @else if (dataWines()!.length === 0) {
-  <p class="text-gray-500 text-center py-4">No hay vinos registrados.</p>
+<p class="text-gray-500 text-center py-4">No hay vinos registrados.</p>
 } @else {
-  <div class="overflow-x-auto">
-    <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-      <thead class="bg-[color:var(--admin-bg-icon)] text-white">
-        <tr>
-          <th class="px-4 py-2 text-left text-sm font-semibold">Nombre</th>
-          <th class="px-4 py-2 text-left text-sm font-semibold">Descripción</th>
-          <th class="px-4 py-2 text-left text-sm font-semibold">Volumen (ml)</th>
-          <th class="px-4 py-2 text-left text-sm font-semibold">Stock</th>
-          <th class="px-4 py-2 text-left text-sm font-semibold">Estado</th>
-          <th class="px-4 py-2 text-left text-sm font-semibold">Sabor</th>
-          <th class="px-4 py-2 text-left text-sm font-semibold">Presentación</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (wine of dataWines(); track wine.id_vino) {
-          <tr class="border-t border-gray-200 hover:bg-gray-50">
-            <td class="px-4 py-2 text-sm text-gray-700">{{ wine.nombre }}</td>
-            <td class="px-4 py-2 text-sm text-gray-700">{{ wine.descripcion }}</td>
-            <td class="px-4 py-2 text-sm text-gray-700">{{ wine.volumen_ml }}</td>
-            <td class="px-4 py-2 text-sm text-gray-700">{{ wine.stock }}</td>
-            <td class="px-4 py-2 text-sm text-gray-700">
+@for (group of groupedEntries(); track group[0]) {
+<div class="mb-10">
+
+  <h2 class="text-xl font-bold mb-4 text-gray-800">
+    {{ group[0] }}
+  </h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+    @for (wine of group[1]; track wine.id_vino) {
+    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition flex flex-col">
+
+      <img [src]="wine.url_img_principal" alt="{{ wine.nombre }}" class="w-full h-48 object-cover" />
+
+      <div class="p-4 flex flex-col gap-4 flex-1">
+
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800">
+            {{ wine.nombre }}
+          </h3>
+
+          <p class="text-sm text-gray-500 line-clamp-2">
+            {{ wine.descripcion }}
+          </p>
+        </div>
+
+        <div class="border-t pt-3 grid grid-cols-2 gap-4">
+
+          <div class="text-sm text-gray-600 space-y-1">
+            <p>
+              <span class="font-medium">SKU:</span>
+              {{ wine.sku || 'N/A' }}
+            </p>
+
+            <p>
+              <span class="font-medium">ML:</span>
+              {{ wine.Presentacion?.volumen_ml || 'N/A' }}
+            </p>
+
+            <p>
+              <span class="font-medium">Dulzor:</span>
+              {{ wine.Dulzor?.nombre || 'N/A' }}
+            </p>
+
+            <p>
+              <span class="font-medium">Stock:</span>
+              {{ wine.stock || '0' }}
+            </p>
+
+            <p class="font-medium">
               @switch (wine.estado) {
-                @case ('D') { Disponible }
-                @case ('A') { Agotado }
-                @case ('P') { Pronto }
-                @default { N/A }
+              @case ('D') { <span class="text-green-600">Disponible</span> }
+              @case ('A') { <span class="text-red-600">Agotado</span> }
+              @case ('P') { <span class="text-yellow-600">Pronto</span> }
+              @default { <span>N/A</span> }
               }
-            </td>
-            <td class="px-4 py-2 text-sm text-gray-700">{{ wine.sabor?.nombre || 'N/A' }}</td>
-            <td class="px-4 py-2 text-sm text-gray-700">{{ wine.presentacion?.nombre || 'N/A' }}</td>
-          </tr>
-        }
-      </tbody>
-    </table>
+            </p>
+
+          </div>
+
+          <div class="border-l pl-4">
+            <p class="text-xs font-medium text-gray-500 mb-1 uppercase tracking-wide">
+              Precios / caja
+            </p>
+
+            @if (wine.Precios?.length) {
+            <ul class="text-xs text-gray-600 space-y-1">
+              @for (precio of wine.Precios?.sort((a, b) => a.cantidad_minima - b.cantidad_minima); track
+              precio.id_precio) {
+              <li class="flex justify-between">
+                <span>Desde {{ precio.cantidad_minima }}</span>
+                <span class="font-semibold text-gray-800">
+                  S/ {{ precio.precio }}
+                </span>
+              </li>
+              }
+            </ul>
+            } @else {
+            <p class="text-xs text-gray-400">Sin precios</p>
+            }
+          </div>
+
+        </div>
+
+        <div class="flex gap-3 pt-3 border-t">
+          <a [routerLink]="['/admin/wines/edit', wine.id_vino]" class="flex-1 flex items-center justify-center gap-2 
+                bg-[var(--admin-bg-icon)] text-white text-sm font-medium py-2 rounded-lg 
+                transition hover:brightness-110">
+            <fa-icon [icon]="icons.faPen"></fa-icon>
+            Editar
+          </a>
+          <button class="flex-1 flex items-center justify-center gap-2 
+            bg-[var(--admin-bg-aside)] text-white text-sm font-medium py-2 rounded-lg 
+            transition hover:brightness-150"><fa-icon [icon]="icons.faTrash"></fa-icon>
+            Eliminar
+          </button>
+        </div>
+
+      </div>
+    </div>
+    }
+
   </div>
+</div>
+}
 }
