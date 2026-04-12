@@ -1,0 +1,117 @@
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-5">
+  <div class="bg-admin-pink-light bg-opacity-30 rounded-xl p-5 transition-all duration-200">
+    <h3 class="text-md font-semibold text-admin-brown mb-3 flex items-center gap-2">
+      <span class="w-1 h-5 bg-admin-pink rounded-full"></span>
+      Sabor
+    </h3>
+    <div class="space-y-3">
+      <button type="button" (click)="isAddingFlavor.set(!isAddingFlavor())"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-admin-pink text-admin-pink hover:bg-admin-pink hover:text-white transition-all duration-200 text-sm font-medium">
+        <span>{{ isAddingFlavor() ? 'Cancelar' : 'Añadir sabor' }}</span>
+        <fa-icon [icon]="isAddingFlavor() ? icons.faCircleXmark : icons.faPlus"></fa-icon>
+      </button>
+
+      @if (isAddingFlavor()) {
+        <div class="flex flex-col sm:flex-row gap-2 mt-3">
+          <input class="flex-1 min-w-0 px-4 py-2 rounded-lg border border-gray-200 outline-none"
+            type="text" [ngModel]="newFlavorName()" (ngModelChange)="newFlavorName.set($event)" placeholder="Nuevo sabor">
+          <button type="button" (click)="saveFlavor()" class="px-4 py-2 rounded-lg bg-admin-pink text-white">Guardar</button>
+        </div>
+      }
+
+      <select class="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none bg-white"
+        [ngModel]="formFacade.wineData().id_sabor" (ngModelChange)="formFacade.updateField('id_sabor', $event)">
+        <option [ngValue]="null">-- SELECCIONAR SABOR --</option>
+        @for (f of catalogFacade.flavors(); track f.id_sabor) {
+          <option [value]="f.id_sabor">{{ f.nombre }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="bg-admin-pink-light bg-opacity-30 rounded-xl p-5 transition-all duration-200">
+    <h3 class="text-md font-semibold text-admin-brown mb-3 flex items-center gap-2">
+      <span class="w-1 h-5 bg-admin-pink rounded-full"></span>
+      Dulzor
+    </h3>
+    <div class="space-y-3">
+      <button type="button" (click)="isAddingSweet.set(!isAddingSweet())"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-admin-pink text-admin-pink hover:bg-admin-pink hover:text-white transition-all duration-200 text-sm font-medium">
+        <span>{{ isAddingSweet() ? 'Cancelar' : 'Añadir dulzor' }}</span>
+        <fa-icon [icon]="isAddingSweet() ? icons.faCircleXmark : icons.faPlus"></fa-icon>
+      </button>
+
+      @if (isAddingSweet()) {
+        <div class="flex flex-col sm:flex-row gap-2 mt-3">
+          <input class="flex-1 min-w-0 px-4 py-2 rounded-lg border border-gray-200 outline-none"
+            type="text" [ngModel]="newSweetName()" (ngModelChange)="newSweetName.set($event)" placeholder="Nuevo dulzor">
+          <button type="button" (click)="saveSweet()" class="px-4 py-2 rounded-lg bg-admin-pink text-white">Guardar</button>
+        </div>
+      }
+
+      <select class="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none bg-white"
+        [ngModel]="formFacade.wineData().id_dulzor" (ngModelChange)="formFacade.updateField('id_dulzor', $event)">
+        <option [ngValue]="null">-- SELECCIONAR DULZOR --</option>
+        @for (s of catalogFacade.sweets(); track s.id_dulzor) {
+          <option [value]="s.id_dulzor">{{ s.nombre }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="bg-admin-pink-light bg-opacity-30 rounded-xl p-5 lg:col-span-2 xl:col-span-1">
+    <h3 class="text-lg font-semibold text-admin-brown mb-4 flex items-center gap-2">
+      <span class="w-1 h-6 bg-admin-pink rounded-full"></span>
+      Presentación
+    </h3>
+    <div class="space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <button type="button" (click)="isAddingPresentation.set(!isAddingPresentation())"
+          class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-admin-pink text-admin-pink hover:bg-admin-pink hover:text-white transition-all duration-200 text-sm font-medium">
+          <span>{{ isAddingPresentation() ? 'Cancelar' : 'Añadir presentación' }}</span>
+          <fa-icon [icon]="isAddingPresentation() ? icons.faCircleXmark : icons.faPlus"></fa-icon>
+        </button>
+      </div>
+
+      @if (isAddingPresentation()) {
+        <div class="flex flex-col sm:flex-row items-end gap-4 mt-2">
+
+          <div class="flex flex-col flex-1">
+            <span class="text-xs text-admin-brown-light mb-1">ml</span>
+            <input
+              class="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none"
+              type="number"
+              placeholder="ml"
+              [ngModel]="newPres().volumen_ml"
+              (ngModelChange)="newPres.update(p => ({...p, volumen_ml: $event}))">
+          </div>
+
+          <div class="flex flex-col flex-1">
+            <span class="text-xs text-admin-brown-light mb-1">Botellas/caja</span>
+            <input
+              class="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none"
+              type="number"
+              placeholder="unid./caja"
+              [ngModel]="newPres().botellas_por_caja"
+              (ngModelChange)="newPres.update(p => ({...p, botellas_por_caja: $event}))">
+          </div>
+
+          <button
+            type="button"
+            (click)="savePresentation()"
+            class="px-4 py-2 rounded-lg bg-admin-pink text-white h-[42px]">
+            Guardar
+          </button>
+
+        </div>
+      }
+      <select class="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none bg-white mt-4"
+        [ngModel]="formFacade.wineData().id_presentacion" (ngModelChange)="formFacade.updateField('id_presentacion', $event)">
+        <option [ngValue]="null">-- SELECCIONAR PRESENTACIÓN --</option>
+        @for (p of catalogFacade.presentations(); track p.id_presentacion) {
+          <option [value]="p.id_presentacion">{{ p.volumen_ml }} ml - {{ p.botellas_por_caja }} uds/caja</option>
+        }
+      </select>
+    </div>
+  </div>
+</div>

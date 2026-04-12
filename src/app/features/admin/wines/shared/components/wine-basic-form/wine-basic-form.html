@@ -1,0 +1,73 @@
+<div class="bg-admin-pink-light bg-opacity-40 rounded-xl p-5 transition-all duration-200 mb-5">
+  <h3 class="text-lg font-semibold text-admin-brown mb-4 flex items-center gap-2">
+    <span class="w-1 h-6 bg-admin-pink rounded-full"></span>
+    Información General
+  </h3>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-5">
+
+    <!-- SKU -->
+    <div class="md:col-span-1 lg:col-span-2">
+      <label class="block text-sm font-medium text-admin-brown-light mb-1">SKU</label>
+      <input
+        class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-admin-pink focus:ring-2 focus:ring-admin-pink focus:ring-opacity-20 outline-none"
+        type="text"
+        [ngModel]="facade.wineData().sku"
+        (ngModelChange)="facade.updateField('sku', $event)"
+        placeholder="Ej: VINO-001">
+    </div>
+
+    <!-- Nombre -->
+    <div class="md:col-span-1 lg:col-span-4">
+      <label class="block text-sm font-medium text-admin-brown-light mb-1">Nombre del Vino</label>
+      <input
+        class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-admin-pink focus:ring-2 focus:ring-admin-pink focus:ring-opacity-20 outline-none"
+        type="text"
+        [ngModel]="facade.wineData().nombre"
+        (ngModelChange)="facade.updateField('nombre', $event)"
+        placeholder="Nombre del producto">
+    </div>
+
+    <!-- Stock -->
+    <div class="md:col-span-1 lg:col-span-2">
+      <label class="block text-sm font-medium text-admin-brown-light mb-1">Stock</label>
+      <input
+        class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-admin-pink focus:ring-2 focus:ring-admin-pink focus:ring-opacity-20 outline-none"
+        type="number"
+        [ngModel]="facade.wineData().stock"
+        (ngModelChange)="facade.updateField('stock', $event)"
+        placeholder="0">
+    </div>
+
+    <!-- Estado -->
+    <div class="md:col-span-1 lg:col-span-4">
+      <label class="block text-sm font-medium text-admin-brown-light mb-2">Estado</label>
+
+      <div class="flex flex-wrap items-center gap-4">
+        @for (state of [ {v:'D', l:'Disponible'}, {v:'A', l:'Agotado'}, {v:'P', l:'Pronto'} ]; track state.v) {
+          <label class="inline-flex items-center gap-1 text-admin-brown cursor-pointer">
+            <input
+              type="radio"
+              name="estado"
+              [value]="state.v"
+              [ngModel]="facade.wineData().estado"
+              (ngModelChange)="facade.updateField('estado', $event)"
+              class="w-4 h-4 text-admin-pink focus:ring-admin-pink border-gray-300">
+            <span class="text-sm">{{ state.l }}</span>
+          </label>
+        }
+      </div>
+    </div>
+
+    <!-- Descripción -->
+    <div class="md:col-span-2 lg:col-span-12">
+      <label class="block text-sm font-medium text-admin-brown-light mb-1">Descripción</label>
+      <textarea rows="3"
+        class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-admin-pink focus:ring-2 focus:ring-admin-pink focus:ring-opacity-20 outline-none resize-y"
+        [ngModel]="facade.wineData().descripcion"
+        (ngModelChange)="facade.updateField('descripcion', $event)"
+        placeholder="Notas de cata, origen, maridaje..."></textarea>
+    </div>
+
+  </div>
+</div>

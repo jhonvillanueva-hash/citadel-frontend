@@ -1,1 +1,30 @@
-<p>wines-edit works!</p>
+<div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+  <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-admin-pink-light">
+    <div class="bg-gradient-to-r from-admin-pink to-admin-pink-dark px-6 py-5 sm:px-8">
+      <h2 class="text-2xl font-bold text-white tracking-tight">Editar Vino</h2>
+      <p class="text-admin-pink-light text-sm mt-1">Modifique los datos del vino seleccionado.</p>
+    </div>
+
+    <div class="p-6 sm:p-8 space-y-8">
+      <app-wine-basic-form></app-wine-basic-form>
+      <app-wine-catalog-selects></app-wine-catalog-selects>
+      <app-wine-price-list></app-wine-price-list>
+      <app-wine-image-uploader></app-wine-image-uploader>
+
+      <div class="pt-4 flex justify-between">
+        <button type="button" (click)="router.navigate(['/admin/wines'])" 
+          class="px-8 py-3 rounded-xl border border-admin-pink text-admin-pink font-semibold hover:bg-admin-pink/10 transition-all">
+          Cancelar
+        </button>
+        <button type="button" (click)="handleUpdate()" [disabled]="formFacade.isLoading()"
+          class="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-admin-pink to-admin-pink-dark text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all disabled:opacity-50">
+          @if (formFacade.isLoading()) {
+            <span>Actualizando...</span>
+          } @else {
+            Actualizar Vino
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

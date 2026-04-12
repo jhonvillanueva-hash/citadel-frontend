@@ -51,6 +51,7 @@ export interface Vino {
   Dulzor?: Dulzor;
   Presentacion?: Presentacion;
   Precios?: Precio[];
+  ImagenAdicionalVinos?: ImagenAdicionalVino[];
 }
 
 export interface Sabor {
