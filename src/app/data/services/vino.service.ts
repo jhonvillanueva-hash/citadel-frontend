@@ -13,4 +13,8 @@ export class VinoService extends BaseHttpService<Vino> {
   createWithImage(formData: FormData): Observable<Vino> {
     return this.http.post<Vino>(this.fullUrl, formData, { withCredentials: true});
   }
+
+  updateWithImage(id: number | string, formData: FormData): Observable<Vino> {
+    return this.http.put<Vino>(`${this.fullUrl}/${id}`, formData, { withCredentials: true });
+  }
 }
