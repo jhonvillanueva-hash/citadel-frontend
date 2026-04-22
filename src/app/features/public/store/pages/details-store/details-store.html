@@ -1,0 +1,276 @@
+<app-header></app-header>
+
+@if (isLoading()) {
+  <div class="flex justify-center items-center min-h-[400px]">
+    <div class="text-center">
+      <div class="inline-block animate-spin rounded-none h-12 w-12 border-4 border-[#0e0d12] border-t-transparent"></div>
+      <p class="mt-4 text-[#0e0d12]/70">Cargando información del vino...</p>
+    </div>
+  </div>
+} @else if (errorMessage()) {
+  <div class="flex justify-center items-center min-h-[400px]">
+    <div class="text-center">
+      <p class="text-red-600">{{ errorMessage() }}</p>
+    </div>
+  </div>
+} @else if (wineData(); as wine) {
+  <div class="p-4 md:p-6 lg:p-8">
+    <div class="w-full max-w-7xl mx-auto">
+      <div class="grid items-start grid-cols-1 lg:grid-cols-5 gap-8 max-lg:gap-12 max-sm:gap-8">
+
+        <div class="w-full top-0 lg:col-span-3">
+          <div class="flex flex-row gap-2">
+            <div class="flex flex-col gap-2 w-16 max-sm:w-10 shrink-0">
+              <img
+                [src]="wine.url_img_principal"
+                alt="Imagen principal"
+                (click)="changeMainImage(wine.url_img_principal)"
+                class="aspect-[64/85] object-cover w-full cursor-pointer border-b-2"
+                [class.border-[#0e0d12]]="selectedMainImage() === wine.url_img_principal"
+                [class.border-transparent]="selectedMainImage() !== wine.url_img_principal"
+              />
+              @for (img of wine.imagenes_adicionales; track $index) {
+                <img
+                  [src]="img"
+                  [alt]="'Imagen ' + ($index + 1)"
+                  (click)="changeMainImage(img)"
+                  class="aspect-[64/85] object-cover w-full cursor-pointer border-b-2"
+                  [class.border-[#0e0d12]]="selectedMainImage() === img"
+                  [class.border-transparent]="selectedMainImage() !== img"
+                />
+              }
+            </div>
+
+            <div class="flex-1">
+              <img
+                [src]="selectedMainImage()"
+                [alt]="wine.nombre"
+                class="w-full aspect-[750/800] object-cover"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full lg:col-span-2">
+
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-[#0e0d12] mb-2">
+              {{ wine.nombre }}
+            </h1>
+
+            <div class="mt-4">
+              <p class="text-[#0e0d12]/80 text-sm leading-relaxed">
+                {{ wine.descripcion }}
+              </p>
+            </div>
+
+            <div class="flex items-center flex-wrap gap-4 mt-6">
+              <div class="flex items-baseline gap-2">
+                <h4 class="text-[#0e0d12] text-3xl sm:text-4xl font-bold">
+                  S/ {{ getCurrentPrice() }}
+                </h4>
+                <p class="text-[#0e0d12]/50 text-lg line-through">
+                  S/ {{ wine.precio_base }}
+                </p>
+              </div>
+              @if (getSavingsPerBottle() > 0) {
+                <div class="bg-green-100 text-green-700 px-3 py-1 rounded-none text-sm font-semibold">
+                  Ahorras S/ {{ getSavingsPerBottle() }} por botella
+                </div>
+              }
+            </div>
+          </div>
+
+          <hr class="my-6 border-gray-200" />
+
+          <div>
+            <h3 class="text-xl font-semibold text-[#0e0d12] mb-4">Opciones de Compra</h3>
+
+            <div class="flex gap-4 mb-6">
+              <button
+                (click)="setIndividualMode()"
+                [class.bg-[#0e0d12]]="selectedBoxType() === 'individual'"
+                [class.text-white]="selectedBoxType() === 'individual'"
+                [class.border-[#0e0d12]]="selectedBoxType() === 'individual'"
+                [class.bg-white]="selectedBoxType() !== 'individual'"
+                [class.text-[#0e0d12]]="selectedBoxType() !== 'individual'"
+                [class.border-gray-300]="selectedBoxType() !== 'individual'"
+                class="px-6 py-2 rounded-none border-2 transition font-medium"
+              >
+                Botellas Individuales
+              </button>
+              <button
+                (click)="setBoxesMode()"
+                [class.bg-[#0e0d12]]="selectedBoxType() === 'boxes'"
+                [class.text-white]="selectedBoxType() === 'boxes'"
+                [class.border-[#0e0d12]]="selectedBoxType() === 'boxes'"
+                [class.bg-white]="selectedBoxType() !== 'boxes'"
+                [class.text-[#0e0d12]]="selectedBoxType() !== 'boxes'"
+                [class.border-gray-300]="selectedBoxType() !== 'boxes'"
+                class="px-6 py-2 rounded-none border-2 transition font-medium"
+              >
+                Cajas ({{ wine.presentacion.botellas_por_caja }} botellas)
+              </button>
+            </div>
+
+            @if (selectedBoxType() === 'individual') {
+              <div>
+                <label class="text-sm font-medium text-[#0e0d12] mb-2 block">Cantidad de botellas</label>
+                <div class="flex gap-4 items-center border border-gray-300 bg-white rounded-none px-4 py-2 w-max">
+                  <button
+                    (click)="decrementQuantity()"
+                    class="w-8 h-8 flex items-center justify-center border-0 bg-gray-100 rounded-none hover:bg-gray-200 transition cursor-pointer text-[#0e0d12] font-bold"
+                  >
+                    -
+                  </button>
+                  <span class="text-[#0e0d12] text-base font-semibold px-6 min-w-[60px] text-center">
+                    {{ selectedQuantity() }}
+                  </span>
+                  <button
+                    (click)="incrementQuantity()"
+                    class="w-8 h-8 flex items-center justify-center border-0 bg-gray-100 rounded-none hover:bg-gray-200 transition cursor-pointer text-[#0e0d12] font-bold"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            }
+
+            @if (selectedBoxType() === 'boxes') {
+              <div>
+                <label class="text-sm font-medium text-[#0e0d12] mb-2 block">Cantidad de cajas</label>
+                <div class="flex flex-wrap gap-3 mb-4">
+                  <button
+                    (click)="setBoxes(1)"
+                    [class.bg-[#0e0d12]]="selectedBoxes() === 1"
+                    [class.text-white]="selectedBoxes() === 1"
+                    [class.bg-white]="selectedBoxes() !== 1"
+                    [class.text-[#0e0d12]]="selectedBoxes() !== 1"
+                    [class.border-gray-300]="selectedBoxes() !== 1"
+                    class="w-12 h-10 rounded-none border transition font-medium"
+                  >
+                    1
+                  </button>
+                  <button
+                    (click)="setBoxes(5)"
+                    [class.bg-[#0e0d12]]="selectedBoxes() === 5"
+                    [class.text-white]="selectedBoxes() === 5"
+                    [class.bg-white]="selectedBoxes() !== 5"
+                    [class.text-[#0e0d12]]="selectedBoxes() !== 5"
+                    [class.border-gray-300]="selectedBoxes() !== 5"
+                    class="w-12 h-10 rounded-none border transition font-medium"
+                  >
+                    5
+                  </button>
+                  <button
+                    (click)="setBoxes(10)"
+                    [class.bg-[#0e0d12]]="selectedBoxes() === 10"
+                    [class.text-white]="selectedBoxes() === 10"
+                    [class.bg-white]="selectedBoxes() !== 10"
+                    [class.text-[#0e0d12]]="selectedBoxes() !== 10"
+                    [class.border-gray-300]="selectedBoxes() !== 10"
+                    class="w-12 h-10 rounded-none border transition font-medium"
+                  >
+                    10
+                  </button>
+                </div>
+
+                <div class="flex gap-4 items-center border border-gray-300 bg-white rounded-none px-4 py-2 w-max">
+                  <button
+                    (click)="decrementBoxes()"
+                    class="w-8 h-8 flex items-center justify-center border-0 bg-gray-100 rounded-none hover:bg-gray-200 transition cursor-pointer text-[#0e0d12] font-bold"
+                  >
+                    -
+                  </button>
+                  <span class="text-[#0e0d12] text-base font-semibold px-6 min-w-[60px] text-center">
+                    {{ selectedBoxes() }}
+                  </span>
+                  <button
+                    (click)="incrementBoxes()"
+                    class="w-8 h-8 flex items-center justify-center border-0 bg-gray-100 rounded-none hover:bg-gray-200 transition cursor-pointer text-[#0e0d12] font-bold"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            }
+
+            <div class="mt-6 p-4 bg-gray-50 rounded-none">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-[#0e0d12] font-medium">Total a pagar:</span>
+                <span class="text-[#0e0d12] text-2xl font-bold">S/ {{ getTotal() }}</span>
+              </div>
+              @if (getTotalSavings() > 0) {
+                <div class="flex justify-between items-center mb-4 text-sm">
+                  <span class="text-green-600 font-medium">Ahorro total:</span>
+                  <span class="text-green-600 font-semibold">S/ {{ getTotalSavings() }}</span>
+                </div>
+              }
+              <button
+                (click)="addToCart()"
+                class="w-full py-3 bg-[#0e0d12] text-white rounded-none font-medium hover:bg-[#1c1a24] transition"
+              >
+                Añadir al Carrito
+              </button>
+            </div>
+          </div>
+
+          <hr class="my-6 border-gray-200" />
+
+          <div>
+            <h3 class="text-xl font-semibold text-[#0e0d12] mb-4">Información del Vino</h3>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              <div class="bg-gray-50 p-3 rounded-none">
+                <p class="text-xs text-[#0e0d12]/60 mb-1">Sabor</p>
+                <p class="text-[#0e0d12] font-semibold">{{ wine.sabor }}</p>
+              </div>
+              <div class="bg-gray-50 p-3 rounded-none">
+                <p class="text-xs text-[#0e0d12]/60 mb-1">Dulzor</p>
+                <p class="text-[#0e0d12] font-semibold">{{ wine.dulzor }}</p>
+              </div>
+              <div class="bg-gray-50 p-3 rounded-none">
+                <p class="text-xs text-[#0e0d12]/60 mb-1">Volumen</p>
+                <p class="text-[#0e0d12] font-semibold">{{ wine.presentacion.volumen_ml }} ml</p>
+              </div>
+              <div class="bg-gray-50 p-3 rounded-none">
+                <p class="text-xs text-[#0e0d12]/60 mb-1">Botellas por caja</p>
+                <p class="text-[#0e0d12] font-semibold">{{ wine.presentacion.botellas_por_caja }}</p>
+              </div>
+            </div>
+
+            <div>
+              <h4 class="text-md font-semibold text-[#0e0d12] mb-3">Precios por volumen</h4>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-4 py-2 text-left text-[#0e0d12]">Cantidad</th>
+                      <th class="px-4 py-2 text-left text-[#0e0d12]">Precio unitario</th>
+                      <th class="px-4 py-2 text-left text-[#0e0d12]">Ahorro por botella</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-200">
+                    @for (price of wine.precios_por_cantidad; track $index) {
+                      <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-2 text-[#0e0d12]/80">
+                          @if (price.cantidad === 1) {
+                            {{ price.cantidad }} botella
+                          } @else {
+                            {{ price.cantidad }} botellas
+                          }
+                        </td>
+                        <td class="px-4 py-2 text-[#0e0d12]/80">S/ {{ price.precio }}</td>
+                        <td class="px-4 py-2 text-green-600">S/ {{ price.ahorro }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -20,6 +20,9 @@ export class RegisterComponent {
   private platformId = inject(PLATFORM_ID);
   public isServer = isPlatformServer(this.platformId);
 
+  showTermsModal = signal(false);
+  termsAccepted = signal(false);
+
   registerForm = this.fb.group({
     nombres: ['', Validators.required],
     apellidos: ['', Validators.required],
@@ -39,12 +42,43 @@ export class RegisterComponent {
   inputClasses(controlName: string) {
     return this.isInvalid(controlName)
       ? 'border-red-500 ring-1 ring-red-500 focus:ring-red-500'
-      : 'border-gray-300 focus:ring-secondary focus:border-secondary';
+      : 'border-gray-300 focus:ring-[#0e0d12] focus:border-[#0e0d12]';
+  }
+
+  openTermsModal() {
+    this.showTermsModal.set(true);
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeTermsModal() {
+    this.showTermsModal.set(false);
+    document.body.style.overflow = '';
+  }
+
+  acceptTerms() {
+    this.termsAccepted.set(true);
+    this.closeTermsModal();
+  }
+
+  onTermsCheckboxChange(event: any) {
+    if (event.target.checked) {
+      if (!this.termsAccepted()) {
+        event.target.checked = false;
+        this.openTermsModal();
+      }
+    } else {
+      this.termsAccepted.set(false);
+    }
   }
 
   onSubmit() {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
+      return;
+    }
+
+    if (!this.termsAccepted()) {
+      this.errorMessage.set('Debes aceptar los términos y condiciones para registrarte');
       return;
     }
 

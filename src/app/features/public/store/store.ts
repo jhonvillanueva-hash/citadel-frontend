@@ -14,5 +14,5 @@ import { ProductStore } from './components/product-store/product-store';
 })
 
 export class Store {
-  
+  filterType: 'todos' | 'mixtos' | 'promociones' | 'sabor' = 'todos';
 }

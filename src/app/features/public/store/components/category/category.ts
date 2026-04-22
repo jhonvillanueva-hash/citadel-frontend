@@ -1,39 +1,78 @@
-import { Component } from '@angular/core'
+import { Component, OnInit, inject, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
-
-export interface CategoryWine {
-    id: number;
-    name: string;
-    amount?: number;
-}
-
-export const categories: CategoryWine[] = [
-    { id: 1, name: 'Seco', amount: 24 },
-    { id: 2, name: 'Semiseco', amount: 18 },
-    { id: 3, name: 'Dulce', amount: 12 },
-]
+import { VinoService } from '../../../../../data/services/vino.service'
+import { DulzorService } from '../../../../../data/services/dulzor.service'
+import { Dulzor, Vino } from '../../../../../data/models/api.models'
+import { forkJoin } from 'rxjs'
+import { RouterLink } from '@angular/router'
 
 export interface InternalCategory {
   id: number
   name: string
-  img: string
-  amount?: number
+  amount: number
 }
-
-export const internalCategories: InternalCategory[] = [
-  ...categories.map(category => ({ id: category.id, name: category.name, img: `/img/store/${category.name.toLowerCase()}.jpg`, amount: category.amount })),
-]
 
 @Component({
   selector: 'app-category',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './category.html',
   styles: ``,
 })
 
-export class Category {
-  internalCategories: InternalCategory[] = internalCategories
+export class Category implements OnInit {
+  private vinoService = inject(VinoService)
+  private dulzorService = inject(DulzorService)
+
+  internalCategories = signal<InternalCategory[]>([])
+  isLoading = signal<boolean>(true)
+
+  ngOnInit(): void {
+    this.loadCategories()
+  }
+
+  private loadCategories(): void {
+    forkJoin({
+      vinos: this.vinoService.getAll(),
+      dulzores: this.dulzorService.getAll()
+    }).subscribe({
+      next: ({ vinos, dulzores }) => {
+        const categoriesWithCount = dulzores.map(dulzor => {
+          const amount = vinos.filter(vino => vino.id_dulzor === dulzor.id_dulzor).length
+
+          const formattedName = this.formatDulzorName(dulzor.nombre)
+
+          return {
+            id: dulzor.id_dulzor,
+            name: formattedName,
+            amount: amount
+          }
+        })
+
+        this.internalCategories.set(categoriesWithCount)
+        this.isLoading.set(false)
+      },
+      error: (error) => {
+        console.error('Error al cargar categorías:', error)
+        this.isLoading.set(false)
+      }
+    })
+  }
+
+  private formatDulzorName(nombre: string): string {
+    const lowerName = nombre.toLowerCase()
+    const capitalized = lowerName.charAt(0).toUpperCase() + lowerName.slice(1)
+    return capitalized
+  }
+
+  generarSlug(texto: string): string {
+    return texto
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-');
+  }
 
   trackById(index: number, item: InternalCategory) {
     return item.id

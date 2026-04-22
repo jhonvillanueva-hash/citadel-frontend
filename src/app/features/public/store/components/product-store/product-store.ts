@@ -1,24 +1,30 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 import { VinoService } from '../../../../../data/services/vino.service';
-import { SaborService } from '../../../../../data/services/sabor.service';
-import { PresentacionService } from '../../../../../data/services/presentacion.service';
 import { PrecioService } from '../../../../../data/services/precio.service';
 
 import { Precio, Vino } from '../../../../../data/models/api.models';
-import { forkJoin } from 'rxjs';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCartShopping, faEye } from '@fortawesome/free-solid-svg-icons';
+
+import { signal, computed } from '@angular/core';
+import { input } from '@angular/core';
+
+import { CartItem, CartService } from '../../../../../core/services/cart.service';
 
 export interface InternalProduct {
   id: number;
   flavor: string;
+  flavorId: number;
   category: string;
+  categoryId: number;
   name: string;
   description: string;
   volumen: string;
+  volumen_ml: number;
+  botellas_por_caja: number;
   state: string;
   image: string;
   iconoFlavor?: string;
@@ -35,87 +41,117 @@ export interface InternalProduct {
 
 export class ProductStore implements OnInit {
 
+  filterType = input<'todos' | 'mixtos' | 'promociones' | 'sabor' | 'dulzor'>('todos');
+  filterSaborId = input<number | undefined>();
+  filterDulzorId = input<number | undefined>();
+  @Input() filterSaborNombre?: string;
+  @Input() customTitle?: string;
+
+  private cartService = inject(CartService);
+
   icons = {
     faEye,
     faCartShopping
   }
 
   private vinoService = inject(VinoService);
-  private saborService = inject(SaborService);
-  private presentacionService = inject(PresentacionService);
   private precioService = inject(PrecioService);
 
-  products: InternalProduct[] = [];
+  allProducts = signal<InternalProduct[]>([]);
 
-  private flavorMap = new Map<number, string>();
-  private categoryMap = new Map<number, string>();
+  filteredProducts = computed(() => {
+    const products = this.allProducts();
+    const type = this.filterType();
+    const saborId = this.filterSaborId();
+    const dulzorId = this.filterDulzorId();
+
+    console.log('COMPUTED RUN', { products, type, saborId });
+
+    if (!products.length) return [];
+
+    let result = products.filter(p => p.state === 'Disponible');
+
+    if (type === 'sabor' && saborId !== undefined) {
+      result = result.filter(p => p.flavorId === saborId);
+    }
+
+    if (type === 'dulzor' && dulzorId !== undefined) {
+      result = result.filter(p => p.categoryId === dulzorId);
+    }
+
+    return result;
+  });
 
   ngOnInit(): void {
-    this.loadCatalogs();
-  }
-
-  private loadCatalogs(): void {
-    this.saborService.getAll().subscribe(sabores => {
-      sabores.forEach(s => this.flavorMap.set(s.id_sabor, s.nombre));
-
-      this.presentacionService.getAll().subscribe(presentaciones => {
-        presentaciones.forEach(p =>
-          this.categoryMap.set(p.id_presentacion, '')
-        );
-
-        this.loadVinosYPrecios();
-      });
-    });
+    this.loadVinosYPrecios();
   }
 
   private loadVinosYPrecios(): void {
-    forkJoin({
-      vinos: this.vinoService.getAll(),
-      precios: this.precioService.getAll()
-    }).subscribe(({ vinos, precios }) => {
-      this.products = this.mapProducts(vinos, precios);
+    this.vinoService.getAll().subscribe({
+      next: (vinos: Vino[]) => {
+        this.precioService.getAll().subscribe({
+          next: (precios: Precio[]) => {
+            this.allProducts.set(this.mapProducts(vinos, precios));
+          }
+        });
+      }
     });
+  }
+
+  private capitalizeFirstLetter(nombre: string): string {
+    if (!nombre || nombre === 'Desconocido') return nombre;
+
+    const lowerName = nombre.toLowerCase();
+    return lowerName.charAt(0).toUpperCase() + lowerName.slice(1);
   }
 
 private mapProducts(vinos: Vino[], precios: Precio[]): InternalProduct[] {
-    return vinos.map(vino => {
+  return vinos.map(vino => {
+    const rawFlavorName = vino.Sabor?.nombre ?? 'Desconocido';
+    const rawCategoryName = vino.Dulzor?.nombre ?? 'Desconocido';
 
-      const flavorName = this.flavorMap.get(vino.id_sabor) ?? 'Desconocido';
-      const categoryName = this.categoryMap.get(vino.id_presentacion) ?? 'Desconocido';
+    const flavorName = this.capitalizeFirstLetter(rawFlavorName);
+    const categoryName = this.capitalizeFirstLetter(rawCategoryName);
 
-      const preciosDelVino = precios.filter(p => p.id_vino === vino.id_vino);
+    const volumenMl = vino.Presentacion?.volumen_ml ?? 0;
+    const botellasPorCaja = vino.Presentacion?.botellas_por_caja ?? 12;
 
-      return {
-        id: vino.id_vino,
-        flavor: flavorName,
-        category: categoryName,
-        name: vino.nombre,
-        description: vino.descripcion,
-        volumen: `ml`,
-        state: vino.estado === 'D' ? 'Disponible' : 'No disponible',
-        image: vino.url_img_principal,
-        prices: preciosDelVino,
+    const preciosDelVino = precios.filter(p => p.id_vino === vino.id_vino);
 
-        iconoCategory: this.getCategoryIcon(categoryName),
-        iconoFlavor: this.getFlavorIcon(flavorName),
-      };
-    });
-  }
+    return {
+      id: vino.id_vino,
+      flavor: flavorName,
+      flavorId: vino.id_sabor,
+      category: categoryName,
+      categoryId: vino.id_dulzor,
+      name: vino.nombre,
+      description: vino.descripcion,
+      volumen: `${volumenMl} ml`,
+      volumen_ml: volumenMl,
+      botellas_por_caja: botellasPorCaja,
+      state: vino.estado === 'D' ? 'Disponible' : 'No disponible',
+      image: vino.url_img_principal,
+      prices: preciosDelVino,
+      iconoCategory: this.getCategoryIcon(rawCategoryName),
+      iconoFlavor: this.getFlavorIcon(rawFlavorName),
+    };
+  });
+}
 
   private getCategoryIcon(category: string): string {
     const lowerCat = category.toLowerCase();
     if (lowerCat.includes('dulce')) return '/img/store/icons/droplet-fill.svg';
-    if (lowerCat.includes('seco')) return '/img/store/icons/droplet.svg';
     if (lowerCat.includes('semiseco')) return '/img/store/icons/droplet-half.svg';
-    return '';
+    if (lowerCat.includes('seco')) return '/img/store/icons/droplet.svg';
+    return '/img/store/icons/droplet.svg';
   }
 
   private getFlavorIcon(flavor: string): string {
     const lowerFlavor = flavor.toLowerCase();
-    if (lowerFlavor.includes('frambuesas')) return '/img/store/icons/baya.svg';
-    if (lowerFlavor.includes('zarzamoras')) return '/img/store/icons/mora-de-los-pantanos.svg';
-    if (lowerFlavor.includes('arandanos')) return '/img/store/icons/arandanos.svg';
-    return '';
+    if (lowerFlavor.includes('frambuesa')) return '/img/store/icons/baya.svg';
+    if (lowerFlavor.includes('zarzamora')) return '/img/store/icons/mora-de-los-pantanos.svg';
+    if (lowerFlavor.includes('arandano')) return '/img/store/icons/arandanos.svg';
+    return '/img/store/icons/baya.svg';
   }
 
   getMainPrice(prices: Precio[] | undefined): Precio | null {
@@ -127,7 +163,56 @@ private mapProducts(vinos: Vino[], precios: Precio[]): InternalProduct[] {
     return unitPrice || prices[0];
   }
 
+  addToCart(wine: InternalProduct) {
+    const mainPrice = this.getMainPrice(wine.prices);
+    if (!mainPrice) return;
+
+    const preciosOrdenados = (wine.prices || [])
+      .sort((a, b) => a.cantidad_minima - b.cantidad_minima)
+      .map(p => ({
+        cantidad: p.cantidad_minima,
+        precio: parseFloat(p.precio as unknown as string)
+      }));
+
+    const precioBase = preciosOrdenados.find(p => p.cantidad === 1)?.precio || 0;
+
+    const cartItem: CartItem = {
+      id_vino: wine.id,
+      nombre: wine.name,
+      cantidad: 1,  
+      presentacion: `1 botella`,
+      volumen_ml: wine.volumen_ml,
+      url_img_principal: wine.image,
+      precio_base: precioBase,
+      precios_por_cantidad: preciosOrdenados,
+      botellas_por_caja: wine.botellas_por_caja,
+      esCaja: false
+    };
+
+    this.cartService.addToCart(cartItem);
+  }
+
   trackById(index: number, item: InternalProduct) {
     return item.id;
+  }
+
+  generarSlug(texto: string): string {
+    return texto
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-');
+  }
+
+  getTitle(): string {
+    if (this.customTitle) return this.customTitle;
+
+    switch (this.filterType()) {
+      case 'todos': return 'Todos los Vinos';
+      case 'mixtos': return 'Vinos Mixtos';
+      case 'promociones': return 'Vinos en Promoción';
+      default: return 'Lista de Vinos';
+    }
   }
 }
