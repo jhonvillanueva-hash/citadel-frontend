@@ -18,6 +18,7 @@
     <div class="w-full max-w-7xl mx-auto">
       <div class="grid items-start grid-cols-1 lg:grid-cols-5 gap-8 max-lg:gap-12 max-sm:gap-8">
 
+        <!-- Zona de imágenes - SIN MODIFICAR -->
         <div class="w-full top-0 lg:col-span-3">
           <div class="flex flex-row gap-2">
             <div class="flex flex-col gap-2 w-16 max-sm:w-10 shrink-0">
@@ -51,42 +52,45 @@
           </div>
         </div>
 
+        <!-- Zona de detalles - TEXTOS REDUCIDOS -->
         <div class="w-full lg:col-span-2">
 
+          <!-- Título y descripción -->
           <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-[#0e0d12] mb-2">
+            <h1 class="text-xl sm:text-2xl font-bold text-[#0e0d12] mb-1">
               {{ wine.nombre }}
             </h1>
 
-            <div class="mt-4">
-              <p class="text-[#0e0d12]/80 text-sm leading-relaxed">
+            <div class="mt-2">
+              <p class="text-[#0e0d12]/70 text-xs leading-relaxed">
                 {{ wine.descripcion }}
               </p>
             </div>
 
-            <div class="flex items-center flex-wrap gap-4 mt-6">
+            <div class="flex items-center flex-wrap gap-3 mt-4">
               <div class="flex items-baseline gap-2">
-                <h4 class="text-[#0e0d12] text-3xl sm:text-4xl font-bold">
+                <h4 class="text-[#0e0d12] text-2xl sm:text-3xl font-bold">
                   S/ {{ getCurrentPrice() }}
                 </h4>
-                <p class="text-[#0e0d12]/50 text-lg line-through">
+                <p class="text-[#0e0d12]/40 text-base line-through">
                   S/ {{ wine.precio_base }}
                 </p>
               </div>
               @if (getSavingsPerBottle() > 0) {
-                <div class="bg-green-100 text-green-700 px-3 py-1 rounded-none text-sm font-semibold">
-                  Ahorras S/ {{ getSavingsPerBottle() }} por botella
+                <div class="bg-green-100 text-green-700 px-2 py-0.5 text-xs font-medium">
+                  Ahorras S/ {{ getSavingsPerBottle() }}/botella
                 </div>
               }
             </div>
           </div>
 
-          <hr class="my-6 border-gray-200" />
+          <hr class="my-4 border-gray-200" />
 
+          <!-- Opciones de Compra -->
           <div>
-            <h3 class="text-xl font-semibold text-[#0e0d12] mb-4">Opciones de Compra</h3>
+            <h3 class="text-base font-semibold text-[#0e0d12] mb-3">Opciones de Compra</h3>
 
-            <div class="flex gap-4 mb-6">
+            <div class="flex gap-3 mb-5">
               <button
                 (click)="setIndividualMode()"
                 [class.bg-[#0e0d12]]="selectedBoxType() === 'individual'"
@@ -95,7 +99,7 @@
                 [class.bg-white]="selectedBoxType() !== 'individual'"
                 [class.text-[#0e0d12]]="selectedBoxType() !== 'individual'"
                 [class.border-gray-300]="selectedBoxType() !== 'individual'"
-                class="px-6 py-2 rounded-none border-2 transition font-medium"
+                class="px-4 py-1.5 text-sm border-2 transition font-medium"
               >
                 Botellas Individuales
               </button>
@@ -107,28 +111,28 @@
                 [class.bg-white]="selectedBoxType() !== 'boxes'"
                 [class.text-[#0e0d12]]="selectedBoxType() !== 'boxes'"
                 [class.border-gray-300]="selectedBoxType() !== 'boxes'"
-                class="px-6 py-2 rounded-none border-2 transition font-medium"
+                class="px-4 py-1.5 text-sm border-2 transition font-medium"
               >
-                Cajas ({{ wine.presentacion.botellas_por_caja }} botellas)
+                Cajas ({{ wine.presentacion.botellas_por_caja }})
               </button>
             </div>
 
             @if (selectedBoxType() === 'individual') {
               <div>
-                <label class="text-sm font-medium text-[#0e0d12] mb-2 block">Cantidad de botellas</label>
-                <div class="flex gap-4 items-center border border-gray-300 bg-white rounded-none px-4 py-2 w-max">
+                <label class="text-xs font-medium text-[#0e0d12] mb-1.5 block">Cantidad de botellas</label>
+                <div class="flex gap-3 items-center border border-gray-300 bg-white px-3 py-1.5 w-fit">
                   <button
                     (click)="decrementQuantity()"
-                    class="w-8 h-8 flex items-center justify-center border-0 bg-gray-100 rounded-none hover:bg-gray-200 transition cursor-pointer text-[#0e0d12] font-bold"
+                    class="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition text-[#0e0d12] font-bold text-sm"
                   >
                     -
                   </button>
-                  <span class="text-[#0e0d12] text-base font-semibold px-6 min-w-[60px] text-center">
+                  <span class="text-[#0e0d12] text-sm font-semibold px-4 min-w-[50px] text-center">
                     {{ selectedQuantity() }}
                   </span>
                   <button
                     (click)="incrementQuantity()"
-                    class="w-8 h-8 flex items-center justify-center border-0 bg-gray-100 rounded-none hover:bg-gray-200 transition cursor-pointer text-[#0e0d12] font-bold"
+                    class="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition text-[#0e0d12] font-bold text-sm"
                   >
                     +
                   </button>
@@ -138,8 +142,8 @@
 
             @if (selectedBoxType() === 'boxes') {
               <div>
-                <label class="text-sm font-medium text-[#0e0d12] mb-2 block">Cantidad de cajas</label>
-                <div class="flex flex-wrap gap-3 mb-4">
+                <label class="text-xs font-medium text-[#0e0d12] mb-1.5 block">Cantidad de cajas</label>
+                <div class="flex flex-wrap gap-2 mb-3">
                   <button
                     (click)="setBoxes(1)"
                     [class.bg-[#0e0d12]]="selectedBoxes() === 1"
@@ -147,7 +151,7 @@
                     [class.bg-white]="selectedBoxes() !== 1"
                     [class.text-[#0e0d12]]="selectedBoxes() !== 1"
                     [class.border-gray-300]="selectedBoxes() !== 1"
-                    class="w-12 h-10 rounded-none border transition font-medium"
+                    class="w-10 h-8 text-sm border transition font-medium"
                   >
                     1
                   </button>
@@ -158,7 +162,7 @@
                     [class.bg-white]="selectedBoxes() !== 5"
                     [class.text-[#0e0d12]]="selectedBoxes() !== 5"
                     [class.border-gray-300]="selectedBoxes() !== 5"
-                    class="w-12 h-10 rounded-none border transition font-medium"
+                    class="w-10 h-8 text-sm border transition font-medium"
                   >
                     5
                   </button>
@@ -169,25 +173,25 @@
                     [class.bg-white]="selectedBoxes() !== 10"
                     [class.text-[#0e0d12]]="selectedBoxes() !== 10"
                     [class.border-gray-300]="selectedBoxes() !== 10"
-                    class="w-12 h-10 rounded-none border transition font-medium"
+                    class="w-10 h-8 text-sm border transition font-medium"
                   >
                     10
                   </button>
                 </div>
 
-                <div class="flex gap-4 items-center border border-gray-300 bg-white rounded-none px-4 py-2 w-max">
+                <div class="flex gap-3 items-center border border-gray-300 bg-white px-3 py-1.5 w-fit">
                   <button
                     (click)="decrementBoxes()"
-                    class="w-8 h-8 flex items-center justify-center border-0 bg-gray-100 rounded-none hover:bg-gray-200 transition cursor-pointer text-[#0e0d12] font-bold"
+                    class="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition text-[#0e0d12] font-bold text-sm"
                   >
                     -
                   </button>
-                  <span class="text-[#0e0d12] text-base font-semibold px-6 min-w-[60px] text-center">
+                  <span class="text-[#0e0d12] text-sm font-semibold px-4 min-w-[50px] text-center">
                     {{ selectedBoxes() }}
                   </span>
                   <button
                     (click)="incrementBoxes()"
-                    class="w-8 h-8 flex items-center justify-center border-0 bg-gray-100 rounded-none hover:bg-gray-200 transition cursor-pointer text-[#0e0d12] font-bold"
+                    class="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition text-[#0e0d12] font-bold text-sm"
                   >
                     +
                   </button>
@@ -195,73 +199,74 @@
               </div>
             }
 
-            <div class="mt-6 p-4 bg-gray-50 rounded-none">
-              <div class="flex justify-between items-center mb-2">
-                <span class="text-[#0e0d12] font-medium">Total a pagar:</span>
-                <span class="text-[#0e0d12] text-2xl font-bold">S/ {{ getTotal() }}</span>
+            <div class="mt-5 p-3 bg-gray-50">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-[#0e0d12] font-medium text-sm">Total a pagar:</span>
+                <span class="text-[#0e0d12] text-xl font-bold">S/ {{ getTotal() }}</span>
               </div>
               @if (getTotalSavings() > 0) {
-                <div class="flex justify-between items-center mb-4 text-sm">
+                <div class="flex justify-between items-center mb-3 text-xs">
                   <span class="text-green-600 font-medium">Ahorro total:</span>
                   <span class="text-green-600 font-semibold">S/ {{ getTotalSavings() }}</span>
                 </div>
               }
               <button
                 (click)="addToCart()"
-                class="w-full py-3 bg-[#0e0d12] text-white rounded-none font-medium hover:bg-[#1c1a24] transition"
+                class="w-full py-2 bg-[#0e0d12] text-white font-medium hover:bg-[#1c1a24] transition text-sm"
               >
                 Añadir al Carrito
               </button>
             </div>
           </div>
 
-          <hr class="my-6 border-gray-200" />
+          <hr class="my-4 border-gray-200" />
 
+          <!-- Información del Vino -->
           <div>
-            <h3 class="text-xl font-semibold text-[#0e0d12] mb-4">Información del Vino</h3>
+            <h3 class="text-base font-semibold text-[#0e0d12] mb-3">Información del Vino</h3>
 
-            <div class="grid grid-cols-2 gap-4 mb-6">
-              <div class="bg-gray-50 p-3 rounded-none">
-                <p class="text-xs text-[#0e0d12]/60 mb-1">Sabor</p>
-                <p class="text-[#0e0d12] font-semibold">{{ wine.sabor }}</p>
+            <div class="grid grid-cols-2 gap-3 mb-5">
+              <div class="bg-gray-50 p-2">
+                <p class="text-[10px] text-[#0e0d12]/60 mb-0.5">Sabor</p>
+                <p class="text-[#0e0d12] font-medium text-sm">{{ wine.sabor }}</p>
               </div>
-              <div class="bg-gray-50 p-3 rounded-none">
-                <p class="text-xs text-[#0e0d12]/60 mb-1">Dulzor</p>
-                <p class="text-[#0e0d12] font-semibold">{{ wine.dulzor }}</p>
+              <div class="bg-gray-50 p-2">
+                <p class="text-[10px] text-[#0e0d12]/60 mb-0.5">Dulzor</p>
+                <p class="text-[#0e0d12] font-medium text-sm">{{ wine.dulzor }}</p>
               </div>
-              <div class="bg-gray-50 p-3 rounded-none">
-                <p class="text-xs text-[#0e0d12]/60 mb-1">Volumen</p>
-                <p class="text-[#0e0d12] font-semibold">{{ wine.presentacion.volumen_ml }} ml</p>
+              <div class="bg-gray-50 p-2">
+                <p class="text-[10px] text-[#0e0d12]/60 mb-0.5">Volumen</p>
+                <p class="text-[#0e0d12] font-medium text-sm">{{ wine.presentacion.volumen_ml }} ml</p>
               </div>
-              <div class="bg-gray-50 p-3 rounded-none">
-                <p class="text-xs text-[#0e0d12]/60 mb-1">Botellas por caja</p>
-                <p class="text-[#0e0d12] font-semibold">{{ wine.presentacion.botellas_por_caja }}</p>
+              <div class="bg-gray-50 p-2">
+                <p class="text-[10px] text-[#0e0d12]/60 mb-0.5">Botellas por caja</p>
+                <p class="text-[#0e0d12] font-medium text-sm">{{ wine.presentacion.botellas_por_caja }}</p>
               </div>
             </div>
 
             <div>
-              <h4 class="text-md font-semibold text-[#0e0d12] mb-3">Precios por volumen</h4>
+              <h4 class="text-sm font-semibold text-[#0e0d12] mb-2">Precios por volumen</h4>
               <div class="overflow-x-auto">
-                <table class="w-full text-sm">
+                <table class="w-full text-xs">
                   <thead class="bg-gray-50">
                     <tr>
-                      <th class="px-4 py-2 text-left text-[#0e0d12]">Cantidad</th>
-                      <th class="px-4 py-2 text-left text-[#0e0d12]">Precio unitario</th>
-                      <th class="px-4 py-2 text-left text-[#0e0d12]">Ahorro por botella</th>
+                      <th class="px-3 py-1.5 text-left text-[#0e0d12]">Cantidad</th>
+                      <th class="px-3 py-1.5 text-left text-[#0e0d12]">Precio unitario</th>
+                      <th class="px-3 py-1.5 text-left text-[#0e0d12]">Ahorro</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-gray-200">
                     @for (price of wine.precios_por_cantidad; track $index) {
                       <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-2 text-[#0e0d12]/80">
+                        <td class="px-3 py-1.5 text-[#0e0d12]/70">
                           @if (price.cantidad === 1) {
                             {{ price.cantidad }} botella
                           } @else {
                             {{ price.cantidad }} botellas
                           }
                         </td>
-                        <td class="px-4 py-2 text-[#0e0d12]/80">S/ {{ price.precio }}</td>
-                        <td class="px-4 py-2 text-green-600">S/ {{ price.ahorro }}</td>
+                        <td class="px-3 py-1.5 text-[#0e0d12]/70">S/ {{ price.precio }}</td>
+                        <td class="px-3 py-1.5 text-green-600">S/ {{ price.ahorro }}</td>
                       </tr>
                     }
                   </tbody>

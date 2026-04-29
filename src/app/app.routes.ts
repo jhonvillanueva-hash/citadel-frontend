@@ -11,6 +11,9 @@ import { DetailsStore } from './features/public/store/pages/details-store/detail
 import { FlavorStore } from './features/public/store/pages/flavor-store/flavor-store';
 import { SweetStore } from './features/public/store/pages/sweet-store/sweet-store';
 import { ComplaintsComponent } from './features/public/complaints/complaints';
+import { CartStore } from './features/public/store/pages/cart-store/cart-store';
+import { CheckoutStore } from './features/public/store/pages/checkout-store/checkout-store';
+import { ProfileStore } from './features/public/store/pages/profile-store/profile-store';
 
 export const routes: Routes = [
   {
@@ -42,6 +45,10 @@ export const routes: Routes = [
     component: Store,
   },
   {
+    path: 'store/profile',
+    component: ProfileStore
+  },
+  {
     path: 'store/products/flavors/:name',
     component: FlavorStore,
   },
@@ -56,6 +63,14 @@ export const routes: Routes = [
   {
     path: 'store/products/:slug/:id',
     component: DetailsStore
+  },
+  {
+    path: 'store/cart/checkout',
+    component: CheckoutStore
+  },
+  {
+    path: 'store/cart',
+    component: CartStore
   },
   {
     path: 'admin',
