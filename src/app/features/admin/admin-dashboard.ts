@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { RouterOutlet } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faUser, faChevronDown, faRobot, faArrowRightFromBracket, faBarsStaggered, faBars, faShield, faShieldVirus, faChartLine, faWineBottle, faArrowLeft, faImage } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faChevronDown, faRobot, faArrowRightFromBracket, faBarsStaggered, faBars, faShield, faShieldVirus, faChartLine, faWineBottle, faArrowLeft, faImage, faCommentDots } from '@fortawesome/free-solid-svg-icons';
 import { SidebarItemComponent } from '../../shared/components/admin-sidebar/sidebar-item';
 
 @Component({
@@ -30,6 +30,7 @@ export class AdminDashboardComponent {
     faChartLine,
     faWineBottle,
     faImage,
+    faCommentDots
   };
 
   toggleSidebar() {

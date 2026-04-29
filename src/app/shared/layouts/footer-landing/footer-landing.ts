@@ -2,13 +2,14 @@ import { Component } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEnvelope, faGear } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook, faInstagram, faTwitter, faWhatsapp, faYoutube } from '@fortawesome/free-brands-svg-icons';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-footer-landing',
   standalone: true,
   templateUrl: './footer-landing.html',
   styles: ``,
-  imports: [FontAwesomeModule],
+  imports: [FontAwesomeModule, RouterLink],
 })
 export class FooterLanding {
   icons = {
