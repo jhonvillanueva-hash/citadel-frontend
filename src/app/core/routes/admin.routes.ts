@@ -9,6 +9,7 @@ import { BannersCreateComponent } from '../../features/admin/banners/banners-cre
 import { BannersListComponent } from '../../features/admin/banners/banners-list/banners-list';
 import { WinesConfigComponent } from '../../features/admin/wines/wines-config/wines-config';
 import { WinesEditComponent } from '../../features/admin/wines/wines-edit/wines-edit';
+import { ComplaintsComponent } from '../../features/admin/complaints/complaints';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -51,6 +52,10 @@ export const ADMIN_ROUTES: Routes = [
       {
         path: 'banners/create',
         component: BannersCreateComponent
+      },
+      {
+        path: 'complaints',
+        component: ComplaintsComponent
       },
       {
         path: '',

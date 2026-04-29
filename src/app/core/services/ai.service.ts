@@ -66,7 +66,7 @@ export class AiService {
       }
 
     } catch (e) {
-      // Si no es JSON válido, simplemente lo tratamos como texto plano.
+      console.log(e);
     }
 
     return { format: 'text', text: raw.trim() };

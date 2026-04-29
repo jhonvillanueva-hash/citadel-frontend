@@ -92,6 +92,15 @@
             [(expandedMenu)]="expandedMenu"
             (linkClicked)="sidebarOpen = false">
           </app-admin-sidebar-item>
+
+          <app-admin-sidebar-item
+            [icon]="icons.faCommentDots"
+            label="Reclamaciones"
+            route="/admin/complaints"
+            title="Reclamaciones y quejas"
+            [sidebarOpen]="sidebarOpen"
+            (linkClicked)="sidebarOpen = false">
+          </app-admin-sidebar-item>
       
           <p
             class="nav-section text-[10px] font-semibold uppercase tracking-widest text-[color:var(--admin-bg-icon)]/70 px-3 mt-4 mb-2 whitespace-nowrap" [class.hidden]="!sidebarOpen">

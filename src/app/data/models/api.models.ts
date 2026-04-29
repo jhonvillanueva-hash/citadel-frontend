@@ -96,3 +96,30 @@ export interface Banner {
   url_img: string;
   fecha_expiracion?: Date;
 }
+
+export interface Reclamo {
+  id_reclamo: number;
+  id_pedido: number;
+  dni: string;
+  nombres: string;
+  apellidos: string;
+  email: string;
+  telefono: string;
+  tipo: 'R' | 'Q';
+  motivo: string;
+  detalles: string;
+  estado: 'N' | 'R' | 'S';
+  fecha_creacion: Date;
+}
+
+export interface Cupon {
+  id_cupon: number;
+  codigo: number;
+  tipo_descuento: 'F' | 'P';
+  descuento: number;
+  monto_minimo: number;
+  fecha_inicio: Date;
+  fecha_fin: Date;
+  activo: boolean;
+  fecha_creacion: Date;
+}

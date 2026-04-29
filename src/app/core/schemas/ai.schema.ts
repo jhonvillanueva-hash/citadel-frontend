@@ -7,7 +7,7 @@ const ApexChartConfigSchema = z.object({
   toolbar: z.object({ show: z.boolean().default(true) }).optional(),
   zoom: z.object({ enabled: z.boolean().default(false) }).optional(),
   redrawOnParentResize: z.boolean().default(true),
-}).passthrough(); // permite que el LLM añada height, width, etc.
+}).passthrough();
 
 const ApexSeriesSchema = z.object({
   name: z.string().optional(),

@@ -10,6 +10,7 @@ import { Store } from './features/public/store/store';
 import { DetailsStore } from './features/public/store/pages/details-store/details-store';
 import { FlavorStore } from './features/public/store/pages/flavor-store/flavor-store';
 import { SweetStore } from './features/public/store/pages/sweet-store/sweet-store';
+import { ComplaintsComponent } from './features/public/complaints/complaints';
 import { CartStore } from './features/public/store/pages/cart-store/cart-store';
 import { CheckoutStore } from './features/public/store/pages/checkout-store/checkout-store';
 import { ProfileStore } from './features/public/store/pages/profile-store/profile-store';
@@ -17,7 +18,8 @@ import { ProfileStore } from './features/public/store/pages/profile-store/profil
 export const routes: Routes = [
   {
     path: '',
-    component: Landing
+    component: Landing,
+    title: 'Citadel',
   },
   {
     path: 'login',
@@ -33,6 +35,10 @@ export const routes: Routes = [
     path: 'home',
     component: HomeComponent,
     canActivate: [authGuard]
+  },
+  {
+    path: 'libro-de-reclamaciones',
+    component: ComplaintsComponent,
   },
   {
     path: 'store',

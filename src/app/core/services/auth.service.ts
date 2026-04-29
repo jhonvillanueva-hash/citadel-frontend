@@ -126,6 +126,18 @@ export class AuthService {
     return user.tipo === 'A' ? '/admin' : '/store';
   }
 
+  loginWithGoogle(idToken: string): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(
+        `${this.apiUrl}/google`,
+        { idToken },
+        { withCredentials: true }
+      )
+      .pipe(
+        tap(res => this.handleLoginSuccess(res.accessToken))
+      );
+  }
+
   //Lógica Interna de Sesión
   private handleLoginSuccess(token: string): void {
     this.setSession(token);

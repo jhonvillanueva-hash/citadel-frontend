@@ -18,7 +18,6 @@ export class WinesListComponent {
   toastService = inject(ToastService);
 
   dataWines: Signal<Vino[] | null>;
-  loading = signal(true);
   error = signal<string | null>(null);
 
   constructor() {
