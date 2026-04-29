@@ -1,16 +1,16 @@
 <div class="bg-white p-4 mx-auto max-w-[1400px]">
 
   <h2 class="text-xl sm:text-3xl font-bold text-slate-900 mb-6 sm:mb-8">
-    Lista de Vinos
+    {{ getTitle() === 'Todos los Vinos' ? 'Vinos Destacados' : getTitle() }}
   </h2>
 
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
 
-    @for (wine of products; track trackById($index, wine)) {
+    @for (wine of filteredProducts(); track trackById($index, wine)) {
 
     <div class="group overflow-hidden relative">
 
-      <a class="block cursor-pointer" [routerLink]="['/store/products', wine.id]">
+      <a class="block cursor-pointer" [routerLink]="['/store/products', generarSlug(wine.name), wine.id]">
 
         <div class="aspect-[3/4] bg-slate-100 w-full overflow-hidden relative">
 
@@ -73,7 +73,9 @@
             <fa-icon [icon]="icons.faEye" class="text-[#515255] text-[18px]"/>
           </button>
 
-          <button class="bg-transparent border-0 cursor-pointer">
+          <button
+            (click)="addToCart(wine); $event.stopPropagation()"
+            class="bg-transparent border-0 cursor-pointer">
             <fa-icon [icon]="icons.faCartShopping" class="text-[#515255] text-[18px]"/>
           </button>
         </div>
@@ -87,7 +89,7 @@
 
           <h6 class="text-sm text-slate-600 font-medium mt-2">
             @if (getMainPrice(wine.prices); as mainPrice) {
-              {{ mainPrice.precio | currency:'PEN ':'symbol':'1.2-2' }}
+              S/ {{ mainPrice.precio | number:'1.2-2' }}
             }
           </h6>
         </div>

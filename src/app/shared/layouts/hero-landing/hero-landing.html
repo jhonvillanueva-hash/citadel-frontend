@@ -1,7 +1,7 @@
 <section id="inicio" class="relative min-h-screen bg-cover bg-center bg-no-repeat" style="
     background-image:
       linear-gradient(to right, rgba(0,0,0,.75), rgba(0,0,0,.2)),
-      url('/img/landing/hero/hero3.jpg');
+      url('/img/landing/hero/hero.jpg');
   ">
 
   <header
@@ -127,13 +127,15 @@
 
         <div class="mt-10 flex flex-col sm:flex-row gap-6 sm:justify-center lg:justify-start">
           <button
+            routerLink="/store"
             class="h-14 px-10 text-xl font-semibold text-white rounded-lg bg-secondary transition hover:opacity-90 animate-on-load animate-fade-in-up"
             style="animation-delay: 1.6s;">
             Ver Productos
           </button>
 
           <button
-            class="h-14 px-10 text-xl font-semibold text-secondary border-2 border-secondary rounded-lg transition hover:bg-secondary hover:text-white animate-on-load animate-fade-in-up "
+            routerLink="/login"
+            class="h-14 px-10 text-xl font-semibold text-secondary border-2 border-secondary rounded-lg transition hover:bg-secondary hover:text-white animate-on-load animate-fade-in-up"
             style="animation-delay: 1.8s;">
             Iniciar Sesión
           </button>

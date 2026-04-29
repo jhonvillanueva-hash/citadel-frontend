@@ -1,77 +1,41 @@
-<div class="py-4 mx-auto lg:max-w-6xl md:max-w-4xl max-w-md sm:max-w-xl">
-  <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-10">
-    Presentaciones
+<div class="py-4 px-4 sm:px-6 mx-auto lg:max-w-6xl md:max-w-4xl">
+  <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-6 sm:mb-10">
+    Dulzores
   </h2>
 
-  <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
+    </div>
+  } @else {
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
 
-    @for (category of internalCategories; track trackById($index, category)) {
-
-      <div
-        class="bg-gray-100 p-3 group overflow-hidden cursor-pointer relative z-50
-               hover:before:bg-black before:absolute before:inset-0
-               before:opacity-20 before:transition-all"
-      >
-
-        <div class="w-full aspect-[41/50] overflow-hidden relative">
-          <img
-            [src]="category.img"
-            [alt]="category.name"
-            class="h-full w-full object-cover
-                   group-hover:scale-105 transition-transform duration-300"
-          />
-
-          <!-- MOBILE -->
-          <div
-            class="sm:hidden absolute bottom-0 left-0 right-0
-                   bg-gradient-to-t from-black/70 to-transparent p-3"
-          >
-            <h3 class="text-white text-base font-bold truncate">
+      @for (category of internalCategories(); track trackById($index, category)) {
+        <div
+          class="group bg-[#202125] overflow-hidden cursor-pointer transition-all duration-300
+                 sm:hover:bg-[#c35b64]"
+          [routerLink]="['/store/products/sweetness', generarSlug(category.name), category.id]"
+        >
+          <div class="p-4 sm:p-6 text-center">
+            <h3 class="text-white text-base sm:text-lg lg:text-xl font-bold mb-1 sm:mb-2">
               {{ category.name }}
             </h3>
-            <p class="text-white text-xs">
-              {{ category.amount }} productos
+            <p class="text-gray-300 text-xs sm:text-sm sm:group-hover:text-white transition">
+              {{ category.amount }} {{ category.amount === 1 ? 'producto' : 'productos' }}
             </p>
-          </div>
-
-          <!-- DESKTOP HOVER -->
-          <div
-            class="absolute inset-0 flex flex-col items-center justify-center
-                   p-3 sm:p-4 opacity-0 group-hover:opacity-100
-                   transition-all duration-300 sm:translate-y-8
-                   group-hover:translate-y-0"
-          >
-            <div class="absolute inset-0 bg-black/40"></div>
-
-            <div
-              class="relative z-10 text-center transform
-                     sm:translate-y-4 group-hover:translate-y-0
-                     transition-transform duration-300 delay-100"
-            >
-              <h3 class="text-white text-lg sm:text-xl md:text-2xl font-bold mb-1">
-                {{ category.name }}
-              </h3>
-              <p class="text-white text-xs sm:text-sm md:text-base mb-4">
-                {{ category.amount }} productos
-              </p>
-            </div>
 
             <span
-              class="relative z-10 bg-white text-gray-900
-                     px-4 sm:px-6 py-1.5 sm:py-2 font-medium
-                     text-xs sm:text-sm md:text-base
-                     transform sm:translate-y-6
-                     group-hover:translate-y-0
-                     transition-transform duration-300 delay-150"
+              class="inline-block mt-3 sm:mt-4 bg-secondary text-white px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm
+                     sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300
+                     sm:transform sm:group-hover:translate-y-0 sm:translate-y-2
+                     sm:group-hover:bg-white sm:group-hover:text-secondary"
             >
               Ver más
             </span>
           </div>
-
         </div>
-      </div>
+      }
 
-    }
-
-  </div>
+    </div>
+  }
 </div>

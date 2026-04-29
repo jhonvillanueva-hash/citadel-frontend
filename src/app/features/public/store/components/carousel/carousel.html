@@ -16,9 +16,7 @@
     }
   </div>
 
-  <!-- Botones de navegación -->
   @if (images.length > 1) {
-    <!-- Botón anterior -->
     <button (click)="prev()"
             class="absolute left-4 top-1/2 -translate-y-1/2 z-20
                    bg-black/40 hover:bg-black/60 text-white
@@ -30,7 +28,6 @@
       </svg>
     </button>
 
-    <!-- Botón siguiente -->
     <button (click)="next()"
             class="absolute right-4 top-1/2 -translate-y-1/2 z-20
                    bg-black/40 hover:bg-black/60 text-white
@@ -42,7 +39,6 @@
       </svg>
     </button>
 
-    <!-- Indicadores de slides -->
     <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
       @for (img of images; track img; let i = $index) {
         <button

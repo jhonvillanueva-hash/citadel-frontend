@@ -1,10 +1,29 @@
-<!-- Carousel con márgenes separados del header -->
+
 <div class="mt-6 mb-8 px-4 lg:px-10">
-  <app-carousel
-    [images]="carouselImages"
-    [autoSlide]="true"
-    [slideInterval]="5000">
-  </app-carousel>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center h-64">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
+    </div>
+  }
+
+  @else if (error()) {
+    <div class="flex justify-center items-center h-64 bg-red-50 rounded-lg">
+      <p class="text-red-600">{{ error() }}</p>
+    </div>
+  }
+
+  @else if (carouselImages().length > 0) {
+    <app-carousel
+      [images]="carouselImages()"
+      [autoSlide]="true"
+      [slideInterval]="5000">
+    </app-carousel>
+  }
+
+  @else {
+    <div class="flex justify-center items-center h-64 bg-gray-100 rounded-lg">
+      <p class="text-gray-500">No hay banners disponibles</p>
+    </div>
+  }
 </div>
-
-

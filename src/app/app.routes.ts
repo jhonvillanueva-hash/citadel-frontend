@@ -8,6 +8,8 @@ import { adminGuard } from './core/guards/admin.guard';
 import { Landing } from './features/public/landing/landing';
 import { Store } from './features/public/store/store';
 import { DetailsStore } from './features/public/store/pages/details-store/details-store';
+import { FlavorStore } from './features/public/store/pages/flavor-store/flavor-store';
+import { SweetStore } from './features/public/store/pages/sweet-store/sweet-store';
 
 export const routes: Routes = [
   {
@@ -34,7 +36,19 @@ export const routes: Routes = [
     component: Store,
   },
   {
-    path: 'store/products/:id',
+    path: 'store/products/flavors/:name',
+    component: FlavorStore,
+  },
+  {
+    path: 'store/products/flavors/:name/:id',
+    component: FlavorStore,
+  },
+  {
+    path: 'store/products/sweetness/:name/:id',
+    component: SweetStore,
+  },
+  {
+    path: 'store/products/:slug/:id',
     component: DetailsStore
   },
   {
