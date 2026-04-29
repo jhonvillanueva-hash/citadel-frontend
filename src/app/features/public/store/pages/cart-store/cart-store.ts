@@ -1,31 +1,21 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink, Router } from '@angular/router';
 import { CartService } from '../../../../../core/services/cart.service';
-import { BodyScrollLockDirective } from '../../../../../shared/directives/body-scroll-lock.directive';
-import { RouterLink, NavigationStart, Router  } from "@angular/router";
 
 @Component({
-  selector: 'app-cart-modal',
+  selector: 'app-cart-store',
   standalone: true,
-  imports: [CommonModule, FormsModule, BodyScrollLockDirective, RouterLink],
-  templateUrl: './cart-modal.html',
-  styles: ``
+  imports: [CommonModule, FormsModule, RouterLink],
+  templateUrl: './cart-store.html',
 })
 
-export class CartModal {
+export class CartStore {
   cartService = inject(CartService);
   cartItems = this.cartService.getCartItems();
   subtotal = this.cartService.subtotal;
   private router = inject(Router);
-
-  constructor() {
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationStart) {
-        this.cartService.close();
-      }
-    });
-  }
 
   getQuantityText(item: any): string {
     const totalBotellas = item.cantidad;
@@ -63,5 +53,24 @@ export class CartModal {
 
   removeItem(item: any) {
     this.cartService.removeItem(item.id_vino);
+  }
+
+  getTotalAhorro(): number {
+    let totalAhorro = 0;
+    for (const item of this.cartItems()) {
+      if (this.tieneDescuento(item)) {
+        totalAhorro += (item.precio_base - this.getPrecioUnitarioActual(item)) *
+          (item.esCaja ? item.cantidad * item.botellas_por_caja : item.cantidad);
+      }
+    }
+    return totalAhorro;
+  }
+
+  getTotal(): number {
+    return this.subtotal();
+  }
+
+  volverATienda() {
+    this.router.navigate(['/store']);
   }
 }

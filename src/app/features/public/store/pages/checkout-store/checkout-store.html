@@ -1,0 +1,261 @@
+<div class="min-h-screen bg-white">
+  <div class="p-4 md:p-6 lg:p-8">
+    <div class="w-full max-w-7xl mx-auto">
+      <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
+        <div class="flex-1 lg:flex-[2] min-w-0">
+          <h1 class="text-2xl md:text-3xl font-bold text-[#0e0d12] mb-8">Finalizar compra</h1>
+
+          <div class="space-y-6">
+            <div class="border border-gray-200 bg-white">
+              <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-[#0e0d12] text-white flex items-center justify-center text-sm font-medium">1</div>
+                  <span class="font-medium text-[#0e0d12]">Información personal</span>
+                </div>
+              </div>
+              <div class="p-6">
+                <div class="space-y-5">
+                  <div>
+                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Email *</label>
+                    <input type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" [disabled]="step1Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="cliente@ejemplo.com">
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Nombres *</label>
+                      <input type="text" [ngModel]="nombres()" (ngModelChange)="nombres.set($event)" [disabled]="step1Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="Juan">
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Apellidos *</label>
+                      <input type="text" [ngModel]="apellidos()" (ngModelChange)="apellidos.set($event)" [disabled]="step1Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="Pérez">
+                    </div>
+                  </div>
+                  <div class="flex gap-3">
+                    <button (click)="completeStep1()" [disabled]="!email() || !nombres() || !apellidos() || !email().includes('@') || !email().includes('.') || step1Completed()" class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
+                      Continuar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="border border-gray-200 bg-white">
+              <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 flex items-center justify-center text-sm font-medium" [class.bg-[#0e0d12]]="step2Enabled()" [class.text-white]="step2Enabled()" [class.bg-gray-200]="!step2Enabled()" [class.text-gray-500]="!step2Enabled()">2</div>
+                  <span class="font-medium" [class.text-[#0e0d12]]="step2Enabled()" [class.text-gray-400]="!step2Enabled()">Envío y dirección</span>
+                </div>
+              </div>
+              <div class="p-6">
+                <div class="space-y-5">
+                  <div class="grid grid-cols-2 gap-4">
+                    <button (click)="deliveryType.set('home')" [disabled]="!step2Enabled() || step2Completed()" [class.bg-[#0e0d12]]="deliveryType() === 'home' && step2Enabled() && !step2Completed()" [class.text-white]="deliveryType() === 'home' && step2Enabled() && !step2Completed()" [class.border-[#0e0d12]]="deliveryType() === 'home' && step2Enabled() && !step2Completed()" [class.border-gray-300]="deliveryType() !== 'home' || !step2Enabled() || step2Completed()" [class.opacity-50]="!step2Enabled() || step2Completed()" class="py-3 px-4 border text-center font-medium disabled:cursor-not-allowed text-sm transition-all">
+                      Recibir en casa
+                    </button>
+                    <button (click)="deliveryType.set('pickup')" [disabled]="!step2Enabled() || step2Completed()" [class.bg-[#0e0d12]]="deliveryType() === 'pickup' && step2Enabled() && !step2Completed()" [class.text-white]="deliveryType() === 'pickup' && step2Enabled() && !step2Completed()" [class.border-[#0e0d12]]="deliveryType() === 'pickup' && step2Enabled() && !step2Completed()" [class.border-gray-300]="deliveryType() !== 'pickup' || !step2Enabled() || step2Completed()" [class.opacity-50]="!step2Enabled() || step2Completed()" class="py-3 px-4 border text-center font-medium disabled:cursor-not-allowed text-sm transition-all">
+                      Recoger en tienda
+                    </button>
+                  </div>
+
+                  @if (deliveryType() === 'home') {
+                    <div class="space-y-4">
+                      <div class="grid grid-cols-1 gap-4">
+                        <div>
+                          <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Departamento *</label>
+                          <select [ngModel]="departamento()" (ngModelChange)="departamento.set($event); onDepartamentoChange()" [disabled]="!step2Enabled() || step2Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
+                            <option value="" disabled selected>Seleccionar departamento</option>
+                            @for (dep of departamentos; track dep.id) {
+                              <option [value]="dep.id">{{ dep.departamento }}</option>
+                            }
+                          </select>
+                        </div>
+                        <div>
+                          <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Provincia *</label>
+                          <select [ngModel]="provincia()" (ngModelChange)="provincia.set($event); onProvinciaChange()" [disabled]="!step2Enabled() || step2Completed() || !departamento()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
+                            <option value="" disabled selected>Seleccionar provincia</option>
+                            @for (prov of filteredProvincias; track prov.id) {
+                              <option [value]="prov.id">{{ prov.provincia }}</option>
+                            }
+                          </select>
+                        </div>
+                        <div>
+                          <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Distrito *</label>
+                          <select [ngModel]="distrito()" (ngModelChange)="distrito.set($event)" [disabled]="!step2Enabled() || step2Completed() || !provincia()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
+                            <option value="" disabled selected>Seleccionar distrito</option>
+                            @for (dist of filteredDistritos; track dist.id) {
+                              <option [value]="dist.id">{{ dist.distrito }}</option>
+                            }
+                          </select>
+                        </div>
+                        <div>
+                          <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Avenida / Calle / Jirón *</label>
+                          <input type="text" [ngModel]="direccion()" (ngModelChange)="direccion.set($event)" [disabled]="!step2Enabled() || step2Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="Av. José Pardo">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                          <div>
+                            <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Número *</label>
+                            <input type="text" [ngModel]="numeroCasa()" (ngModelChange)="numeroCasa.set($event)" [disabled]="!step2Enabled() || step2Completed()" class="w-full px-3 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="123">
+                          </div>
+                          <div>
+                            <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Código Postal</label>
+                            <input type="text" [ngModel]="codigoPostal()" (ngModelChange)="codigoPostal.set($event)" [disabled]="!step2Enabled() || step2Completed()" class="w-full px-3 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="15001">
+                          </div>
+                        </div>
+                        <div class="flex gap-2">
+                          <button (click)="buscarEnMapa()" [disabled]="!step2Enabled() || step2Completed() || !direccion() || !departamento() || !provincia() || !distrito() || !numeroCasa()" class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed text-sm font-medium">
+                            Buscar en mapa
+                          </button>
+                        </div>
+                        @if (mapUrl()) {
+                          <iframe [src]="mapUrl()" width="100%" height="300" style="border:0" loading="lazy" allowfullscreen></iframe>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  @if (deliveryType() === 'pickup') {
+                    <div class="bg-gray-50 p-5 border border-gray-200">
+                      <p class="font-medium text-[#0e0d12] mb-2 text-sm">Punto de recogida</p>
+                      <p class="text-[#0e0d12]/70 mb-1 text-sm">{{ pickupAddress() }}</p>
+                      <p class="text-xs text-[#0e0d12]/50">{{ pickupDetails() }}</p>
+                      <iframe [src]="storeMapUrl" width="100%" height="300" style="border:0" loading="lazy" allowfullscreen></iframe>
+                    </div>
+                  }
+
+                  <div class="flex gap-3">
+                    <button (click)="goBackToStep1()" [disabled]="!step2Enabled() || step2Completed()" class="px-6 py-2 border border-gray-300 text-[#0e0d12] hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium">
+                      Regresar
+                    </button>
+                    <button (click)="completeStep2()" [disabled]="!step2Enabled() || step2Completed() || (deliveryType() === 'home' && (!direccion() || !departamento() || !provincia() || !distrito() || !numeroCasa()))" class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
+                      Continuar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="border border-gray-200 bg-white">
+              <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 flex items-center justify-center text-sm font-medium" [class.bg-[#0e0d12]]="step3Enabled()" [class.text-white]="step3Enabled()" [class.bg-gray-200]="!step3Enabled()" [class.text-gray-500]="!step3Enabled()">3</div>
+                  <span class="font-medium" [class.text-[#0e0d12]]="step3Enabled()" [class.text-gray-400]="!step3Enabled()">Método de pago</span>
+                </div>
+              </div>
+              <div class="p-6">
+                <div class="space-y-4">
+                  <div (click)="step3Enabled() && !step3Completed() ? paymentMethod.set('yape') : null" [class.border-[#0e0d12]]="paymentMethod() === 'yape' && step3Enabled()" class="border border-gray-200 p-4 cursor-pointer transition-all" [class.pointer-events-none]="!step3Enabled() || step3Completed()">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                        <img [src]="yapeIcon" alt="Yape" class="w-10 h-10 object-contain rounded-lg">
+                        <div>
+                          <p class="font-medium text-[#0e0d12] text-sm">Yape</p>
+                          <p class="text-xs text-[#0e0d12]/50">Paga con Yape escaneando el código QR</p>
+                        </div>
+                      </div>
+                      <div class="w-5 h-5 rounded-full border-2" [class.border-[#0e0d12]]="paymentMethod() === 'yape'" [class.border-gray-300]="paymentMethod() !== 'yape'">
+                        @if (paymentMethod() === 'yape') {
+                          <div class="w-3 h-3 bg-[#0e0d12] m-[2px]"></div>
+                        }
+                      </div>
+                    </div>
+                    @if (paymentMethod() === 'yape') {
+                      <div class="mt-4 pt-4 border-t border-gray-200">
+                        <div class="flex justify-center">
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Commons_QR_code.png" alt="QR Yape" class="w-32 h-32 object-contain border border-gray-200">
+                        </div>
+                        <p class="text-center text-xs text-[#0e0d12]/50 mt-2">Escanea el código QR con Yape</p>
+                      </div>
+                    }
+                  </div>
+
+                  <div (click)="step3Enabled() && !step3Completed() ? paymentMethod.set('pagoefectivo') : null" [class.border-[#0e0d12]]="paymentMethod() === 'pagoefectivo' && step3Enabled()" class="border border-gray-200 p-4 cursor-pointer transition-all" [class.pointer-events-none]="!step3Enabled() || step3Completed()">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                        <img [src]="pagoEfectivoIcon" alt="PagoEfectivo" class="w-10 h-10 object-contain rounded-lg">
+                        <div>
+                          <p class="font-medium text-[#0e0d12] text-sm">PagoEfectivo</p>
+                          <p class="text-xs text-[#0e0d12]/50">Paga con código QR o referencia</p>
+                        </div>
+                      </div>
+                      <div class="w-5 h-5 rounded-full border-2" [class.border-[#0e0d12]]="paymentMethod() === 'pagoefectivo'" [class.border-gray-300]="paymentMethod() !== 'pagoefectivo'">
+                        @if (paymentMethod() === 'pagoefectivo') {
+                          <div class="w-3 h-3 bg-[#0e0d12] m-[2px]"></div>
+                        }
+                      </div>
+                    </div>
+                    @if (paymentMethod() === 'pagoefectivo') {
+                      <div class="mt-4 pt-4 border-t border-gray-200">
+                        <div class="flex justify-center">
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Commons_QR_code.png" alt="QR PagoEfectivo" class="w-32 h-32 object-contain border border-gray-200">
+                        </div>
+                        <p class="text-center text-xs text-[#0e0d12]/50 mt-2">Escanea el código QR o usa el número de referencia</p>
+                      </div>
+                    }
+                  </div>
+
+                  <div class="flex gap-3">
+                    <button (click)="goBackToStep2()" [disabled]="!step3Enabled() || step3Completed()" class="px-6 py-2 border border-gray-300 text-[#0e0d12] hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium">
+                      Regresar
+                    </button>
+                    <button (click)="completeStep3()" [disabled]="!step3Enabled() || step3Completed() || !paymentMethod()" class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
+                      Continuar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:w-96 shrink-0">
+          <div class="sticky top-8">
+            <div class="bg-gray-50 p-5 md:p-6">
+              <h2 class="text-lg font-bold text-[#0e0d12] mb-5">Resumen del pedido</h2>
+              <div class="space-y-2 mb-4">
+                <div class="flex justify-between text-[#0e0d12]/70 text-sm">
+                  <span>Subtotal</span>
+                  <span>S/ {{ subtotal.toFixed(2) }}</span>
+                </div>
+                <div class="flex justify-between text-[#0e0d12]/70 text-sm">
+                  <span>Envío (5%)</span>
+                  <span>S/ {{ shippingCost.toFixed(2) }}</span>
+                </div>
+              </div>
+              <div class="border-t border-gray-200 pt-3 mb-5">
+                <div class="flex justify-between items-center">
+                  <span class="text-[#0e0d12] font-medium">Total</span>
+                  <span class="text-xl font-bold text-[#0e0d12]">S/ {{ total.toFixed(2) }}</span>
+                </div>
+              </div>
+              <button (click)="confirmReserve()" [disabled]="!isReserveEnabled" class="w-full py-2.5 bg-[#0e0d12] text-white font-medium hover:bg-[#1c1a24] transition text-sm disabled:bg-gray-300 disabled:cursor-not-allowed">
+                RESERVAR
+              </button>
+              <button (click)="goBackToStore()" class="w-full mt-3 py-2.5 border border-gray-300 text-[#0e0d12] font-medium hover:bg-gray-50 transition text-sm">
+                REGRESAR A LA TIENDA
+              </button>
+            </div>
+
+            <div class="bg-gray-50 p-5 md:p-6 mt-4">
+              <h3 class="font-semibold text-base text-[#0e0d12] mb-3">Productos</h3>
+              <div class="space-y-3 max-h-60 overflow-y-auto custom-scroll">
+                @for (item of cartItems(); track item.id_vino) {
+                  <div class="flex items-center gap-2 text-sm">
+                    <img [src]="item.url_img_principal" alt="{{ item.nombre }}" class="w-10 h-10 object-cover rounded flex-shrink-0">
+                    <div class="flex-1 min-w-0">
+                      <p class="text-[#0e0d12]/80 truncate">{{ item.nombre }} x{{ item.cantidad }}</p>
+                    </div>
+                    <span class="font-medium text-[#0e0d12] whitespace-nowrap">
+                      S/ {{ cartService.getTotalItem(item).toFixed(2) }}
+                    </span>
+                  </div>
+                }
+                @empty {
+                  <p class="text-center text-[#0e0d12]/50 text-sm py-4">No hay productos en el carrito</p>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
