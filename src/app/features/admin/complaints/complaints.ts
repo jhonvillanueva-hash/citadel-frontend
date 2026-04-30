@@ -10,7 +10,6 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <div class="p-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         @for (complaint of dataComplaints(); track complaint.id_reclamo) {
           <div class="bg-white shadow-md rounded-2xl p-4 border border-gray-200">
@@ -83,7 +82,6 @@ import { RouterLink } from '@angular/router';
           Cargando reclamos...
         </p>
       }
-    </div>
   `
 })
 export class ComplaintsComponent implements OnInit {

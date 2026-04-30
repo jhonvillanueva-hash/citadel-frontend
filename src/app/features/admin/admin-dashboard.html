@@ -101,6 +101,20 @@
             [sidebarOpen]="sidebarOpen"
             (linkClicked)="sidebarOpen = false">
           </app-admin-sidebar-item>
+
+          <app-admin-sidebar-item
+            [icon]="icons.faTicket"
+            label="Cupones"
+            title="Promociones y descuentos"
+            [sidebarOpen]="sidebarOpen"
+            [children]="[
+              { label:'Ver cupones', route:'/admin/coupons', title:'Ver cupones' },
+              { label:'Crear cupones', route:'/admin/coupons/create', title:'Crear cupones' }
+            ]"
+            menuKey="cupones"
+            [(expandedMenu)]="expandedMenu"
+            (linkClicked)="sidebarOpen = false">
+          </app-admin-sidebar-item>
       
           <p
             class="nav-section text-[10px] font-semibold uppercase tracking-widest text-[color:var(--admin-bg-icon)]/70 px-3 mt-4 mb-2 whitespace-nowrap" [class.hidden]="!sidebarOpen">
