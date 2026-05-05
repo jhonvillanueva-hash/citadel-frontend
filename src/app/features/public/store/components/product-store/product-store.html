@@ -75,8 +75,15 @@
 
           <button
             (click)="addToCart(wine); $event.stopPropagation()"
-            class="bg-transparent border-0 cursor-pointer">
-            <fa-icon [icon]="icons.faCartShopping" class="text-[#515255] text-[18px]"/>
+            [disabled]="isLoading(wine.id)"
+            class="bg-transparent border-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+
+            @if (isLoading(wine.id)) {
+              <span class="text-xs">...</span>
+            } @else {
+              <fa-icon [icon]="icons.faCartShopping" class="text-[#515255] text-[18px]"/>
+            }
+
           </button>
         </div>
 

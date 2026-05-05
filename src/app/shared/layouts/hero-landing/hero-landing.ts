@@ -13,7 +13,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
 export class HeroLanding {
   private authService = inject(AuthService);
-  currentUser = this.authService.currentUser;  
+  currentUser = this.authService.currentUser;
 
   logout() {
     this.authService.logout();

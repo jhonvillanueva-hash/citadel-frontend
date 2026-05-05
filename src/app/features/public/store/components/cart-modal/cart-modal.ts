@@ -1,67 +1,55 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { CartService } from '../../../../../core/services/cart.service';
+import { RouterLink, NavigationStart, Router } from '@angular/router';
+import { CartService, CartItem } from '../../../../../core/services/cart.service';
 import { BodyScrollLockDirective } from '../../../../../shared/directives/body-scroll-lock.directive';
-import { RouterLink, NavigationStart, Router  } from "@angular/router";
 
 @Component({
   selector: 'app-cart-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, BodyScrollLockDirective, RouterLink],
+  imports: [CommonModule, RouterLink, BodyScrollLockDirective],
   templateUrl: './cart-modal.html',
-  styles: ``
 })
-
-export class CartModal {
+export class CartModal implements OnInit {
   cartService = inject(CartService);
-  cartItems = this.cartService.getCartItems();
-  subtotal = this.cartService.subtotal;
   private router = inject(Router);
 
   constructor() {
     this.router.events.subscribe(event => {
-      if (event instanceof NavigationStart) {
-        this.cartService.close();
-      }
+      if (event instanceof NavigationStart) this.cartService.close();
     });
   }
 
-  getQuantityText(item: any): string {
-    const totalBotellas = item.cantidad;
-    const botellasPorCaja = item.botellas_por_caja;
-    const cajas = Math.floor(totalBotellas / botellasPorCaja);
-    const botellasSueltas = totalBotellas % botellasPorCaja;
-
-    if (cajas === 0) {
-      return `${totalBotellas} ${totalBotellas === 1 ? 'botella' : 'botellas'}`;
-    } else if (botellasSueltas === 0) {
-      return `${totalBotellas} botellas (${cajas} ${cajas === 1 ? 'caja' : 'cajas'})`;
-    } else {
-      return `${totalBotellas} botellas (${cajas} ${cajas === 1 ? 'caja' : 'cajas'} + ${botellasSueltas} ${botellasSueltas === 1 ? 'botella' : 'botellas'})`;
-    }
+  ngOnInit(): void {
+    
   }
 
-  getPrecioUnitarioActual(item: any): number {
+  getQuantityText(item: CartItem): string {
+    const { cantidad, botellas_por_caja } = item;
+    const cajas = Math.floor(cantidad / botellas_por_caja);
+    const sueltas = cantidad % botellas_por_caja;
+    if (cajas === 0) return `${cantidad} ${cantidad === 1 ? 'botella' : 'botellas'}`;
+    if (sueltas === 0) return `${cantidad} botellas (${cajas} ${cajas === 1 ? 'caja' : 'cajas'})`;
+    return `${cantidad} botellas (${cajas} ${cajas === 1 ? 'caja' : 'cajas'} + ${sueltas} ${sueltas === 1 ? 'botella' : 'botellas'})`;
+  }
+
+  getPrecioUnitarioActual(item: CartItem): number {
     return this.cartService.getPrecioUnitarioActual(item);
   }
 
-  getTotalItem(item: any): number {
+  getTotalItem(item: CartItem): number {
     return this.cartService.getTotalItem(item);
   }
 
-  tieneDescuento(item: any): boolean {
-    return this.getPrecioUnitarioActual(item) < item.precio_base;
+  tieneDescuento(item: CartItem): boolean {
+    return this.cartService.tieneDescuento(item);
   }
 
-  updateQuantity(item: any, change: number) {
-    const newQuantity = item.cantidad + change;
-    if (newQuantity >= 1) {
-      this.cartService.updateQuantity(item.id_vino, item.presentacion, newQuantity);
-    }
+  updateQuantity(item: CartItem, change: number): void {
+    this.cartService.updateQuantity(item, change);
   }
 
-  removeItem(item: any) {
-    this.cartService.removeItem(item.id_vino);
+  removeItem(item: CartItem): void {
+    this.cartService.removeItem(item);
   }
 }

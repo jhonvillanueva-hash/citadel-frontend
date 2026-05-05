@@ -1,6 +1,8 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ViewChild, ElementRef } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faUser,
@@ -19,6 +21,8 @@ import {
 import { UsuarioService } from '../../../../../data/services/usuario.service';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { Usuario } from '../../../../../data/models/api.models';
+import { RouterLink } from "@angular/router";
+import { CartService } from '../../../../../core/services/cart.service';
 
 interface Order {
   id: string;
@@ -50,13 +54,17 @@ const EMPTY_PROFILE: UserProfile = {
 @Component({
   selector: 'app-profile-store',
   standalone: true,
-  imports: [CommonModule, FormsModule, FontAwesomeModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, RouterLink],
   templateUrl: './profile-store.html'
 })
 export class ProfileStore implements OnInit {
 
   private usuarioService = inject(UsuarioService);
   private authService = inject(AuthService);
+
+  private router = inject(Router);
+
+  private cartService = inject(CartService);
 
   currentUser = this.authService.currentUser;
   usuarioApi = signal<Usuario | null>(null);
@@ -76,8 +84,17 @@ export class ProfileStore implements OnInit {
 
   activeTab = signal<'profile' | 'security' | 'orders'>('profile');
   isEditingProfile = signal(false);
+  avatarDb = signal<string | null>(null);
   avatarPreview = signal<string | null>(null);
   isMobileMenuOpen = signal(false);
+
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  selectedFileName = signal<string | null>(null);
+  fileInputRef!: HTMLInputElement;
+
+  triggerFileInput(input: HTMLInputElement) {
+    input.click();
+  }
 
   tabs = [
     { id: 'profile' as const, name: 'Perfil', icon: faUser },
@@ -102,6 +119,17 @@ export class ProfileStore implements OnInit {
     const first = this.userDataProfile().firstName?.charAt(0) || '';
     const last = this.userDataProfile().lastName?.charAt(0) || '';
     return `${first}${last}`.toUpperCase();
+  });
+
+  maskedEmail = computed(() => {
+    const email = this.userDataProfile().email;
+    if (!email) return '...';
+    const [localPart, domain] = email.split('@');
+    if (!localPart || !domain) return '...';
+    const maskedLocal = localPart.length > 2
+      ? localPart.substring(0, 2) + '****'
+      : '****';
+    return `${maskedLocal}@${domain}`;
   });
 
   passwordStrength = computed(() => {
@@ -164,7 +192,7 @@ export class ProfileStore implements OnInit {
     this.originalProfile.set({ ...profile });
 
     if (user.url_img) {
-      this.avatarPreview.set(user.url_img);
+      this.avatarDb.set(user.url_img);
     }
   }
 
@@ -181,26 +209,33 @@ export class ProfileStore implements OnInit {
     this.isMobileMenuOpen.set(false);
   }
 
-  goBackToStore(): void {
-    console.log('Navigate back to store');
-  }
-
   onDrop(event: DragEvent): void {
     event.preventDefault();
-    const file = event.dataTransfer?.files[0];
-    if (file && file.type.startsWith('image/')) {
-      this.processImage(file);
-    }
+
+    const file = event.dataTransfer?.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return;
+
+    this.selectedFileName.set(file.name); 
+    this.processImage(file);
   }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
+
     if (input.files && input.files[0]) {
-      this.processImage(input.files[0]);
+      const file = input.files[0];
+
+      this.selectedFileName.set(file.name); 
+      this.processImage(file);
+
+      input.value = '';
     }
   }
 
   processImage(file: File): void {
+    if (file.size > 5 * 1024 * 1024) return;
+
     const reader = new FileReader();
     reader.onload = (e) => {
       this.avatarPreview.set(e.target?.result as string);
@@ -210,6 +245,11 @@ export class ProfileStore implements OnInit {
 
   removeAvatar(): void {
     this.avatarPreview.set(null);
+    this.selectedFileName.set(null);
+
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
   }
 
   enableEditing(): void {
@@ -238,14 +278,18 @@ export class ProfileStore implements OnInit {
       dni: current.dni,
       direccion: current.address,
       ciudad: current.city,
-      url_img: this.avatarPreview() ?? undefined
+      url_img: this.selectedFileName() ? `https://preview.redd.it/mereleona-vs-natsu-from-fairy-tail-who-would-win-v0-uitjwhlhst3e1.jpg?width=640&crop=smart&auto=webp&s=c8ebf0076e6992f19f4cbeb507902ab8ad545faf` : undefined
     };
 
     this.usuarioService.update(user.id_usuario, payload).subscribe({
       next: () => {
         this.originalProfile.set({ ...current });
         this.isEditingProfile.set(false);
-        alert('Perfil actualizado correctamente');
+
+        if (this.avatarPreview()) {
+          this.avatarDb.set(this.avatarPreview()!);
+          this.avatarPreview.set(null);
+        }
       },
       error: (err) => {
         console.error(err);
@@ -286,17 +330,31 @@ export class ProfileStore implements OnInit {
         }
         break;
       case 'phone':
-        if (profile.phone && profile.phone.length < 9) {
-          errors['phone'] = 'Teléfono inválido';
+        if (!/^[0-9]{9}$/.test(profile.phone)) {
+          errors['phone'] = 'Debe tener 9 dígitos';
         } else {
           delete errors['phone'];
         }
         break;
       case 'dni':
-        if (profile.dni && profile.dni.length < 8) {
-          errors['dni'] = 'DNI inválido';
+        if (!/^[0-9]{8}$/.test(profile.dni)) {
+          errors['dni'] = 'Debe tener 8 dígitos';
         } else {
           delete errors['dni'];
+        }
+        break;
+      case 'address':
+        if (profile.address && /[^a-zA-Z0-9\s]/.test(profile.address)) {
+          errors['address'] = 'No se permiten signos';
+        } else {
+          delete errors['address'];
+        }
+        break;
+      case 'city':
+        if (profile.city && /[^a-zA-Z\s]/.test(profile.city)) {
+          errors['city'] = 'No se permiten signos';
+        } else {
+          delete errors['city'];
         }
         break;
     }
@@ -305,7 +363,7 @@ export class ProfileStore implements OnInit {
   }
 
   validateAllFields(): boolean {
-    ['firstName', 'lastName', 'email', 'phone', 'dni'].forEach(f => this.validateField(f));
+    ['firstName', 'lastName', 'email', 'phone', 'dni', 'address', 'city'].forEach(f => this.validateField(f));
     return Object.keys(this.fieldErrors()).length === 0;
   }
 
@@ -313,6 +371,31 @@ export class ProfileStore implements OnInit {
     const base = 'w-full px-4 py-2.5 bg-gray-50 border focus:outline-none focus:ring-1 focus:ring-[#0e0d12] focus:border-[#0e0d12] transition-all duration-200 disabled:bg-gray-100 disabled:text-gray-500 text-[#0e0d12] text-sm';
     return `${base} ${this.fieldErrors()[field] ? 'border-red-500' : 'border-gray-200'}`;
   }
+
+  onlyNumbers(event: KeyboardEvent): void {
+    if (!/[0-9]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Tab') {
+      event.preventDefault();
+    }
+  }
+
+  onlyLettersAndNumbers(event: KeyboardEvent): void {
+    if (!/[a-zA-Z0-9\s]/.test(event.key)) {
+      event.preventDefault();
+    }
+  }
+
+  isProfileValid = computed(() => {
+    const p = this.userDataProfile();
+
+    const phoneValid = p.phone === '' || /^[0-9]{9}$/.test(p.phone);
+    const dniValid = p.dni === '' || /^[0-9]{8}$/.test(p.dni);
+
+    const requiredValid =
+      p.firstName.trim().length >= 2 &&
+      p.lastName.trim().length > 0;
+
+    return phoneValid && dniValid && requiredValid && Object.keys(this.fieldErrors()).length === 0;
+  });
 
   validatePassword(): void {}
 
@@ -326,10 +409,6 @@ export class ProfileStore implements OnInit {
       alert('Contraseña actualizada correctamente');
     }
   }
-
-  memberSince = (): string => {
-    return '15 de marzo de 2023';
-  };
 
   orders = (): Order[] => this.ordersSignal();
 
@@ -369,6 +448,7 @@ export class ProfileStore implements OnInit {
   }
 
   logout(): void {
-    console.log('User logged out');
+    this.cartService.clearCart();
+    this.authService.logout();   
   }
 }

@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
-import { HomeComponent } from './features/public/home/home';
 import { authGuard } from './core/guards/auth.guard';
 import { publicGuard } from './core/guards/public.guard';
 import { adminGuard } from './core/guards/admin.guard';
@@ -14,12 +13,17 @@ import { ComplaintsComponent } from './features/public/complaints/complaints';
 import { CartStore } from './features/public/store/pages/cart-store/cart-store';
 import { CheckoutStore } from './features/public/store/pages/checkout-store/checkout-store';
 import { ProfileStore } from './features/public/store/pages/profile-store/profile-store';
+import { storeGuard } from './core/guards/store.guard';
 
 export const routes: Routes = [
   {
     path: '',
     component: Landing,
     title: 'Citadel',
+  },
+  {
+    path: 'libro-de-reclamaciones',
+    component: ComplaintsComponent,
   },
   {
     path: 'login',
@@ -32,45 +36,51 @@ export const routes: Routes = [
     canActivate: [publicGuard]
   },
   {
-    path: 'home',
-    component: HomeComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'libro-de-reclamaciones',
-    component: ComplaintsComponent,
-  },
-  {
     path: 'store',
     component: Store,
+    data: { showHeader: true },
+    canActivate: [storeGuard],
   },
   {
     path: 'store/profile',
-    component: ProfileStore
+    component: ProfileStore,
+    data: { showHeader: false },
   },
   {
     path: 'store/products/flavors/:name',
     component: FlavorStore,
+    data: { showHeader: true },
+    canActivate: [storeGuard],
   },
   {
     path: 'store/products/flavors/:name/:id',
     component: FlavorStore,
+    data: { showHeader: true },
+    canActivate: [storeGuard],
   },
   {
     path: 'store/products/sweetness/:name/:id',
     component: SweetStore,
+    data: { showHeader: true },
+    canActivate: [storeGuard]
   },
   {
     path: 'store/products/:slug/:id',
-    component: DetailsStore
+    component: DetailsStore,
+    data: { showHeader: true },
+    canActivate: [storeGuard],
   },
   {
     path: 'store/cart/checkout',
-    component: CheckoutStore
+    component: CheckoutStore,
+    data: { showHeader: false },
+    canActivate: [storeGuard],
   },
   {
     path: 'store/cart',
-    component: CartStore
+    component: CartStore,
+    data: { showHeader: false },
+    canActivate: [storeGuard],
   },
   {
     path: 'admin',

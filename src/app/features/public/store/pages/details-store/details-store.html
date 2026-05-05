@@ -1,5 +1,3 @@
-<app-header></app-header>
-
 @if (isLoading()) {
   <div class="flex justify-center items-center min-h-[400px]">
     <div class="text-center">
@@ -18,7 +16,6 @@
     <div class="w-full max-w-7xl mx-auto">
       <div class="grid items-start grid-cols-1 lg:grid-cols-5 gap-8 max-lg:gap-12 max-sm:gap-8">
 
-        <!-- Zona de imágenes - SIN MODIFICAR -->
         <div class="w-full top-0 lg:col-span-3">
           <div class="flex flex-row gap-2">
             <div class="flex flex-col gap-2 w-16 max-sm:w-10 shrink-0">
@@ -52,10 +49,8 @@
           </div>
         </div>
 
-        <!-- Zona de detalles - TEXTOS REDUCIDOS -->
         <div class="w-full lg:col-span-2">
 
-          <!-- Título y descripción -->
           <div>
             <h1 class="text-xl sm:text-2xl font-bold text-[#0e0d12] mb-1">
               {{ wine.nombre }}
@@ -86,7 +81,6 @@
 
           <hr class="my-4 border-gray-200" />
 
-          <!-- Opciones de Compra -->
           <div>
             <h3 class="text-base font-semibold text-[#0e0d12] mb-3">Opciones de Compra</h3>
 
@@ -221,7 +215,6 @@
 
           <hr class="my-4 border-gray-200" />
 
-          <!-- Información del Vino -->
           <div>
             <h3 class="text-base font-semibold text-[#0e0d12] mb-3">Información del Vino</h3>
 

@@ -151,7 +151,7 @@ export class AuthService {
     if (this.isBrowser()) {
       localStorage.removeItem(this.LOGGED_IN_KEY);
     }
-    this.router.navigate(['/']);
+    this.router.navigate(['/store']);
   }
 
   private setSession(token: string): void {

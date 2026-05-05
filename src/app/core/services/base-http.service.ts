@@ -32,14 +32,14 @@ export abstract class BaseHttpService<T> {
         switch (strategy) {
         case 'admin-public':
             return isAdmin ? `/admin/${endpoint}` : `/public/${endpoint}`;
-        
+
         case 'admin-me':
             return isAdmin ? `/admin/${endpoint}` : `/me/${endpoint}`;
-        
+
         case 'admin-me-custom':
             const adminEndpoint = customAdminEndpoint || endpoint;
             return isAdmin ? `/admin/${adminEndpoint}` : `/me/${endpoint}`;
-        
+
         default:
             return `/${endpoint}`;
         }
@@ -92,5 +92,23 @@ export abstract class BaseHttpService<T> {
             });
         }
         return params;
+    }
+
+    addOrUpdate(data: {
+      id_carrito: number;
+      id_vino: number;
+      cantidad: number;
+    }) {
+      return this.http.post<any>(`${this.fullUrl}/agregar`, data, {
+        withCredentials: true
+      });
+
+    }
+
+    getByCarrito(id_carrito: number) {
+      return this.http.get<any[]>(
+        `${this.fullUrl}/carrito/${id_carrito}`,
+        { withCredentials: true }
+      );
     }
 }

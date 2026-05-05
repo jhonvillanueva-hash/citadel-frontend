@@ -10,7 +10,6 @@ import { AiChatWidgetComponent } from "../../../shared/layouts/ai-chat-widget/ai
 @Component({
   selector: 'app-landing',
   templateUrl: './landing.html',
-  styleUrl: './landing.css',
   imports: [HeroLanding, InfoLanding, FooterLanding, WhatsappButtonComponent, FabStackComponent, AiButtonComponent, AiChatWidgetComponent]
 })
 
