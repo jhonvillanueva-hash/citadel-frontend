@@ -10,6 +10,9 @@ import { BannersListComponent } from '../../features/admin/banners/banners-list/
 import { WinesConfigComponent } from '../../features/admin/wines/wines-config/wines-config';
 import { WinesEditComponent } from '../../features/admin/wines/wines-edit/wines-edit';
 import { ComplaintsComponent } from '../../features/admin/complaints/complaints';
+import { CouponsListComponent } from '../../features/admin/coupons/coupons-list/coupons-list';
+import { CouponsEditComponent } from '../../features/admin/coupons/coupons-edit/coupons-edit';
+import { CouponsCreateComponent } from '../../features/admin/coupons/coupons-create/coupons-create';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -56,6 +59,18 @@ export const ADMIN_ROUTES: Routes = [
       {
         path: 'complaints',
         component: ComplaintsComponent
+      },
+      {
+        path: 'coupons',
+        component: CouponsListComponent
+      },
+      {
+        path: 'coupons/create',
+        component: CouponsCreateComponent
+      },
+      {
+        path: 'coupons/edit/:id',
+        component: CouponsEditComponent
       },
       {
         path: '',
