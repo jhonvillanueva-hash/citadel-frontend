@@ -22,7 +22,8 @@ body {
 :root {
   --text: #ffffff;
   --primary: #2d3e51;
-  --secondary: #c35b64; /*c23340*/
+
+  --secondary: #c35b64;
   --background: #0d1b22;
   --background-two: #12242d;
   --background-three: #162b36;

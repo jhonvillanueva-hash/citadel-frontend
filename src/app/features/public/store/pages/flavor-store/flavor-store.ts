@@ -1,17 +1,14 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { HeaderStore } from '../../components/header-store/header-store';
 import { ProductStore } from '../../components/product-store/product-store';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-flavor-store',
   standalone: true,
-  imports: [CommonModule, HeaderStore, ProductStore],
+  imports: [CommonModule, ProductStore],
   template: `
-    <app-header></app-header>
-
     <app-product
       [filterType]="filterType()"
       [filterSaborId]="filterSaborId()"

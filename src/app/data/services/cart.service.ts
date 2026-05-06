@@ -3,7 +3,7 @@ import { BaseHttpService, PathConfig } from '../../core/services/base-http.servi
 import { Carrito } from '../models/api.models';
 
 @Injectable({ providedIn: 'root' })
-export class CartService extends BaseHttpService<Carrito> {
+export class CarritoService extends BaseHttpService<Carrito> {
   protected pathConfig: PathConfig = {
     strategy: 'admin-me',
     endpoint: 'carritos'

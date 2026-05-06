@@ -4,8 +4,11 @@ import { RouterModule } from '@angular/router';
 
 import { VinoService } from '../../../../../data/services/vino.service';
 import { PrecioService } from '../../../../../data/services/precio.service';
+import { CarritoService as ApiCartService } from '../../../../../data/services/cart.service';
+import { CarritoProductoService } from '../../../../../data/services/carrito-producto.service';
+import { AuthService } from '../../../../../core/services/auth.service';
 
-import { Precio, Vino } from '../../../../../data/models/api.models';
+import { Precio, Vino, Carrito } from '../../../../../data/models/api.models';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCartShopping, faEye } from '@fortawesome/free-solid-svg-icons';
 
@@ -13,6 +16,7 @@ import { signal, computed } from '@angular/core';
 import { input } from '@angular/core';
 
 import { CartItem, CartService } from '../../../../../core/services/cart.service';
+import { switchMap, of } from 'rxjs';
 
 export interface InternalProduct {
   id: number;
@@ -47,15 +51,18 @@ export class ProductStore implements OnInit {
   @Input() filterSaborNombre?: string;
   @Input() customTitle?: string;
 
-  private cartService = inject(CartService);
+  private localCartService = inject(CartService);
 
-  icons = {
-    faEye,
-    faCartShopping
-  }
+  private apiCartService = inject(ApiCartService);
+  private carritoProductoService = inject(CarritoProductoService);
+  private authService = inject(AuthService);
+
+  icons = { faEye, faCartShopping };
 
   private vinoService = inject(VinoService);
   private precioService = inject(PrecioService);
+
+
 
   allProducts = signal<InternalProduct[]>([]);
 
@@ -64,8 +71,6 @@ export class ProductStore implements OnInit {
     const type = this.filterType();
     const saborId = this.filterSaborId();
     const dulzorId = this.filterDulzorId();
-
-    console.log('COMPUTED RUN', { products, type, saborId });
 
     if (!products.length) return [];
 
@@ -100,43 +105,42 @@ export class ProductStore implements OnInit {
 
   private capitalizeFirstLetter(nombre: string): string {
     if (!nombre || nombre === 'Desconocido') return nombre;
-
     const lowerName = nombre.toLowerCase();
     return lowerName.charAt(0).toUpperCase() + lowerName.slice(1);
   }
 
-private mapProducts(vinos: Vino[], precios: Precio[]): InternalProduct[] {
-  return vinos.map(vino => {
-    const rawFlavorName = vino.Sabor?.nombre ?? 'Desconocido';
-    const rawCategoryName = vino.Dulzor?.nombre ?? 'Desconocido';
+  private mapProducts(vinos: Vino[], precios: Precio[]): InternalProduct[] {
+    return vinos.map(vino => {
+      const rawFlavorName = vino.Sabor?.nombre ?? 'Desconocido';
+      const rawCategoryName = vino.Dulzor?.nombre ?? 'Desconocido';
 
-    const flavorName = this.capitalizeFirstLetter(rawFlavorName);
-    const categoryName = this.capitalizeFirstLetter(rawCategoryName);
+      const flavorName = this.capitalizeFirstLetter(rawFlavorName);
+      const categoryName = this.capitalizeFirstLetter(rawCategoryName);
 
-    const volumenMl = vino.Presentacion?.volumen_ml ?? 0;
-    const botellasPorCaja = vino.Presentacion?.botellas_por_caja ?? 12;
+      const volumenMl = vino.Presentacion?.volumen_ml ?? 0;
+      const botellasPorCaja = vino.Presentacion?.botellas_por_caja ?? 12;
 
-    const preciosDelVino = precios.filter(p => p.id_vino === vino.id_vino);
+      const preciosDelVino = precios.filter(p => p.id_vino === vino.id_vino);
 
-    return {
-      id: vino.id_vino,
-      flavor: flavorName,
-      flavorId: vino.id_sabor,
-      category: categoryName,
-      categoryId: vino.id_dulzor,
-      name: vino.nombre,
-      description: vino.descripcion,
-      volumen: `${volumenMl} ml`,
-      volumen_ml: volumenMl,
-      botellas_por_caja: botellasPorCaja,
-      state: vino.estado === 'D' ? 'Disponible' : 'No disponible',
-      image: vino.url_img_principal,
-      prices: preciosDelVino,
-      iconoCategory: this.getCategoryIcon(rawCategoryName),
-      iconoFlavor: this.getFlavorIcon(rawFlavorName),
-    };
-  });
-}
+      return {
+        id: vino.id_vino,
+        flavor: flavorName,
+        flavorId: vino.id_sabor,
+        category: categoryName,
+        categoryId: vino.id_dulzor,
+        name: vino.nombre,
+        description: vino.descripcion,
+        volumen: `${volumenMl} ml`,
+        volumen_ml: volumenMl,
+        botellas_por_caja: botellasPorCaja,
+        state: vino.estado === 'D' ? 'Disponible' : 'No disponible',
+        image: vino.url_img_principal,
+        prices: preciosDelVino,
+        iconoCategory: this.getCategoryIcon(rawCategoryName),
+        iconoFlavor: this.getFlavorIcon(rawFlavorName),
+      };
+    });
+  }
 
   private getCategoryIcon(category: string): string {
     const lowerCat = category.toLowerCase();
@@ -155,23 +159,74 @@ private mapProducts(vinos: Vino[], precios: Precio[]): InternalProduct[] {
   }
 
   getMainPrice(prices: Precio[] | undefined): Precio | null {
-    if (!prices || prices.length === 0) {
-      return null;
-    }
-
+    if (!prices || prices.length === 0) return null;
     const unitPrice = prices.find(p => p.cantidad_minima === 1);
     return unitPrice || prices[0];
   }
 
-  addToCart(wine: InternalProduct) {
+  loadingProducts = signal<Set<number>>(new Set());
+
+  setLoading(id: number, state: boolean) {
+    const current = new Set(this.loadingProducts());
+    if (state) current.add(id);
+    else current.delete(id);
+    this.loadingProducts.set(current);
+  }
+
+  isLoading(id: number): boolean {
+    return this.loadingProducts().has(id);
+  }
+
+  addToCart(wine: InternalProduct): void {
     const mainPrice = this.getMainPrice(wine.prices);
     if (!mainPrice) return;
 
+    const user = this.authService.currentUser();
+
+    this.setLoading(wine.id, true);
+
+    if (!user) {
+      this.addToLocalCart(wine, mainPrice);
+      this.setLoading(wine.id, false);
+      return;
+    }
+
+    this.apiCartService.getAll().pipe(
+      switchMap((carritos: Carrito[]) => {
+        const carritoActivo = carritos.find(c => c.estado === 'E');
+        if (carritoActivo) return of(carritoActivo);
+
+        return this.apiCartService.create({
+          id_usuario: user.id_usuario,
+          estado: 'E'
+        });
+      }),
+      switchMap((carrito: Carrito) =>
+        this.carritoProductoService.addOrUpdate({
+          id_carrito: carrito.id_carrito,
+          id_vino: wine.id,
+          cantidad: 1
+        })
+      )
+    ).subscribe({
+      next: () => {
+        this.addToLocalCart(wine, mainPrice);
+
+        this.setLoading(wine.id, false);
+      },
+      error: (err) => {
+        console.error(err);
+        this.setLoading(wine.id, false);
+      }
+    });
+  }
+
+  private addToLocalCart(wine: InternalProduct, mainPrice: Precio): void {
     const preciosOrdenados = (wine.prices || [])
       .sort((a, b) => a.cantidad_minima - b.cantidad_minima)
       .map(p => ({
         cantidad: p.cantidad_minima,
-        precio: parseFloat(p.precio as unknown as string)
+        precio: Number(p.precio) || 0
       }));
 
     const precioBase = preciosOrdenados.find(p => p.cantidad === 1)?.precio || 0;
@@ -179,7 +234,7 @@ private mapProducts(vinos: Vino[], precios: Precio[]): InternalProduct[] {
     const cartItem: CartItem = {
       id_vino: wine.id,
       nombre: wine.name,
-      cantidad: 1,  
+      cantidad: 1,
       presentacion: `1 botella`,
       volumen_ml: wine.volumen_ml,
       url_img_principal: wine.image,
@@ -189,7 +244,7 @@ private mapProducts(vinos: Vino[], precios: Precio[]): InternalProduct[] {
       esCaja: false
     };
 
-    this.cartService.addToCart(cartItem);
+    this.localCartService.addToCart(cartItem);
   }
 
   trackById(index: number, item: InternalProduct) {
@@ -207,7 +262,6 @@ private mapProducts(vinos: Vino[], precios: Precio[]): InternalProduct[] {
 
   getTitle(): string {
     if (this.customTitle) return this.customTitle;
-
     switch (this.filterType()) {
       case 'todos': return 'Todos los Vinos';
       case 'mixtos': return 'Vinos Mixtos';

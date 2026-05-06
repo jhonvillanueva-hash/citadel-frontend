@@ -226,7 +226,7 @@
                   <span class="text-xl font-bold text-[#0e0d12]">S/ {{ total.toFixed(2) }}</span>
                 </div>
               </div>
-              <button (click)="confirmReserve()" [disabled]="!isReserveEnabled" class="w-full py-2.5 bg-[#0e0d12] text-white font-medium hover:bg-[#1c1a24] transition text-sm disabled:bg-gray-300 disabled:cursor-not-allowed">
+              <button routerLink="/login" class="w-full py-2.5 bg-[#0e0d12] text-white font-medium hover:bg-[#1c1a24] transition text-sm disabled:bg-gray-300 disabled:cursor-not-allowed">
                 RESERVAR
               </button>
               <button (click)="goBackToStore()" class="w-full mt-3 py-2.5 border border-gray-300 text-[#0e0d12] font-medium hover:bg-gray-50 transition text-sm">

@@ -1,12 +1,15 @@
 import { Component, inject, OnInit, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCartShopping, faList, faUser } from '@fortawesome/free-solid-svg-icons';
-import { RouterLink } from '@angular/router';
+import { faCartShopping, faList, faUser, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { RouterLink, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { SaborService } from '../../../../../data/services/sabor.service';
 import { Sabor } from '../../../../../data/models/api.models';
 import { CartService } from '../../../../../core/services/cart.service';
+import { UsuarioService } from '../../../../../data/services/usuario.service';
+import { Usuario } from '../../../../../data/models/api.models';
+import { filter } from 'rxjs/operators';
 
 export interface InternalNav {
   id?: number
@@ -23,6 +26,10 @@ export interface InternalNav {
 
 export class HeaderStore implements OnInit {
   private authService = inject(AuthService);
+  private usuarioService = inject(UsuarioService);
+  usuarioApi = signal<Usuario | null>(null);
+  avatarDb = signal<string | null>(null);
+  userInitials = signal<string>('');
 
   private cartService = inject(CartService);
 
@@ -33,19 +40,48 @@ export class HeaderStore implements OnInit {
   }
 
   private saborService = inject(SaborService);
+  private router = inject(Router);
 
   currentUser = this.authService.currentUser;
   internalNavs = signal<InternalNav[]>([]);
   isLoading = signal<boolean>(true);
+  currentUrl = signal<string>('');
+  isMobileMenuOpen = signal<boolean>(false);
 
   icons = {
     faCartShopping,
     faList,
-    faUser
+    faUser,
+    faSearch,
+    faTimes
   }
 
   ngOnInit(): void {
     this.loadFlavors();
+    if (this.currentUser()) {
+      this.loadUsuario();
+    }
+
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      this.currentUrl.set(event.urlAfterRedirects);
+      this.isMobileMenuOpen.set(false);
+    });
+  }
+
+  isActive(nav: InternalNav): boolean {
+    const url = this.currentUrl();
+
+    if (nav.name === 'Todos') {
+      return url === '/store' || url.includes('/store/products/flavors/todos');
+    }
+
+    if (nav.id) {
+      return url.endsWith('/' + nav.id);
+    }
+
+    return false;
   }
 
   private formatSaborName(nombre: string): string {
@@ -66,18 +102,39 @@ export class HeaderStore implements OnInit {
     return formattedName.charAt(0).toUpperCase() + formattedName.slice(1);
   }
 
+  loadUsuario(): void {
+    if (!this.currentUser()) return;
+    this.usuarioService.getAll().subscribe({
+      next: (res) => {
+        const user = res[0];
+        this.usuarioApi.set(user);
+
+        if (user?.url_img) {
+          this.avatarDb.set(user.url_img);
+        } else {
+          this.avatarDb.set(null);
+        }
+
+        const first = user?.nombres?.charAt(0) || '';
+        const last = user?.apellidos?.charAt(0) || '';
+        this.userInitials.set((first + last).toUpperCase());
+      },
+      error: () => {
+        this.avatarDb.set(null);
+        this.userInitials.set('');
+      }
+    });
+  }
+
   private loadFlavors(): void {
     this.saborService.getAll().subscribe({
       next: (sabores: Sabor[]) => {
-
         const navItems: InternalNav[] = [
           { name: 'Todos' },
           ...sabores.map(sabor => ({
             id: sabor.id_sabor,
             name: this.formatSaborName(sabor.nombre)
-          })),
-          { name: 'Mixtos' },
-          { name: 'Promociones' }
+          }))
         ];
 
         this.internalNavs.set(navItems);
@@ -85,9 +142,7 @@ export class HeaderStore implements OnInit {
       },
       error: () => {
         this.internalNavs.set([
-          { name: 'Todos' },
-          { name: 'Mixtos' },
-          { name: 'Promociones' }
+          { name: 'Todos' }
         ]);
         this.isLoading.set(false);
       }
@@ -105,5 +160,9 @@ export class HeaderStore implements OnInit {
 
   trackById(index: number, item: InternalNav) {
     return item.id ?? item.name;
+  }
+
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen.set(!this.isMobileMenuOpen());
   }
 }

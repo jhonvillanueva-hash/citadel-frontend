@@ -2,15 +2,12 @@ import { Component, inject, computed } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ProductStore } from '../../components/product-store/product-store';
-import { HeaderStore } from '../../components/header-store/header-store';
 
 @Component({
   selector: 'app-sweet-store',
   standalone: true,
-  imports: [ProductStore, HeaderStore],
+  imports: [ProductStore],
   template: `
-    <app-header></app-header>
-
     <app-product
       [filterType]="'dulzor'"
       [filterDulzorId]="filterDulzorId()"
