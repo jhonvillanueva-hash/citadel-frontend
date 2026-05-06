@@ -17,16 +17,16 @@
                 <div class="space-y-5">
                   <div>
                     <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Email *</label>
-                    <input type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" [disabled]="step1Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="cliente@ejemplo.com">
+                    <input type="email" [ngModel]="email()" (ngModelChange)="onEmailChange($event)" [disabled]="step1Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="cliente@ejemplo.com">
                   </div>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                       <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Nombres *</label>
-                      <input type="text" [ngModel]="nombres()" (ngModelChange)="nombres.set($event)" [disabled]="step1Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="Juan">
+                      <input type="text" [ngModel]="nombres()" (ngModelChange)="onNombresChange($event)" [disabled]="step1Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="Juan">
                     </div>
                     <div>
                       <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Apellidos *</label>
-                      <input type="text" [ngModel]="apellidos()" (ngModelChange)="apellidos.set($event)" [disabled]="step1Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="Pérez">
+                      <input type="text" [ngModel]="apellidos()" (ngModelChange)="onApellidosChange($event)" [disabled]="step1Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="Pérez">
                     </div>
                   </div>
                   <div class="flex gap-3">
@@ -48,10 +48,10 @@
               <div class="p-6">
                 <div class="space-y-5">
                   <div class="grid grid-cols-2 gap-4">
-                    <button (click)="deliveryType.set('home')" [disabled]="!step2Enabled() || step2Completed()" [class.bg-[#0e0d12]]="deliveryType() === 'home' && step2Enabled() && !step2Completed()" [class.text-white]="deliveryType() === 'home' && step2Enabled() && !step2Completed()" [class.border-[#0e0d12]]="deliveryType() === 'home' && step2Enabled() && !step2Completed()" [class.border-gray-300]="deliveryType() !== 'home' || !step2Enabled() || step2Completed()" [class.opacity-50]="!step2Enabled() || step2Completed()" class="py-3 px-4 border text-center font-medium disabled:cursor-not-allowed text-sm transition-all">
+                    <button (click)="onDeliveryTypeChange('home')" [disabled]="!step2Enabled() || step2Completed()" [class.bg-[#0e0d12]]="deliveryType() === 'home' && step2Enabled() && !step2Completed()" [class.text-white]="deliveryType() === 'home' && step2Enabled() && !step2Completed()" [class.border-[#0e0d12]]="deliveryType() === 'home' && step2Enabled() && !step2Completed()" [class.border-gray-300]="deliveryType() !== 'home' || !step2Enabled() || step2Completed()" [class.opacity-50]="!step2Enabled() || step2Completed()" class="py-3 px-4 border text-center font-medium disabled:cursor-not-allowed text-sm transition-all">
                       Recibir en casa
                     </button>
-                    <button (click)="deliveryType.set('pickup')" [disabled]="!step2Enabled() || step2Completed()" [class.bg-[#0e0d12]]="deliveryType() === 'pickup' && step2Enabled() && !step2Completed()" [class.text-white]="deliveryType() === 'pickup' && step2Enabled() && !step2Completed()" [class.border-[#0e0d12]]="deliveryType() === 'pickup' && step2Enabled() && !step2Completed()" [class.border-gray-300]="deliveryType() !== 'pickup' || !step2Enabled() || step2Completed()" [class.opacity-50]="!step2Enabled() || step2Completed()" class="py-3 px-4 border text-center font-medium disabled:cursor-not-allowed text-sm transition-all">
+                    <button (click)="onDeliveryTypeChange('pickup')" [disabled]="!step2Enabled() || step2Completed()" [class.bg-[#0e0d12]]="deliveryType() === 'pickup' && step2Enabled() && !step2Completed()" [class.text-white]="deliveryType() === 'pickup' && step2Enabled() && !step2Completed()" [class.border-[#0e0d12]]="deliveryType() === 'pickup' && step2Enabled() && !step2Completed()" [class.border-gray-300]="deliveryType() !== 'pickup' || !step2Enabled() || step2Completed()" [class.opacity-50]="!step2Enabled() || step2Completed()" class="py-3 px-4 border text-center font-medium disabled:cursor-not-allowed text-sm transition-all">
                       Recoger en tienda
                     </button>
                   </div>
@@ -79,7 +79,7 @@
                         </div>
                         <div>
                           <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Distrito *</label>
-                          <select [ngModel]="distrito()" (ngModelChange)="distrito.set($event)" [disabled]="!step2Enabled() || step2Completed() || !provincia()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
+                          <select [ngModel]="distrito()" (ngModelChange)="onDistritoChange($event)" [disabled]="!step2Enabled() || step2Completed() || !provincia()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
                             <option value="" disabled selected>Seleccionar distrito</option>
                             @for (dist of filteredDistritos; track dist.id) {
                               <option [value]="dist.id">{{ dist.distrito }}</option>
@@ -88,16 +88,16 @@
                         </div>
                         <div>
                           <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Avenida / Calle / Jirón *</label>
-                          <input type="text" [ngModel]="direccion()" (ngModelChange)="direccion.set($event)" [disabled]="!step2Enabled() || step2Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="Av. José Pardo">
+                          <input type="text" [ngModel]="direccion()" (ngModelChange)="onDireccionChange($event)" [disabled]="!step2Enabled() || step2Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="Av. José Pardo">
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                           <div>
                             <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Número *</label>
-                            <input type="text" [ngModel]="numeroCasa()" (ngModelChange)="numeroCasa.set($event)" [disabled]="!step2Enabled() || step2Completed()" class="w-full px-3 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="123">
+                            <input type="text" [ngModel]="numeroCasa()" (ngModelChange)="onNumeroCasaChange($event)" [disabled]="!step2Enabled() || step2Completed()" class="w-full px-3 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="123">
                           </div>
                           <div>
                             <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Código Postal</label>
-                            <input type="text" [ngModel]="codigoPostal()" (ngModelChange)="codigoPostal.set($event)" [disabled]="!step2Enabled() || step2Completed()" class="w-full px-3 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="15001">
+                            <input type="text" [ngModel]="codigoPostal()" (ngModelChange)="onCodigoPostalChange($event)" [disabled]="!step2Enabled() || step2Completed()" class="w-full px-3 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="15001">
                           </div>
                         </div>
                         <div class="flex gap-2">
@@ -142,7 +142,11 @@
               </div>
               <div class="p-6">
                 <div class="space-y-4">
-                  <div (click)="step3Enabled() && !step3Completed() ? paymentMethod.set('yape') : null" [class.border-[#0e0d12]]="paymentMethod() === 'yape' && step3Enabled()" class="border border-gray-200 p-4 cursor-pointer transition-all" [class.pointer-events-none]="!step3Enabled() || step3Completed()">
+
+                  <div (click)="step3Enabled() && !step3Completed() ? paymentMethod.set('yape') : null"
+                    [class.border-[#0e0d12]]="paymentMethod() === 'yape' && step3Enabled()"
+                    class="border border-gray-200 p-4 cursor-pointer transition-all"
+                    [class.pointer-events-none]="!step3Enabled() || step3Completed()">
                     <div class="flex items-center justify-between">
                       <div class="flex items-center gap-3">
                         <img [src]="yapeIcon" alt="Yape" class="w-10 h-10 object-contain rounded-lg">
@@ -151,23 +155,20 @@
                           <p class="text-xs text-[#0e0d12]/50">Paga con Yape escaneando el código QR</p>
                         </div>
                       </div>
-                      <div class="w-5 h-5 rounded-full border-2" [class.border-[#0e0d12]]="paymentMethod() === 'yape'" [class.border-gray-300]="paymentMethod() !== 'yape'">
+                      <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
+                        [class.border-[#0e0d12]]="paymentMethod() === 'yape'"
+                        [class.border-gray-300]="paymentMethod() !== 'yape'">
                         @if (paymentMethod() === 'yape') {
-                          <div class="w-3 h-3 bg-[#0e0d12] m-[2px]"></div>
+                          <div class="w-2.5 h-2.5 rounded-full bg-[#0e0d12]"></div>
                         }
                       </div>
                     </div>
-                    @if (paymentMethod() === 'yape') {
-                      <div class="mt-4 pt-4 border-t border-gray-200">
-                        <div class="flex justify-center">
-                          <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Commons_QR_code.png" alt="QR Yape" class="w-32 h-32 object-contain border border-gray-200">
-                        </div>
-                        <p class="text-center text-xs text-[#0e0d12]/50 mt-2">Escanea el código QR con Yape</p>
-                      </div>
-                    }
                   </div>
 
-                  <div (click)="step3Enabled() && !step3Completed() ? paymentMethod.set('pagoefectivo') : null" [class.border-[#0e0d12]]="paymentMethod() === 'pagoefectivo' && step3Enabled()" class="border border-gray-200 p-4 cursor-pointer transition-all" [class.pointer-events-none]="!step3Enabled() || step3Completed()">
+                  <div (click)="step3Enabled() && !step3Completed() ? paymentMethod.set('pagoefectivo') : null"
+                    [class.border-[#0e0d12]]="paymentMethod() === 'pagoefectivo' && step3Enabled()"
+                    class="border border-gray-200 p-4 cursor-pointer transition-all"
+                    [class.pointer-events-none]="!step3Enabled() || step3Completed()">
                     <div class="flex items-center justify-between">
                       <div class="flex items-center gap-3">
                         <img [src]="pagoEfectivoIcon" alt="PagoEfectivo" class="w-10 h-10 object-contain rounded-lg">
@@ -176,20 +177,14 @@
                           <p class="text-xs text-[#0e0d12]/50">Paga con código QR o referencia</p>
                         </div>
                       </div>
-                      <div class="w-5 h-5 rounded-full border-2" [class.border-[#0e0d12]]="paymentMethod() === 'pagoefectivo'" [class.border-gray-300]="paymentMethod() !== 'pagoefectivo'">
+                      <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
+                        [class.border-[#0e0d12]]="paymentMethod() === 'pagoefectivo'"
+                        [class.border-gray-300]="paymentMethod() !== 'pagoefectivo'">
                         @if (paymentMethod() === 'pagoefectivo') {
-                          <div class="w-3 h-3 bg-[#0e0d12] m-[2px]"></div>
+                          <div class="w-2.5 h-2.5 rounded-full bg-[#0e0d12]"></div>
                         }
                       </div>
                     </div>
-                    @if (paymentMethod() === 'pagoefectivo') {
-                      <div class="mt-4 pt-4 border-t border-gray-200">
-                        <div class="flex justify-center">
-                          <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Commons_QR_code.png" alt="QR PagoEfectivo" class="w-32 h-32 object-contain border border-gray-200">
-                        </div>
-                        <p class="text-center text-xs text-[#0e0d12]/50 mt-2">Escanea el código QR o usa el número de referencia</p>
-                      </div>
-                    }
                   </div>
 
                   <div class="flex gap-3">
@@ -219,14 +214,72 @@
                   <span>Envío (5%)</span>
                   <span>S/ {{ shippingCost.toFixed(2) }}</span>
                 </div>
+
+                @if (!couponApplied()) {
+                  <div class="border-t border-gray-200 mt-2 pt-3">
+                    @if (!showCouponInput()) {
+                      <button (click)="activateCoupon()" class="text-xs text-[#0e0d12]/60 hover:text-[#0e0d12] transition font-medium">
+                        + Activar cupón
+                      </button>
+                    } @else {
+                      <div class="w-full overflow-hidden">
+                        <form (submit)="applyCoupon(); $event.preventDefault()" class="space-y-2">
+                          <input
+                            type="text"
+                            name="coupon"
+                            [ngModel]="couponCode()"
+                            (ngModelChange)="couponCode.set($event); couponError.set('')"
+                            maxlength="6"
+                            placeholder="Ingrese código de 6 dígitos"
+                            class="w-full min-w-0 px-3 py-1.5 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] text-sm"
+                            [class.border-red-400]="couponError()"
+                          />
+                          @if (couponError()) {
+                            <p class="text-xs text-red-500">{{ couponError() }}</p>
+                          }
+                          <div class="flex flex-col sm:flex-row gap-2">
+                            <button
+                              type="submit"
+                              [disabled]="couponCode().length !== 6 || !/^\d+$/.test(couponCode())"
+                              class="w-full sm:w-auto px-3 py-1.5 bg-[#0e0d12] text-white text-xs font-medium hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition">
+                              Aplicar
+                            </button>
+                            <button
+                              type="button"
+                              (click)="cancelCoupon()"
+                              class="w-full sm:w-auto px-3 py-1.5 border border-gray-300 text-[#0e0d12] text-xs font-medium hover:bg-gray-50 transition">
+                              Cancelar
+                            </button>
+                          </div>
+                          <p class="text-[10px] text-[#0e0d12]/40">Código numérico de 6 dígitos</p>
+                        </form>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="border-t border-gray-200 mt-2 pt-3">
+                    <div class="flex justify-between items-center text-sm">
+                      <span class="text-[#0e0d12]/70">Descuento</span>
+                      <div class="flex items-center gap-3">
+                        <span class="text-[#0e0d12] font-medium">-S/ {{ discountAmount.toFixed(2) }}</span>
+                        <button (click)="removeCoupon()" class="text-xs text-red-500 hover:text-red-600 transition">Quitar</button>
+                      </div>
+                    </div>
+                    <div class="text-xs text-green-600 mt-1">✓ Cupón aplicado</div>
+                  </div>
+                }
               </div>
+
               <div class="border-t border-gray-200 pt-3 mb-5">
                 <div class="flex justify-between items-center">
                   <span class="text-[#0e0d12] font-medium">Total</span>
                   <span class="text-xl font-bold text-[#0e0d12]">S/ {{ total.toFixed(2) }}</span>
                 </div>
               </div>
-              <button routerLink="/login" class="w-full py-2.5 bg-[#0e0d12] text-white font-medium hover:bg-[#1c1a24] transition text-sm disabled:bg-gray-300 disabled:cursor-not-allowed">
+
+              <button (click)="handleReservar()"
+                [disabled]="!step1Completed() || !step2Completed() || !step3Completed()"
+                class="w-full py-2.5 bg-[#0e0d12] text-white font-medium hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm">
                 RESERVAR
               </button>
               <button (click)="goBackToStore()" class="w-full mt-3 py-2.5 border border-gray-300 text-[#0e0d12] font-medium hover:bg-gray-50 transition text-sm">

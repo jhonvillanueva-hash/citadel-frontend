@@ -14,6 +14,7 @@ import { CartStore } from './features/public/store/pages/cart-store/cart-store';
 import { CheckoutStore } from './features/public/store/pages/checkout-store/checkout-store';
 import { ProfileStore } from './features/public/store/pages/profile-store/profile-store';
 import { storeGuard } from './core/guards/store.guard';
+import { SearchStore } from './features/public/store/pages/search-store/search-store';
 
 export const routes: Routes = [
   {
@@ -45,6 +46,11 @@ export const routes: Routes = [
     path: 'store/profile',
     component: ProfileStore,
     data: { showHeader: false },
+  },
+  {
+    path: 'store/search',
+    component: SearchStore,
+    data: { showHeader: true },
   },
   {
     path: 'store/products/flavors/:name',

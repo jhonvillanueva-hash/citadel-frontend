@@ -6,7 +6,6 @@ import { ViewChild, ElementRef } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faUser,
-  faLock,
   faBox,
   faSignOutAlt,
   faEdit,
@@ -22,7 +21,8 @@ import { UsuarioService } from '../../../../../data/services/usuario.service';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { Usuario } from '../../../../../data/models/api.models';
 import { RouterLink } from "@angular/router";
-import { CartService } from '../../../../../core/services/cart.service';
+import { CarritoService } from '../../../../../data/services/cart.service';
+import { CarritoProductoService } from '../../../../../data/services/carrito-producto.service';
 
 interface Order {
   id: string;
@@ -61,16 +61,14 @@ export class ProfileStore implements OnInit {
 
   private usuarioService = inject(UsuarioService);
   private authService = inject(AuthService);
-
   private router = inject(Router);
-
-  private cartService = inject(CartService);
+  private carritoService = inject(CarritoService);
+  private carritoProductoService = inject(CarritoProductoService);
 
   currentUser = this.authService.currentUser;
   usuarioApi = signal<Usuario | null>(null);
 
   faUser = faUser;
-  faLock = faLock;
   faBox = faBox;
   faSignOutAlt = faSignOutAlt;
   faEdit = faEdit;
@@ -82,7 +80,7 @@ export class ProfileStore implements OnInit {
   faCamera = faCamera;
   faArrowLeft = faArrowLeft;
 
-  activeTab = signal<'profile' | 'security' | 'orders'>('profile');
+  activeTab = signal<'profile' | 'orders'>('profile');
   isEditingProfile = signal(false);
   avatarDb = signal<string | null>(null);
   avatarPreview = signal<string | null>(null);
@@ -98,7 +96,6 @@ export class ProfileStore implements OnInit {
 
   tabs = [
     { id: 'profile' as const, name: 'Perfil', icon: faUser },
-    { id: 'security' as const, name: 'Seguridad', icon: faLock },
     { id: 'orders' as const, name: 'Pedidos', icon: faBox }
   ];
 
@@ -106,12 +103,6 @@ export class ProfileStore implements OnInit {
   private originalProfile = signal<UserProfile>({ ...EMPTY_PROFILE });
 
   fieldErrors = signal<Record<string, string>>({});
-
-  passwordData = {
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  };
 
   ordersSignal = signal<Order[]>([]);
 
@@ -130,30 +121,6 @@ export class ProfileStore implements OnInit {
       ? localPart.substring(0, 2) + '****'
       : '****';
     return `${maskedLocal}@${domain}`;
-  });
-
-  passwordStrength = computed(() => {
-    const pwd = this.passwordData.newPassword;
-    return {
-      hasMinLength: pwd.length >= 8,
-      hasUpperCase: /[A-Z]/.test(pwd),
-      hasNumber: /[0-9]/.test(pwd)
-    };
-  });
-
-  passwordMismatch = computed((): boolean => {
-    return this.passwordData.newPassword !== '' &&
-           this.passwordData.confirmPassword !== '' &&
-           this.passwordData.newPassword !== this.passwordData.confirmPassword;
-  });
-
-  isPasswordValid = computed((): boolean => {
-    const strength = this.passwordStrength();
-    return strength.hasMinLength &&
-           strength.hasUpperCase &&
-           strength.hasNumber &&
-           !this.passwordMismatch() &&
-           this.passwordData.newPassword !== '';
   });
 
   constructor() {
@@ -216,7 +183,7 @@ export class ProfileStore implements OnInit {
     if (!file) return;
     if (!file.type.startsWith('image/')) return;
 
-    this.selectedFileName.set(file.name); 
+    this.selectedFileName.set(file.name);
     this.processImage(file);
   }
 
@@ -226,7 +193,7 @@ export class ProfileStore implements OnInit {
     if (input.files && input.files[0]) {
       const file = input.files[0];
 
-      this.selectedFileName.set(file.name); 
+      this.selectedFileName.set(file.name);
       this.processImage(file);
 
       input.value = '';
@@ -397,34 +364,47 @@ export class ProfileStore implements OnInit {
     return phoneValid && dniValid && requiredValid && Object.keys(this.fieldErrors()).length === 0;
   });
 
-  validatePassword(): void {}
-
-  updatePassword(): void {
-    if (this.isPasswordValid()) {
-      this.passwordData = {
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      };
-      alert('Contraseña actualizada correctamente');
-    }
-  }
-
   orders = (): Order[] => this.ordersSignal();
 
   loadOrders(): void {
-    const storedOrders = localStorage.getItem('mockOrders');
-    if (storedOrders) {
-      this.ordersSignal.set(JSON.parse(storedOrders));
-    } else {
-      const mockOrders: Order[] = [
-        { id: 'ORD-001', date: '2024-01-15', total: 129.99, status: 'completed' },
-        { id: 'ORD-002', date: '2024-02-20', total: 89.50, status: 'shipped' },
-        { id: 'ORD-003', date: '2024-03-10', total: 245.00, status: 'pending' }
-      ];
-      this.ordersSignal.set(mockOrders);
-      localStorage.setItem('mockOrders', JSON.stringify(mockOrders));
-    }
+    this.ordersSignal.set([]);
+
+    this.carritoService.getAll().subscribe({
+      next: (carritos) => {
+
+        const vendidos = carritos.filter(c => c.estado === 'V');
+
+        if (vendidos.length === 0) {
+          this.ordersSignal.set([]);
+          return;
+        }
+
+        vendidos.forEach(carrito => {
+          this.carritoProductoService
+            .getByCarrito(carrito.id_carrito)
+            .subscribe(productos => {
+
+              const total = productos.reduce((sum, p) =>
+                sum + (p.cantidad * p.precio_venta), 0
+              );
+
+              this.ordersSignal.update(prev => [
+                ...prev,
+                {
+                  id: carrito.id_carrito.toString(),
+                  date: new Date(carrito.fecha_compra).toLocaleDateString(),
+                  total: total,
+                  status: 'completed'
+                }
+              ]);
+            });
+        });
+
+      },
+      error: () => {
+        this.ordersSignal.set([]);
+      }
+    });
   }
 
   getStatusBadgeClass(status: string): string {
@@ -448,7 +428,6 @@ export class ProfileStore implements OnInit {
   }
 
   logout(): void {
-    this.cartService.clearCart();
-    this.authService.logout();   
+    this.authService.logout();
   }
 }
