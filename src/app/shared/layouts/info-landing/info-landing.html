@@ -1,422 +1,148 @@
-<section id="inicio" class="w-full bg-bg py-12 lg:py-16">
-  <div class="px-4 md:px-24 lg:px-8">
-
-    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-
-      <div class="flex flex-col items-center text-center px-5 animate-on-scroll fade-up delay-100">
-        <div class="flex items-center justify-center w-[90px] h-[90px] mb-4 rounded-full bg-secondary text-white
-                 transition-colors duration-300
-                 animate-on-scroll icon-float-aura delay-100">
-          <fa-icon [icon]="icons.faDiagramProject" class="text-[35px]"/>
+<section id="inicio" class="w-full bg-bg py-14 lg:py-20">
+  <div class="max-w-screen-xl mx-auto px-4 sm:px-8 lg:px-12">
+    <ul class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4" role="list">
+      @for (b of benefits; track b.label; let i = $index) {
+      <li class="flex flex-col items-center text-center animate-on-scroll fade-up" [class]="delays[i]">
+        <div
+          class="flex items-center justify-center w-20 h-20 mb-5 rounded-full bg-secondary animate-on-scroll icon-float-aura"
+          [class]="delays[i]" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-9 h-9" aria-hidden="true">
+            <path [attr.d]="b.svgPath" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
         </div>
-        <p class="mb-2 font-semibold text-[20px] text-white">
-          Berries Seleccionados
-        </p>
-        <p class="text-[14px] font-light text-white">
-          Frutos cultivados cuidadosamente en campos del norte del Perú.
-        </p>
-      </div>
-
-      <div class="flex flex-col items-center text-center px-5 animate-on-scroll fade-up delay-200">
-        <div class="flex items-center justify-center w-[90px] h-[90px] mb-4 rounded-full bg-secondary text-white
-                 transition-colors duration-300
-                 animate-on-scroll icon-float-aura delay-200">
-          <fa-icon [icon]="icons.faAward" class="text-[35px]"/>
-        </div>
-        <p class="mb-2 font-semibold text-[20px] text-white">
-          Calidad Artesanal
-        </p>
-        <p class="text-[14px] font-light text-white">
-          Procesos cuidados que garantizan sabor, aroma y autenticidad.
-        </p>
-      </div>
-
-      <div class="flex flex-col items-center text-center px-5 animate-on-scroll fade-up delay-300">
-        <div class="flex items-center justify-center w-[90px] h-[90px] mb-4 rounded-full bg-secondary text-white
-                 transition-colors duration-300
-                 animate-on-scroll icon-float-aura delay-300">
-          <fa-icon [icon]="icons.faTruck" class="text-[35px]"/>
-        </div>
-        <p class="mb-2 font-semibold text-[20px] text-white">
-          Producción Responsable
-        </p>
-        <p class="text-[14px] font-light text-white">
-          Elaboración cuidadosa que conserva la frescura de cada botella.
-        </p>
-      </div>
-
-      <div class="flex flex-col items-center text-center px-5 animate-on-scroll fade-up delay-400">
-        <div class="flex items-center justify-center w-[90px] h-[90px] mb-4 rounded-full bg-secondary text-white
-                 transition-colors duration-300
-                 animate-on-scroll icon-float-aura delay-400">
-          <fa-icon [icon]="icons.faHeart" class="text-[35px]"/>
-        </div>
-        <p class="mb-2 font-semibold text-[20px] text-white">
-          Sabores Únicos
-        </p>
-        <p class="text-[14px] font-light text-white">
-          Vinos de berries creados para experiencias diferentes y naturales.
-        </p>
-      </div>
-
-    </div>
+        <p class="mb-1.5 font-semibold text-lg text-white">{{ b.label }}</p>
+        <p class="text-sm font-light text-white/75 leading-relaxed">{{ b.desc }}</p>
+      </li>
+      }
+    </ul>
   </div>
 </section>
 
+<section id="historia" class="w-full bg-bg py-14 lg:py-20">
+  <div class="max-w-screen-xl mx-auto px-4 sm:px-8 lg:px-12">
 
-<section id="historia" class="w-full bg-bg py-12 lg:py-16">
-  <div class="px-4 md:px-20 lg:px-12">
-
-    <div class="mb-8 text-center">
-
-      <strong class="block mt-6 text-[16px] font-poppins text-secondary text-scroll-animate text-delay-100">
+    <header class="mb-10 text-center">
+      <strong
+        class="block text-sm font-semibold tracking-widest text-secondary uppercase text-scroll-animate text-delay-100">
         CONOCE
       </strong>
-
-      <h2 class="mt-1 text-[42px] font-poppins font-semibold text-white text-scroll-animate text-delay-200">
+      <h2 class="mt-2 text-4xl font-semibold text-white text-scroll-animate text-delay-200">
         Nuestra Historia
       </h2>
-
-      <p class="mt-2 mb-6 text-[14px] font-poppins text-white/80 max-w-3xl mx-auto text-scroll-animate text-delay-300">
-        Desde nuestros primeros pasos hasta consolidar una propuesta diferente, nuestra historia está marcada por la
-pasión, la innovación y el respeto por la naturaleza.
-
+      <p
+        class="mt-3 text-sm font-light text-white/70 max-w-2xl mx-auto leading-relaxed text-scroll-animate text-delay-300">
+        Desde nuestros primeros pasos hasta consolidar una propuesta diferente, nuestra historia está marcada
+        por la pasión, la innovación y el respeto por la naturaleza.
       </p>
+    </header>
 
-    </div>
-
-    <div class="grid gap-8 lg:grid-cols-2 sm:mx-auto max-w-screen-lg">
-
-      <div class="grid grid-cols-2 gap-5">
-        <img class="object-cover w-full h-56 col-span-2 rounded shadow-lg
-         transition-transform duration-300 ease-in-out
-         hover:scale-105 cursor-zoom-in" src="/img/landing/info/primera.png" />
-
-        <img class="object-cover w-full h-48 rounded shadow-lg
-         transition-transform duration-300 ease-in-out
-         hover:scale-110 cursor-zoom-in" src="/img/landing/info/segunda.png" />
-
-        <img class="object-cover w-full h-48 rounded shadow-lg
-         transition-transform duration-300 ease-in-out
-         hover:scale-110 cursor-zoom-in" src="/img/landing/info/tercera.png" />
-
+    <div class="grid gap-10 lg:grid-cols-2 max-w-5xl mx-auto items-start">
+      <div class="grid grid-cols-2 gap-4">
+        <img class="col-span-2 w-full h-56 object-cover rounded-lg" src="/img/landing/info/primera.webp"
+          alt="Proceso de elaboración de vinos Citadel" loading="lazy" decoding="async" width="640" height="224" />
+        <img class="w-full h-44 object-cover rounded-lg" src="/img/landing/info/segunda.webp"
+          alt="Berries seleccionados para vinos Citadel" loading="lazy" decoding="async" width="310" height="176" />
+        <img class="w-full h-44 object-cover rounded-lg" src="/img/landing/info/tercera.webp"
+          alt="Viñedo y producción artesanal Citadel" loading="lazy" decoding="async" width="310" height="176" />
       </div>
 
-      <div class="flex flex-col justify-start px-6">
-
-        <h3 class="text-[24px] font-poppins font-semibold text-white mb-2 text-scroll-slow text-delay-400">
+      <div class="flex flex-col justify-start">
+        <h3 class="text-2xl font-semibold text-white mb-3 text-scroll-slow text-delay-400">
           Un Legado de Excelencia
         </h3>
-
-        <p
-          class="text-[14px] font-poppins font-light leading-relaxed text-white/80 mb-3 text-scroll-animate text-delay-500">
+        <p class="text-sm font-light leading-relaxed text-white/75 mb-3 text-scroll-animate text-delay-500">
           Vinos Citadel nace en el año 2022 cuando dos ingenieros apasionados por el vino decidieron crear una propuesta
-innovadora, enfocada en la elaboración de vinos de berries con identidad local y procesos cuidadosamente
-artesanales, inspirados en la riqueza natural del norte del Perú.
-
+          innovadora, enfocada en la elaboración de vinos de berries con identidad local y procesos cuidadosamente
+          artesanales, inspirados en la riqueza natural del norte del Perú.
         </p>
-
-        <p class="text-[14px] font-poppins font-light leading-relaxed text-white/80 text-scroll-animate text-delay-600">
+        <p class="text-sm font-light leading-relaxed text-white/75 text-scroll-animate text-delay-600">
           El nombre Citadel nace como homenaje a la ciudadela de Chan Chan, símbolo de historia, cultura y orgullo
-peruano. Esta inspiración nos impulsa a crear vinos que conecten tradición y modernidad, ofreciendo
-experiencias auténticas que celebran el sabor, la naturaleza y los momentos compartidos.
-
+          peruano. Esta inspiración nos impulsa a crear vinos que conecten tradición y modernidad, ofreciendo
+          experiencias auténticas que celebran el sabor, la naturaleza y los momentos compartidos.
         </p>
-
-        <button
-          (click)="openFacebookPage()"
-          class="mt-4 w-[140px] h-[40px] border border-secondary text-secondary font-poppins text-[14px] rounded hover:bg-secondary hover:text-white transition text-scroll-fast text-delay-700">
+        <a href="https://www.facebook.com/vinoscitadel?locale=es_LA" target="_blank" rel="noopener noreferrer"
+          class="mt-5 inline-flex items-center justify-center w-36 h-10 border border-secondary text-secondary text-sm rounded transition-colors duration-200 hover:bg-secondary hover:text-white text-scroll-fast text-delay-700"
+          aria-label="Conoce más sobre Vinos Citadel en Facebook">
           Conoce Más
-        </button>
-
+        </a>
       </div>
     </div>
   </div>
 </section>
 
-<section  id="destacados" class="w-full bg-bg2 py-12">
+<section id="destacados" class="w-full bg-bg2 py-14 lg:py-20">
+  <div class="max-w-screen-xl mx-auto px-4 sm:px-8 lg:px-12 animate-on-scroll fade-up delay-100">
 
-  <div class="px-4 md:px-24 lg:px-8 animate-on-scroll fade-up delay-100">
-
-    <div class="mb-8 text-center">
-      <strong class="block mt-10 text-[18px] font-poppins text-secondary">
-        NUESTRA SELECCION
+    <header class="mb-12 text-center">
+      <strong class="block text-sm font-semibold tracking-widest text-secondary uppercase">
+        NUESTRA SELECCIÓN
       </strong>
-
-      <h2 class="mt-2 text-[50px] font-poppins text-white">
-        Vinos Destacados
-      </h2>
-
-      <p class="mt-2 mb-10 text-[14px] font-poppins text-white max-w-3xl mx-auto">
-Descubre nuestra selección de vinos de berries, elaborados en presentaciones dulce, semiseco y seco,
-pensados para distintos momentos y estilos de consumo.
-
-
+      <h2 class="mt-2 text-4xl font-semibold text-white">Vinos Destacados</h2>
+      <p class="mt-3 text-sm font-light text-white/75 max-w-2xl mx-auto leading-relaxed">
+        Descubre nuestra selección de vinos de berries, elaborados en presentaciones dulce, semiseco y seco,
+        pensados para distintos momentos y estilos de consumo.
       </p>
-    </div>
+    </header>
 
-    <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-
-      <div class="rounded-[7px] bg-transparent overflow-hidden flex flex-col
-         transition-all duration-300 ease-out
-         hover:-translate-y-3 hover:shadow-2xl hover:shadow-black/40">
-
-
-        <div class="h-[300px] bg-bg3 flex items-center justify-center
-         rounded-t-[7px] overflow-hidden group">
-
-          <img src="/img/landing/info/products/1.png" class="w-[190px] h-[240px] object-contain
-         transition-transform duration-500 ease-out
-         group-hover:scale-125 cursor-zoom-in" alt="">
-
+    <ul class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4" role="list">
+      @for (p of featuredProducts; track p.name) {
+      <li class="rounded-lg overflow-hidden flex flex-col transition-transform duration-300 hover:-translate-y-1">
+        <div class="h-[280px] bg-bg3 flex items-center justify-center rounded-t-lg overflow-hidden">
+          <img [src]="p.img" [alt]="p.name + ' - Vino de berries Citadel'"
+            class="w-44 h-56 object-contain transition-transform duration-300 hover:scale-[1.08]" loading="lazy"
+            decoding="async" width="176" height="224" />
         </div>
-
-        <div class="bg-bg4 px-4 py-3 rounded-b-[7px] flex flex-col flex-1">
-
-          <strong class="text-[16px] font-poppins text-secondary">
-            SEMISECO
-          </strong>
-
-          <h3 class="mt-2 text-[20px] font-poppins text-white">
-            Arándano – 750 ml
-          </h3>
-
-          <p class="mt-2 text-[14px] font-poppins text-white font-light">
-            Vino de arándanos con notas frescas y frutales, equilibrio suave y un final agradable al paladar.
-          </p>
-
+        <div class="bg-bg4 px-4 py-4 rounded-b-lg flex flex-col flex-1">
+          <strong class="text-xs font-semibold tracking-widest text-secondary uppercase">{{ p.type }}</strong>
+          <h3 class="mt-2 text-lg font-semibold text-white">{{ p.name }}</h3>
+          <p class="mt-1.5 text-sm font-light text-white/70 leading-relaxed">{{ p.desc }}</p>
           <div class="mt-auto pt-4 flex items-center justify-between">
-
-            <span class="text-[16px] font-poppins text-white">
-              S/ 25.00
-            </span>
-
-            <button routerLink="/store/products/flavors/todos" class="w-[150px] h-[50px] border border-secondary rounded-[5px]
-                     text-secondary font-poppins text-[16px]
-                     hover:bg-secondary hover:text-white transition">
+            <span class="text-base font-medium text-white">{{ p.price }}</span>
+            <a routerLink="/store/products/flavors/todos"
+              class="inline-flex items-center justify-center w-36 h-11 border border-secondary rounded text-secondary text-sm transition-colors duration-200 hover:bg-secondary hover:text-white"
+              [attr.aria-label]="'Ver detalles de ' + p.name">
               Ver Detalles
-            </button>
-
+            </a>
           </div>
         </div>
-      </div>
-
-      <div class="rounded-[7px] bg-transparent overflow-hidden flex flex-col
-         transition-all duration-300 ease-out
-         hover:-translate-y-3 hover:shadow-2xl hover:shadow-black/40">
-
-        <div class="h-[300px] bg-bg3 flex items-center justify-center
-         rounded-t-[7px] overflow-hidden group">
-
-          <img src="/img/landing/info/products/2.png" class="w-[190px] h-[240px] object-contain
-         transition-transform duration-500 ease-out
-         group-hover:scale-125 cursor-zoom-in" alt="">
-
-        </div>
-        <div class="bg-bg4 px-4 py-3 rounded-b-[7px] flex flex-col flex-1">
-          <strong class="text-[16px] font-poppins text-secondary">SECO</strong>
-          <h3 class="mt-2 text-[20px] font-poppins text-white">Zarzamora – 750 ml</h3>
-          <p class="mt-2 text-[14px] font-poppins text-white font-light">Vino de carácter intenso, con sabor profundo a zarzamora y un perfil seco ideal para carnes y quesos.
-          </p>
-          <div class="mt-auto pt-4 flex items-center justify-between">
-            <span class="text-[16px] font-poppins text-white">S/ 25.00</span>
-            <button routerLink="/store/products/flavors/todos" class="w-[150px] h-[50px] border border-secondary rounded-[5px]
-                           text-secondary font-poppins text-[16px]
-                           hover:bg-secondary hover:text-white transition">
-              Ver Detalles
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="rounded-[7px] bg-transparent overflow-hidden flex flex-col
-         transition-all duration-300 ease-out
-         hover:-translate-y-3 hover:shadow-2xl hover:shadow-black/40">
-
-        <div class="h-[300px] bg-bg3 flex items-center justify-center
-         rounded-t-[7px] overflow-hidden group">
-
-          <img src="/img/landing/info/products/3.png" class="w-[190px] h-[240px] object-contain
-         transition-transform duration-500 ease-out
-         group-hover:scale-125 cursor-zoom-in" alt="">
-
-        </div>
-        <div class="bg-bg4 px-4 py-3 rounded-b-[7px] flex flex-col flex-1">
-          <strong class="text-[16px] font-poppins text-secondary">DULCE</strong>
-          <h3 class="mt-2 text-[20px] font-poppins text-white">Frambuesa – 750 ml</h3>
-          <p class="mt-2 text-[14px] font-poppins text-white font-light">
-            Vino dulce y aromático, con notas suaves de frambuesa y una textura ligera y refrescante.
-          </p>
-          <div class="mt-auto pt-4 flex items-center justify-between">
-            <span class="text-[16px] font-poppins text-white">S/ 25.00</span>
-            <button routerLink="/store/products/flavors/todos" class="w-[150px] h-[50px] border border-secondary rounded-[5px]
-                           text-secondary font-poppins text-[16px]
-                           hover:bg-secondary hover:text-white transition">
-              Ver Detalles
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="rounded-[7px] bg-transparent overflow-hidden flex flex-col
-         transition-all duration-300 ease-out
-         hover:-translate-y-3 hover:shadow-2xl hover:shadow-black/40">
-
-        <div class="h-[300px] bg-bg3 flex items-center justify-center
-         rounded-t-[7px] overflow-hidden group">
-
-          <img src="/img/landing/info/products/4.png" class="w-[190px] h-[240px] object-contain
-         transition-transform duration-500 ease-out
-         group-hover:scale-125 cursor-zoom-in" alt="">
-
-        </div>
-        <div class="bg-bg4 px-4 py-3 rounded-b-[7px] flex flex-col flex-1">
-          <strong class="text-[16px] font-poppins text-secondary">SEMISECO</strong>
-          <h3 class="mt-2 text-[20px] font-poppins text-white">Berry Mix</h3>
-          <p class="mt-2 text-[14px] font-poppins text-white font-light">
-            Mezcla equilibrada de arándano, zarzamora y frambuesa, ideal para compartir y disfrutar en cualquier ocasión.
-          </p>
-          <div class="mt-auto pt-4 flex items-center justify-between">
-            <span class="text-[16px] font-poppins text-white">S/ 25.00</span>
-            <button routerLink="/store/products/flavors/todos" class="w-[150px] h-[50px] border border-secondary rounded-[5px]
-                           text-secondary font-poppins text-[16px]
-                           hover:bg-secondary hover:text-white transition">
-              Ver Detalles
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+      </li>
+      }
+    </ul>
   </div>
 </section>
 
-<section id="colecciones" class="w-full bg-bg2 py-12">
+<section id="colecciones" class="w-full bg-bg2 py-14 lg:py-20">
+  <div class="max-w-screen-xl mx-auto px-4 sm:px-8 lg:px-12 animate-on-scroll fade-up delay-100">
 
-  <div class="px-4 md:px-24 lg:px-8 flex flex-col items-center animate-on-scroll fade-up delay-100">
+    <header class="mb-12 text-center">
+      <strong class="block text-sm font-semibold tracking-widest text-secondary uppercase">EXPLORA</strong>
+      <h2 class="mt-2 text-4xl font-semibold text-white">Nuestras Colecciones</h2>
+      <p class="mt-3 text-sm font-light text-white/75 max-w-2xl mx-auto leading-relaxed">
+        Encuentra el vino ideal para cada momento explorando nuestras colecciones, creadas según sabor,
+        ocasión y estilo de consumo.
+      </p>
+    </header>
 
-    <strong class="mt-10 text-[18px] font-poppins text-secondary">
-      EXPLORA
-    </strong>
-
-    <h2 class="mt-2 text-[50px] font-poppins text-white text-center">
-      Nuestras Colecciones
-    </h2>
-
-    <p class="mt-2 mb-10 text-[14px] font-poppins text-white text-center max-w-3xl">
-      Encuentra el vino ideal para cada momento explorando nuestras colecciones, creadas según sabor, ocasión
-y estilo de consumo.
-
-    </p>
-
-    <div class="w-full grid gap-10 sm:grid-cols-2 lg:grid-cols-4 px-5">
-
-      <div
-        class="h-[250px] rounded-[7px] px-5 py-4 flex flex-col justify-center
-         bg-cover bg-center bg-no-repeat
-         transition-all duration-300 ease-out
-         hover:-translate-y-3 hover:shadow-2xl hover:shadow-black/40
-         bg-[linear-gradient(to_right,rgba(0,0,0,0.792),rgba(0,0,0,0.168)),url('/img/landing/hero/carousel/1-fondo.png')]">
-
-
-        <strong class="text-[15px] font-poppins font-medium text-secondary">
-          8 Productos
-        </strong>
-
-        <h3 class="mt-2 text-[22px] font-poppins font-semibold text-white">
-          Dulces
-        </h3>
-
-        <p class="mt-1 text-[14px] font-poppins font-light text-white">
-          Suaves, frutales y fáciles de disfrutar.
-        </p>
-
-        <button  routerLink="/store/products/flavors/todos" class="mt-5 w-[140px] h-[40px] border border-secondary rounded-[5px]
-                 text-secondary font-poppins text-[14px]
-                 hover:bg-secondary hover:text-white transition">
-          Ver Coleccion
-        </button>
-      </div>
-
-      <div
-        class="h-[250px] rounded-[7px] px-5 py-4 flex flex-col justify-center
-         bg-cover bg-center bg-no-repeat
-         transition-all duration-300 ease-out
-         hover:-translate-y-3 hover:shadow-2xl hover:shadow-black/40
-         bg-[linear-gradient(to_right,rgba(0,0,0,0.792),rgba(0,0,0,0.168)),url('/img/landing/hero/carousel/2-fondo.png')]">
-
-
-        <strong class="text-[15px] font-poppins font-medium text-secondary">
-         10 Productos
-        </strong>
-
-        <h3 class="mt-2 text-[22px] font-poppins font-semibold text-white">
-          Semisecos
-        </h3>
-
-        <p class="mt-1 text-[14px] font-poppins font-light text-white">
-          Equilibrio perfecto entre dulzor y frescura.
-        </p>
-
-        <button routerLink="/store/products/flavors/todos" class="mt-5 w-[140px] h-[40px] border border-secondary rounded-[5px]
-                 text-secondary font-poppins text-[14px]
-                 hover:bg-secondary hover:text-white transition">
-          Ver Coleccion
-        </button>
-      </div>
-
-      <div
-        class="h-[250px] rounded-[7px] px-5 py-4 flex flex-col justify-center
-         bg-cover bg-center bg-no-repeat
-         transition-all duration-300 ease-out
-         hover:-translate-y-3 hover:shadow-2xl hover:shadow-black/40
-         bg-[linear-gradient(to_right,rgba(0,0,0,0.792),rgba(0,0,0,0.168)),url('/img/landing/hero/carousel/3-fondo.png')]">
-
-
-        <strong class="text-[15px] font-poppins font-medium text-secondary">
-          6 Productos
-        </strong>
-
-        <h3 class="mt-2 text-[22px] font-poppins font-semibold text-white">
-          Secos
-        </h3>
-
-        <p class="mt-1 text-[14px] font-poppins font-light text-white">
-          Intensos, con carácter y personalidad.
-        </p>
-
-        <button routerLink="/store/products/flavors/todos" class="mt-5 w-[140px] h-[40px] border border-secondary rounded-[5px]
-                 text-secondary font-poppins text-[14px]
-                 hover:bg-secondary hover:text-white transition">
-          Ver Coleccion
-        </button>
-      </div>
-
-      <div
-        class="h-[250px] rounded-[7px] px-5 py-4 flex flex-col justify-center
-         bg-cover bg-center bg-no-repeat
-         transition-all duration-300 ease-out
-         hover:-translate-y-3 hover:shadow-2xl hover:shadow-black/40
-         bg-[linear-gradient(to_right,rgba(0,0,0,0.792),rgba(0,0,0,0.168)),url('/img/landing/hero/carousel/4-fondo.png')]">
-
-
-        <strong class="text-[15px] font-poppins font-medium text-secondary">
-          5 Productos
-        </strong>
-
-        <h3 class="mt-2 text-[22px] font-poppins font-semibold text-white">
-          Mix & Especiales
-        </h3>
-
-        <p class="mt-1 text-[14px] font-poppins font-light text-white">
-          Combinaciones únicas para experiencias diferentes.
-        </p>
-
-        <button routerLink="/store/products/flavors/todos" class="mt-5 w-[140px] h-[40px] border border-secondary rounded-[5px]
-                 text-secondary font-poppins text-[14px]
-                 hover:bg-secondary hover:text-white transition">
-          Ver Coleccion
-        </button>
-      </div>
-
-    </div>
+    <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4" role="list">
+      @for (c of collections; track c.name) {
+      <li class="relative h-60 rounded-lg overflow-hidden transition-transform duration-300 hover:-translate-y-1">
+        <img [src]="c.img" [alt]="'Colección ' + c.name + ' de Vinos Citadel'"
+          class="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async" width="400"
+          height="240" />
+        <div class="absolute inset-0 bg-gradient-to-r from-black/80 to-black/20"></div>
+        <div class="relative z-10 flex flex-col justify-center h-full px-5 py-4">
+          <strong class="text-xs font-semibold tracking-widest text-secondary">{{ c.count }}</strong>
+          <h3 class="mt-1.5 text-xl font-semibold text-white">{{ c.name }}</h3>
+          <p class="mt-1 text-sm font-light text-white/80">{{ c.desc }}</p>
+          <a routerLink="/store/products/flavors/todos"
+            class="mt-4 inline-flex items-center justify-center w-36 h-9 border border-secondary rounded text-secondary text-sm transition-colors duration-200 hover:bg-secondary hover:text-white"
+            [attr.aria-label]="'Ver colección ' + c.name">
+            Ver Colección
+          </a>
+        </div>
+      </li>
+      }
+    </ul>
   </div>
 </section>

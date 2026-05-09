@@ -1,162 +1,107 @@
-<footer class="w-full bg-bg text-text">
+<footer class="w-full bg-bg text-text" aria-label="Pie de página Vinos Citadel">
 
-  <div class="w-full px-4 pt-16 md:px-24 lg:px-8">
-    <div class="max-w-screen-xl mx-auto grid gap-10 mb-10 sm:grid-cols-2 lg:grid-cols-4 items-start">
+  <div class="max-w-screen-xl mx-auto px-4 sm:px-8 lg:px-12 pt-14 pb-10">
+    <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 items-start">
 
-      <div>
-        <a href="/" class="inline-flex items-center">
-          <img src="/img/logo.png" alt="Logo" class="h-[40px]">
+      <div class="sm:col-span-2 lg:col-span-1">
+        <a routerLink="/" aria-label="Ir al inicio de Vinos Citadel">
+          <img src="/img/logo.avif" alt="Logo Vinos Citadel" loading="lazy" decoding="async" width="120" height="40"
+            class="h-10 w-auto" />
         </a>
-
-        <p class="mt-6 text-[14px] font-poppins font-light text-text max-w-md">
-          Descubre nuestra exclusiva colección de vinos, elaborados con pasión y tradición
-          en los mejores viñedos del mundo.
+        <p class="mt-5 text-sm font-light text-text/70 max-w-xs leading-relaxed">
+          Vinos de berries artesanales, elaborados con pasión e identidad del norte del Perú.
         </p>
-
-        <div class="flex gap-4 mt-6">
-          <button
-            type="button"
-            (click)="openFacebookPage()"
-            class="w-10 h-10 rounded-full bg-bg3 flex items-center justify-center hover:bg-secondary transition">
-            <fa-icon [icon]="icons.faFacebook" class="text-text"/>
-          </button>
-
-          <button
-            type="button"
-            (click)="openInstagramPage()"
-            class="w-10 h-10 rounded-full bg-bg3 flex items-center justify-center hover:bg-secondary transition">
-            <fa-icon [icon]="icons.faInstagram" class="text-text"/>
-          </button>
-
-          <button
-            type="button"
-            (click)="openTiktokPage()"
-            class="w-10 h-10 rounded-full bg-bg3 flex items-center justify-center hover:bg-secondary transition">
-            <fa-icon [icon]="icons.faTiktok" class="text-text"/>
-          </button>
-        </div>
+        <nav aria-label="Redes sociales" class="flex gap-3 mt-5">
+          @for (s of socialLinks; track s.label) {
+          <a [href]="s.href" target="_blank" rel="noopener noreferrer" [attr.aria-label]="s.label"
+            class="w-9 h-9 rounded-full bg-bg3 flex items-center justify-center transition-colors duration-200 hover:bg-secondary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+              stroke-linejoin="round" class="w-4 h-4 text-text" aria-hidden="true">
+              <path [attr.d]="s.svgPath" />
+            </svg>
+          </a>
+          }
+        </nav>
       </div>
 
-      <div>
-        <strong class="block mb-4 text-[16px] font-poppins font-semibold">
+      <nav aria-label="Tienda">
+        <strong class="block mb-4 text-sm font-semibold tracking-wide uppercase text-text">
           Nuestra Tienda
         </strong>
-          <ul class="space-y-2 text-[14px] font-poppins">
-            <li>
-              <a routerLink="/store/products/flavors/todos" class="hover:text-secondary transition">
-                Frambuesas
-              </a>
-            </li>
-            <li>
-              <a routerLink="/store/products/flavors/todos" class="hover:text-secondary transition">
-                Arándanos
-              </a>
-            </li>
-            <li>
-              <a routerLink="/store/products/flavors/todos" class="hover:text-secondary transition">
-                Zarzamoras
-              </a>
-            </li>
-            <li>
-              <a routerLink="/store/products/flavors/todos" class="hover:text-secondary transition">
-                Mix
-              </a>
-            </li>
-          </ul>
-      </div>
+        <ul class="space-y-2.5">
+          @for (l of storeLinks; track l.label) {
+          <li>
+            <a [routerLink]="l.routerLink"
+              class="text-sm font-light text-text/70 transition-colors duration-200 hover:text-secondary">
+              {{ l.label }}
+            </a>
+          </li>
+          }
+        </ul>
+      </nav>
 
-      <div>
-        <strong class="block mb-4 text-[16px] font-poppins font-semibold">
+      <nav aria-label="Empresa">
+        <strong class="block mb-4 text-sm font-semibold tracking-wide uppercase text-text">
           Nuestra Empresa
         </strong>
-          <ul class="space-y-2 text-[14px] font-poppins">
-            <li>
-              <button
-                type="button"
-                (click)="openFacebookPage()"
-                class="hover:text-secondary transition text-left">
-                Nosotros
-              </button>
-            </li>
-
-            <li>
-              <a routerLink="/store" class="hover:text-secondary transition">
-                Catálogo
-              </a>
-            </li>
-
-            <li>
-              <button
-                type="button"
-                (click)="openInstagramPage()"
-                class="hover:text-secondary transition text-left">
-                Proceso de Elaboración
-              </button>
-            </li>
-          </ul>
-      </div>
+        <ul class="space-y-2.5">
+          @for (l of companyLinks; track l.label) {
+          <li>
+            @if (l.routerLink) {
+            <a [routerLink]="l.routerLink"
+              class="text-sm font-light text-text/70 transition-colors duration-200 hover:text-secondary">
+              {{ l.label }}
+            </a>
+            } @else {
+            <a [href]="l.href" target="_blank" rel="noopener noreferrer"
+              class="text-sm font-light text-text/70 transition-colors duration-200 hover:text-secondary">
+              {{ l.label }}
+            </a>
+            }
+          </li>
+          }
+        </ul>
+      </nav>
 
       <div>
-        <strong class="block mb-4 text-[16px] font-poppins font-semibold">
+        <strong class="block mb-4 text-sm font-semibold tracking-wide uppercase text-text">
           Contáctanos
         </strong>
-
-        <ul class="space-y-3 text-[14px] font-poppins">
-          <li class="flex items-center gap-3">
-            <fa-icon [icon]="icons.faWhatsapp" class="text-[35px]"/>
-            <a
-              href="https://wa.me/51935609881"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="hover:text-secondary transition">
-              +51 935 609 881
+        <ul class="space-y-3">
+          @for (c of contactItems; track c.label) {
+          <li>
+            <a [href]="c.href"
+              [attr.target]="c.href.startsWith('http') || c.href.startsWith('mailto') ? '_blank' : null"
+              [attr.rel]="c.href.startsWith('http') || c.href.startsWith('mailto') ? 'noopener noreferrer' : null"
+              class="flex items-center gap-2.5 text-sm font-light text-text/70 transition-colors duration-200 hover:text-secondary group">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" class="w-4 h-4 shrink-0 text-secondary" aria-hidden="true">
+                <path [attr.d]="c.svgPath" />
+              </svg>
+              {{ c.label }}
             </a>
           </li>
-
-          <li class="flex items-center gap-3">
-            <fa-icon [icon]="icons.faEnvelope" class="text-[35px]"/>
-              <a
-                href="https://mail.google.com/mail/?view=cm&fs=1&to=fgperu@gmail.com"
-                target="_blank"
-                rel="noopener"
-                class="hover:text-secondary transition"
-              >
-                fgperu@gmail.com
-              </a>
-          </li>
-
-          <li class="flex items-center gap-3">
-            <fa-icon [icon]="icons.faEnvelope" class="text-[35px]"/>
-            <a routerLink="/libro-de-reclamaciones" class="hover:text-secondary transition">
-              Libro de reclamaciones
-            </a>
-          </li>
+          }
         </ul>
       </div>
 
     </div>
   </div>
 
-  <hr class="border-bg3 w-full">
+  <hr class="border-bg3">
 
-  <div class="w-full px-4 md:px-24 lg:px-8">
-    <div class="max-w-screen-xl mx-auto flex flex-col-reverse gap-4 py-6 md:flex-row md:items-center md:justify-between">
-      <p class="text-[13px] font-poppins text-text">
-        © 2026 Citadel. Todos los derechos reservados.
+  <div class="max-w-screen-xl mx-auto px-4 sm:px-8 lg:px-12">
+    <div class="flex flex-col-reverse gap-3 py-5 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-xs text-text/50">
+        © 2026 Vinos Citadel. Todos los derechos reservados.
       </p>
-
-      <ul class="flex gap-6 text-[13px] font-poppins">
-        <li>
-          <a routerLink="/register" class="hover:text-secondary transition">
-            Términos de Servicio
-          </a>
-        </li>
-        <li>
-          <a routerLink="/register" class="hover:text-secondary transition">
-            Política de Privacidad
-          </a>
-        </li>
-      </ul>
+      <nav aria-label="Legal" class="flex gap-5">
+        @for (l of legalLinks; track l.label) {
+        <a [routerLink]="l.routerLink" class="text-xs text-text/50 transition-colors duration-200 hover:text-secondary">
+          {{ l.label }}
+        </a>
+        }
+      </nav>
     </div>
   </div>
 
