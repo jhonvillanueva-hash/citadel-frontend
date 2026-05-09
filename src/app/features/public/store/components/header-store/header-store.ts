@@ -1,5 +1,5 @@
-import { Component, inject, OnInit, signal } from '@angular/core'
-import { CommonModule } from '@angular/common'
+import { Component, inject, OnInit, signal, Renderer2, Inject, PLATFORM_ID } from '@angular/core'
+import { CommonModule, isPlatformBrowser } from '@angular/common'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCartShopping, faList, faUser, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { RouterLink, Router, NavigationEnd } from '@angular/router';
@@ -27,6 +27,11 @@ export interface InternalNav {
 export class HeaderStore implements OnInit {
   private authService = inject(AuthService);
   private usuarioService = inject(UsuarioService);
+  private renderer = inject(Renderer2);
+  @Inject(PLATFORM_ID) private platformId: any = inject(PLATFORM_ID);
+
+  searchTerm = signal('');
+
   usuarioApi = signal<Usuario | null>(null);
   avatarDb = signal<string | null>(null);
   userInitials = signal<string>('');
@@ -56,6 +61,12 @@ export class HeaderStore implements OnInit {
     faTimes
   }
 
+  goToSearch(): void {
+    const term = this.searchTerm().trim();
+    if (!term) return;
+    this.router.navigate(['/store/search'], { queryParams: { q: term } });
+  }
+
   ngOnInit(): void {
     this.loadFlavors();
     if (this.currentUser()) {
@@ -66,7 +77,7 @@ export class HeaderStore implements OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
       this.currentUrl.set(event.urlAfterRedirects);
-      this.isMobileMenuOpen.set(false);
+      this.closeMobileMenu();
     });
   }
 
@@ -163,6 +174,24 @@ export class HeaderStore implements OnInit {
   }
 
   toggleMobileMenu(): void {
-    this.isMobileMenuOpen.set(!this.isMobileMenuOpen());
+    const newState = !this.isMobileMenuOpen();
+    this.isMobileMenuOpen.set(newState);
+
+    if (isPlatformBrowser(this.platformId)) {
+      if (newState) {
+        this.renderer.setStyle(document.body, 'overflow', 'hidden');
+      } else {
+        this.renderer.setStyle(document.body, 'overflow', '');
+      }
+    }
+  }
+
+  closeMobileMenu(): void {
+    if (this.isMobileMenuOpen()) {
+      this.isMobileMenuOpen.set(false);
+      if (isPlatformBrowser(this.platformId)) {
+        this.renderer.setStyle(document.body, 'overflow', '');
+      }
+    }
   }
 }

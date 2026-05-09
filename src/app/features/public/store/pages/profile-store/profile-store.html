@@ -353,123 +353,63 @@
         </div>
       }
 
-      @if (activeTab() === 'security') {
-        <div class="max-w-3xl mx-auto">
-          <div class="mb-8 pb-8 border-b border-gray-200">
-            <div class="mb-6">
-              <h2 class="text-2xl font-bold text-[#0e0d12] mb-1">Cambiar contraseña</h2>
-              <p class="text-sm text-[#0e0d12]/50">Actualiza tu contraseña para mantener tu cuenta segura</p>
-            </div>
-
-            <div class="space-y-5">
-              <div>
-                <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Contraseña actual</label>
-                <input
-                  type="password"
-                  [(ngModel)]="passwordData.currentPassword"
-                  class="w-full max-w-xl px-4 py-2.5 bg-gray-50 border border-gray-200 focus:outline-none focus:border-[#0e0d12] transition-all duration-200 text-[#0e0d12] text-sm"
-                >
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Nueva contraseña</label>
-                <input
-                  type="password"
-                  [(ngModel)]="passwordData.newPassword"
-                  (input)="validatePassword()"
-                  class="w-full max-w-xl px-4 py-2.5 bg-gray-50 border border-gray-200 focus:outline-none focus:border-[#0e0d12] transition-all duration-200 text-[#0e0d12] text-sm"
-                >
-                <div class="mt-3 space-y-1">
-                  <p class="text-xs" [class.text-green-600]="passwordStrength().hasMinLength" [class.text-red-600]="!passwordStrength().hasMinLength">
-                    • Mínimo 8 caracteres
-                  </p>
-                  <p class="text-xs" [class.text-green-600]="passwordStrength().hasUpperCase" [class.text-red-600]="!passwordStrength().hasUpperCase">
-                    • Al menos una mayúscula
-                  </p>
-                  <p class="text-xs" [class.text-green-600]="passwordStrength().hasNumber" [class.text-red-600]="!passwordStrength().hasNumber">
-                    • Al menos un número
-                  </p>
-                </div>
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Confirmar contraseña</label>
-                <input
-                  type="password"
-                  [(ngModel)]="passwordData.confirmPassword"
-                  (input)="validatePassword()"
-                  class="w-full max-w-xl px-4 py-2.5 bg-gray-50 border focus:outline-none focus:border-[#0e0d12] transition-all duration-200 text-[#0e0d12] text-sm"
-                  [class.border-red-500]="passwordMismatch()"
-                  [class.border-gray-200]="!passwordMismatch()"
-                >
-                @if (passwordMismatch()) {
-                  <p class="mt-1 text-xs text-red-600">Las contraseñas no coinciden</p>
-                }
-              </div>
-              <button
-                (click)="updatePassword()"
-                [disabled]="!isPasswordValid()"
-                class="px-6 py-2.5 text-sm font-medium text-white bg-[#0e0d12] hover:bg-[#1c1a24] transition-all duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed"
-              >
-                Actualizar contraseña
-              </button>
-            </div>
-          </div>
-        </div>
-      }
-
       @if (activeTab() === 'orders') {
         <div class="max-w-5xl mx-auto">
-          <div class="mb-8">
-            <div class="mb-6">
-              <h2 class="text-2xl font-bold text-[#0e0d12] mb-1">Mis pedidos</h2>
-              <p class="text-sm text-[#0e0d12]/50">Historial de tus compras</p>
+
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold text-[#0e0d12]">Mis pedidos</h2>
+            <p class="text-sm text-[#0e0d12]/50">Historial de tus compras</p>
+          </div>
+
+          @if (orders().length === 0) {
+            <div class="py-10 text-center border border-gray-200">
+              <p class="text-sm text-[#0e0d12]/60">No tienes pedidos aún</p>
+            </div>
+          }
+
+          @if (orders().length > 0) {
+
+            <div class="hidden md:grid md:grid-cols-12 border border-gray-200 text-xs font-medium text-[#0e0d12]/60">
+              <div class="col-span-4 px-4 py-2 border-r border-gray-200">Pedido</div>
+              <div class="col-span-3 px-4 py-2 border-r border-gray-200">Fecha</div>
+              <div class="col-span-3 px-4 py-2 border-r border-gray-200">Total</div>
+              <div class="col-span-2 px-4 py-2">Estado</div>
             </div>
 
-            @if (orders().length === 0) {
-              <div class="text-center py-16">
-                <div class="flex flex-col items-center">
-                  <fa-icon [icon]="faBox" class="text-5xl text-[#0e0d12]/20 mb-4"></fa-icon>
-                  <p class="text-[#0e0d12]/50 text-base">No tienes pedidos aún</p>
-                  <p class="text-[#0e0d12]/30 text-xs mt-1">¡Realiza tu primera compra!</p>
-                </div>
-              </div>
-            }
+            @for (order of orders(); track order.id) {
+              <div class="border border-t-0 border-gray-200">
 
-            @if (orders().length > 0) {
-              <div>
-                <div class="hidden md:grid md:grid-cols-12 gap-4 px-4 py-3 text-xs font-medium text-[#0e0d12]/50 border-b border-gray-200">
-                  <div class="col-span-4">Pedido</div>
-                  <div class="col-span-3">Fecha</div>
-                  <div class="col-span-3">Total</div>
-                  <div class="col-span-2">Estado</div>
-                </div>
+                <div class="flex flex-col md:grid md:grid-cols-12 text-sm">
 
-                @for (order of orders(); track order.id) {
-                  <div class="px-4 py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors">
-                    <div class="flex flex-col md:grid md:grid-cols-12 gap-3 md:gap-4">
-                      <div class="flex justify-between md:block col-span-4">
-                        <span class="md:hidden text-xs font-medium text-[#0e0d12]/50">Pedido</span>
-                        <span class="text-sm font-medium text-[#0e0d12]">#{{ order.id }}</span>
-                      </div>
-                      <div class="flex justify-between md:block col-span-3">
-                        <span class="md:hidden text-xs font-medium text-[#0e0d12]/50">Fecha</span>
-                        <span class="text-sm text-[#0e0d12]/70">{{ order.date }}</span>
-                      </div>
-                      <div class="flex justify-between md:block col-span-3">
-                        <span class="md:hidden text-xs font-medium text-[#0e0d12]/50">Total</span>
-                        <span class="text-sm font-medium text-[#0e0d12]">${{ order.total.toFixed(2) }}</span>
-                      </div>
-                      <div class="flex justify-between items-center md:block col-span-2">
-                        <span class="md:hidden text-xs font-medium text-[#0e0d12]/50">Estado</span>
-                        <span class="inline-flex items-center px-2.5 py-1 text-xs font-medium" [class]="getStatusBadgeClass(order.status)">
-                          {{ getStatusText(order.status) }}
-                        </span>
-                      </div>
-                    </div>
+                  <div class="flex justify-between md:block col-span-4 px-4 py-3 border-r border-gray-200">
+                    <span class="md:hidden text-xs text-[#0e0d12]/50">Pedido</span>
+                    <span class="font-medium text-[#0e0d12]">#{{ order.id }}</span>
                   </div>
-                }
+
+                  <div class="flex justify-between md:block col-span-3 px-4 py-3 border-r border-gray-200">
+                    <span class="md:hidden text-xs text-[#0e0d12]/50">Fecha</span>
+                    <span class="text-[#0e0d12]/70">{{ order.date }}</span>
+                  </div>
+
+                  <div class="flex justify-between md:block col-span-3 px-4 py-3 border-r border-gray-200">
+                    <span class="md:hidden text-xs text-[#0e0d12]/50">Total</span>
+                    <span class="font-medium text-[#0e0d12]">${{ order.total.toFixed(2) }}</span>
+                  </div>
+
+                  <div class="flex justify-between items-center md:block col-span-2 px-4 py-3">
+                    <span class="md:hidden text-xs text-[#0e0d12]/50">Estado</span>
+                    <span class="px-2 py-1 text-xs font-medium border border-gray-300">
+                      {{ getStatusText(order.status) }}
+                    </span>
+                  </div>
+
+                </div>
+
               </div>
             }
-          </div>
+
+          }
+
         </div>
       }
 

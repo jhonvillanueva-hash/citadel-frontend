@@ -21,7 +21,7 @@
               <label class="text-slate-900 text-sm font-medium mb-1 block">
                 Correo electrónico
               </label>
-              <input type="email" formControlName="email" placeholder="correo@ejemplo.com" class="text-slate-900 bg-white border w-full text-sm px-3 py-2 rounded-md outline-none transition
+              <input type="email" formControlName="email" placeholder="correo@ejemplo.com" class="text-slate-900 bg-white border w-full text-sm px-3 py-2 outline-none transition
                       focus:ring-2 focus:ring-secondary focus:border-secondary" />
 
               @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
@@ -40,7 +40,7 @@
               <label class="text-slate-900 text-sm font-medium mb-1 block">
                 Contraseña
               </label>
-              <input type="password" formControlName="contrasena" placeholder="••••••••" class="text-slate-900 bg-white border w-full text-sm px-3 py-2 rounded-md outline-none transition
+              <input type="password" formControlName="contrasena" placeholder="••••••••" class="text-slate-900 bg-white border w-full text-sm px-3 py-2 outline-none transition
                       focus:ring-2 focus:ring-secondary focus:border-secondary" />
 
               @if (loginForm.get('contrasena')?.invalid && loginForm.get('contrasena')?.touched) {
@@ -55,13 +55,13 @@
           </div>
 
           @if (errorMessage(); as message) {
-            <div class="mt-4 bg-red-100 text-red-600 text-xs px-3 py-2 rounded-md border border-red-200">
+            <div class="mt-4 bg-red-100 text-red-600 text-xs px-3 py-2 border border-red-200">
               {{ message }}
             </div>
           }
 
           <div class="mt-5">
-            <button type="submit" [disabled]="loginForm.invalid || isLoading()" class="w-full py-2 text-sm rounded-md text-white bg-[#0e0d12] transition
+            <button type="submit" [disabled]="loginForm.invalid || isLoading()" class="w-full py-2 text-sm text-white bg-[#0e0d12] transition
                     disabled:bg-gray-300 disabled:cursor-not-allowed">
               {{ isLoading() ? 'Ingresando...' : 'Ingresar' }}
             </button>
@@ -87,7 +87,7 @@
       </div>
 
       <div class="max-md:order-1 md:min-h-screen w-full h-full">
-        <img src="img/store/login.jpg" class="w-full h-full object-cover" alt="login-citadel" />
+        <img src="img/store/login.png" class="w-full h-full object-cover" alt="login-citadel" />
       </div>
 
     </div>

@@ -51,6 +51,8 @@ export class ProductStore implements OnInit {
   @Input() filterSaborNombre?: string;
   @Input() customTitle?: string;
 
+  customProducts = input<InternalProduct[] | undefined>(undefined);
+
   private localCartService = inject(CartService);
 
   private apiCartService = inject(ApiCartService);
@@ -67,6 +69,10 @@ export class ProductStore implements OnInit {
   allProducts = signal<InternalProduct[]>([]);
 
   filteredProducts = computed(() => {
+
+    const custom = this.customProducts();
+    if (custom !== undefined) return custom;
+
     const products = this.allProducts();
     const type = this.filterType();
     const saborId = this.filterSaborId();

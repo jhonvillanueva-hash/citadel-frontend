@@ -14,18 +14,26 @@
         </p>
 
         <div class="flex gap-4 mt-6">
-          <a href="#" class="w-10 h-10 rounded-full bg-bg3 flex items-center justify-center hover:bg-secondary transition">
+          <button
+            type="button"
+            (click)="openFacebookPage()"
+            class="w-10 h-10 rounded-full bg-bg3 flex items-center justify-center hover:bg-secondary transition">
             <fa-icon [icon]="icons.faFacebook" class="text-text"/>
-          </a>
-          <a href="#" class="w-10 h-10 rounded-full bg-bg3 flex items-center justify-center hover:bg-secondary transition">
+          </button>
+
+          <button
+            type="button"
+            (click)="openInstagramPage()"
+            class="w-10 h-10 rounded-full bg-bg3 flex items-center justify-center hover:bg-secondary transition">
             <fa-icon [icon]="icons.faInstagram" class="text-text"/>
-          </a>
-          <a href="#" class="w-10 h-10 rounded-full bg-bg3 flex items-center justify-center hover:bg-secondary transition">
-            <fa-icon [icon]="icons.faTwitter" class="text-text"/>
-          </a>
-          <a href="#" class="w-10 h-10 rounded-full bg-bg3 flex items-center justify-center hover:bg-secondary transition">
-            <fa-icon [icon]="icons.faYoutube" class="text-text"/>
-          </a>
+          </button>
+
+          <button
+            type="button"
+            (click)="openTiktokPage()"
+            class="w-10 h-10 rounded-full bg-bg3 flex items-center justify-center hover:bg-secondary transition">
+            <fa-icon [icon]="icons.faTiktok" class="text-text"/>
+          </button>
         </div>
       </div>
 
@@ -33,41 +41,95 @@
         <strong class="block mb-4 text-[16px] font-poppins font-semibold">
           Nuestra Tienda
         </strong>
-        <ul class="space-y-2 text-[14px] font-poppins">
-          <li><a href="#" class="hover:text-secondary transition">Frambuesas</a></li>
-          <li><a href="#" class="hover:text-secondary transition">Arándanos</a></li>
-          <li><a href="#" class="hover:text-secondary transition">Zarzamoras</a></li>
-          <li><a href="#" class="hover:text-secondary transition">Mix</a></li>
-        </ul>
+          <ul class="space-y-2 text-[14px] font-poppins">
+            <li>
+              <a routerLink="/store/products/flavors/todos" class="hover:text-secondary transition">
+                Frambuesas
+              </a>
+            </li>
+            <li>
+              <a routerLink="/store/products/flavors/todos" class="hover:text-secondary transition">
+                Arándanos
+              </a>
+            </li>
+            <li>
+              <a routerLink="/store/products/flavors/todos" class="hover:text-secondary transition">
+                Zarzamoras
+              </a>
+            </li>
+            <li>
+              <a routerLink="/store/products/flavors/todos" class="hover:text-secondary transition">
+                Mix
+              </a>
+            </li>
+          </ul>
       </div>
 
       <div>
         <strong class="block mb-4 text-[16px] font-poppins font-semibold">
           Nuestra Empresa
         </strong>
-        <ul class="space-y-2 text-[14px] font-poppins">
-          <li><a href="#" class="hover:text-secondary transition">Nosotros</a></li>
-          <li><a href="#" class="hover:text-secondary transition">Catálogo</a></li>
-          <li><a href="#" class="hover:text-secondary transition">Proceso de Elaboración</a></li>
-        </ul>
+          <ul class="space-y-2 text-[14px] font-poppins">
+            <li>
+              <button
+                type="button"
+                (click)="openFacebookPage()"
+                class="hover:text-secondary transition text-left">
+                Nosotros
+              </button>
+            </li>
+
+            <li>
+              <a routerLink="/store" class="hover:text-secondary transition">
+                Catálogo
+              </a>
+            </li>
+
+            <li>
+              <button
+                type="button"
+                (click)="openInstagramPage()"
+                class="hover:text-secondary transition text-left">
+                Proceso de Elaboración
+              </button>
+            </li>
+          </ul>
       </div>
 
       <div>
         <strong class="block mb-4 text-[16px] font-poppins font-semibold">
           Contáctanos
         </strong>
+
         <ul class="space-y-3 text-[14px] font-poppins">
           <li class="flex items-center gap-3">
             <fa-icon [icon]="icons.faWhatsapp" class="text-[35px]"/>
-            <a href="#" class="hover:text-secondary transition">+51 912 345 678</a>
+            <a
+              href="https://wa.me/51935609881"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-secondary transition">
+              +51 935 609 881
+            </a>
           </li>
+
           <li class="flex items-center gap-3">
             <fa-icon [icon]="icons.faEnvelope" class="text-[35px]"/>
-            <a href="#" class="hover:text-secondary transition">info@citadel.com</a>
+              <a
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=fgperu@gmail.com"
+                target="_blank"
+                rel="noopener"
+                class="hover:text-secondary transition"
+              >
+                fgperu@gmail.com
+              </a>
           </li>
+
           <li class="flex items-center gap-3">
             <fa-icon [icon]="icons.faEnvelope" class="text-[35px]"/>
-            <a routerLink="/libro-de-reclamaciones" class="hover:text-secondary transition">Libro de reclamaciones</a>
+            <a routerLink="/libro-de-reclamaciones" class="hover:text-secondary transition">
+              Libro de reclamaciones
+            </a>
           </li>
         </ul>
       </div>
@@ -84,8 +146,16 @@
       </p>
 
       <ul class="flex gap-6 text-[13px] font-poppins">
-        <li><a href="#" class="hover:text-secondary transition">Términos de Servicio</a></li>
-        <li><a href="#" class="hover:text-secondary transition">Política de Privacidad</a></li>
+        <li>
+          <a routerLink="/register" class="hover:text-secondary transition">
+            Términos de Servicio
+          </a>
+        </li>
+        <li>
+          <a routerLink="/register" class="hover:text-secondary transition">
+            Política de Privacidad
+          </a>
+        </li>
       </ul>
     </div>
   </div>
