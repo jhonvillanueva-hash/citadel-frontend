@@ -33,7 +33,7 @@ export class WinesEditComponent implements OnInit {
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.catalogFacade.loadAll();
-    
+
     this.wineService.getById(id).subscribe({
       next: (wine) => this.formFacade.initializeForEdit(wine),
       error: (err) => {
@@ -44,10 +44,19 @@ export class WinesEditComponent implements OnInit {
   }
 
   handleUpdate() {
+
+    const error = this.formFacade.validatePriceRows();
+
+    if (error) {
+      this.toast.showWarning(error);
+      return;
+    }
+
     const selectedPresId = this.formFacade.wineData().id_presentacion;
+
     const presentation = this.catalogFacade.presentations()
       .find(p => p.id_presentacion == selectedPresId);
-    
+
     const bottlesPerBox = presentation?.botellas_por_caja || 1;
 
     this.formFacade.submit(bottlesPerBox).subscribe({

@@ -1,9 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { BaseHttpService, PathConfig } from '../../core/services/base-http.service';
 import { Vino } from '../models/api.models';
-import { Observable } from 'rxjs';
-import { signal } from '@angular/core';
-import { of, tap } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class VinoService extends BaseHttpService<Vino> {
@@ -30,10 +28,22 @@ export class VinoService extends BaseHttpService<Vino> {
   }
 
   createWithImage(formData: FormData): Observable<Vino> {
-    return this.http.post<Vino>(this.fullUrl, formData, { withCredentials: true});
+    return this.http
+      .post<Vino>(this.fullUrl, formData, { withCredentials: true })
+      .pipe(
+        tap(() => this.invalidateCache())
+      );
   }
 
   updateWithImage(id: number | string, formData: FormData): Observable<Vino> {
-    return this.http.put<Vino>(`${this.fullUrl}/${id}`, formData, { withCredentials: true });
+    return this.http
+      .put<Vino>(`${this.fullUrl}/${id}`, formData, { withCredentials: true })
+      .pipe(
+        tap(() => this.invalidateCache())
+      );
+  }
+
+  private invalidateCache(): void {
+    this.vinosCache.set(null);
   }
 }

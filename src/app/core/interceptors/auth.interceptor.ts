@@ -5,10 +5,10 @@ import { catchError, switchMap, throwError, filter, take } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
-  const tokenExtractor = inject(HttpXsrfTokenExtractor);
+  //const tokenExtractor = inject(HttpXsrfTokenExtractor);
 
   const isAuthPath = req.url.includes('/auth/login') || req.url.includes('/auth/refresh');
-  let authReq = addToken(req, isAuthPath ? null : authService.accessToken, tokenExtractor.getToken());
+  let authReq = addToken(req, isAuthPath ? null : authService.accessToken, authService.csrfToken);
 
   return next(authReq).pipe(
     catchError((error) => {
@@ -23,7 +23,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           !req.url.includes('/auth/login') &&
           !req.url.includes('/auth/refresh')
         ) {
-          return handle401Error(req, next, authService, tokenExtractor);
+          return handle401Error(req, next, authService);
         }
       }
       return throwError(() => error);
@@ -32,13 +32,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 };
 
 function addToken(request: HttpRequest<any>, authToken: string | null, xsrfToken: string | null) {
-  let headers = request.headers;  
+  let headers = request.headers;
   if (authToken) {
     headers = headers.set('Authorization', `Bearer ${authToken}`);
   }
 
   if (xsrfToken && request.method !== 'GET' && request.method !== 'HEAD') {
-    const cleanToken = xsrfToken.split('.')[0];
+    const cleanToken = xsrfToken.split('.')[0]; 
     headers = headers.set('X-XSRF-TOKEN', cleanToken);
   }
 
@@ -49,7 +49,6 @@ function handle401Error(
   request: HttpRequest<any>,
   next: HttpHandlerFn,
   authService: AuthService,
-  tokenExtractor: HttpXsrfTokenExtractor
 ) {
   if (!authService.isRefreshingToken) {
     authService.notifyRefreshTokenStart();
@@ -57,8 +56,7 @@ function handle401Error(
     return authService.refreshToken().pipe(
       switchMap((response) => {
         authService.notifyRefreshTokenSuccess(response.accessToken);
-        const newXsrfToken = tokenExtractor.getToken();
-        return next(addToken(request, response.accessToken, newXsrfToken));
+        return next(addToken(request, response.accessToken, response.csrfToken));
       }),
       catchError((err) => {
         authService.notifyRefreshTokenError(err);
@@ -72,8 +70,7 @@ function handle401Error(
       filter(token => token !== null),
       take(1),
       switchMap(token => {
-        const currentXsrfToken = tokenExtractor.getToken();
-        return next(addToken(request, token!, currentXsrfToken));
+        return next(addToken(request, token!, authService.csrfToken));
       })
     );
   }

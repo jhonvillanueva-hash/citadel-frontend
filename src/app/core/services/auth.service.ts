@@ -15,6 +15,7 @@ export interface User {
 
 export interface LoginResponse {
   accessToken: string;
+  csrfToken: string;
 }
 
 export interface RegisterResponse extends User {
@@ -38,6 +39,10 @@ export class AuthService {
   private _accessToken: string | null = null;
   public get accessToken(): string | null {
     return this._accessToken;
+  }
+  private _csrfToken: string | null = null;
+  public get csrfToken(): string | null {
+    return this._csrfToken;
   }
 
   //Region Manejo de Cola de Refresco (Semáforo)
@@ -84,7 +89,7 @@ export class AuthService {
     return this.http
       .post<LoginResponse>(`${this.apiUrl}/login`, credentials)
       .pipe(
-        tap(res => this.handleLoginSuccess(res.accessToken)),
+        tap(res => this.handleLoginSuccess(res.accessToken, res.csrfToken)),
         finalize(() => this.isInitializing.set(false))
       );
   }
@@ -108,7 +113,7 @@ export class AuthService {
       })
       .pipe(
         tap(res => {
-          this.handleLoginSuccess(res.accessToken);
+          this.handleLoginSuccess(res.accessToken, res.csrfToken);
         }),
         catchError(err => {
           if (err.status === 401 || err.status === 403) {
@@ -134,12 +139,13 @@ export class AuthService {
         { withCredentials: true }
       )
       .pipe(
-        tap(res => this.handleLoginSuccess(res.accessToken))
+        tap(res => this.handleLoginSuccess(res.accessToken, res.csrfToken))
       );
   }
 
   //Lógica Interna de Sesión
-  private handleLoginSuccess(token: string): void {
+  private handleLoginSuccess(token: string, csrfToken: string): void {
+    this._csrfToken = csrfToken;
     this.setSession(token);
     if (this.isBrowser()) {
       localStorage.setItem(this.LOGGED_IN_KEY, 'true');
@@ -172,6 +178,7 @@ export class AuthService {
 
   private clearSession(): void {
     this._accessToken = null;
+    this._csrfToken = null;
     this._currentUser.set(null);
   }
 
