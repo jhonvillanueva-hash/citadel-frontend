@@ -11,9 +11,9 @@ export const formatPricesForBackend = (
 ) => [
   { cantidad_minima: 1, precio: basePrice },
   ...additionalPrices
-    .filter(p => p.cantidad && p.precio)
+    .filter(p => p.cantidad != null && p.precio != null)
     .map(p => ({
-      cantidad_minima: calculateQuantityPerBox(p.cantidad!, bottlesPerBox),
+      cantidad_minima: calculateQuantityPerBox(Number(p.cantidad), bottlesPerBox),
       precio: p.precio!
     }))
 ];

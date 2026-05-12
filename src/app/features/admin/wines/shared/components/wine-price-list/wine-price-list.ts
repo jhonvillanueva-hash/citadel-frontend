@@ -15,17 +15,13 @@ export class WinePriceListComponent {
   protected toastService = inject(ToastService);
 
   addPriceRow() {
-    this.facade.priceRows.update(prev => {
-      const lastRow = prev[prev.length - 1];
 
-      if (
-        lastRow &&
-        (
-          lastRow.cantidad == null || lastRow.cantidad === 0 ||
-          lastRow.precio == null || lastRow.precio === 0
-        )
-      ) {
-        this.toastService.showWarning('Complete la última fila con valores mayores a 0');
+    this.facade.priceRows.update(prev => {
+
+      const error = this.facade.validatePriceRows();
+
+      if (error) {
+        this.toastService.showWarning(error);
         return prev;
       }
 
