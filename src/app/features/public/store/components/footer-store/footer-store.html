@@ -1,0 +1,130 @@
+<footer class="w-full bg-[#0e0d12] text-white" aria-label="Pie de página Vinos Citadel">
+
+  <!-- Franja superior -->
+  <div class="max-w-screen-xl mx-auto px-4 sm:px-8 lg:px-12 py-10">
+
+    <!-- Fila principal: logo + nav groups + contacto -->
+    <div class="flex flex-col lg:flex-row lg:items-start gap-10">
+
+      <!-- Logo + tagline + redes -->
+      <div class="flex-shrink-0 flex flex-col items-start gap-5">
+        <a routerLink="/store" aria-label="Ir al inicio de Vinos Citadel">
+          <img src="/img/logo.png" alt="Logo Vinos Citadel" loading="lazy" decoding="async"
+            width="110" height="36" class="h-9 w-auto" />
+        </a>
+        <p class="text-xs text-white/50 max-w-[200px] leading-relaxed font-light">
+          Vinos de berries artesanales del norte del Perú.
+        </p>
+        <nav aria-label="Redes sociales" class="flex gap-2.5">
+          @for (s of socialLinks; track s.label) {
+            <a [href]="s.href" target="_blank" rel="noopener noreferrer"
+              [attr.aria-label]="s.label"
+              class="w-8 h-8 rounded-full bg-[#202125] flex items-center justify-center
+                     border border-white/10 transition-colors duration-200
+                     hover:bg-[#c35b64] hover:border-[#c35b64]">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                class="w-3.5 h-3.5 text-white" aria-hidden="true">
+                <path [attr.d]="s.svgPath" />
+              </svg>
+            </a>
+          }
+        </nav>
+      </div>
+
+      <!-- Divisor vertical (solo desktop) -->
+      <div class="hidden lg:block w-px bg-white/10 self-stretch mx-4"></div>
+
+      <!-- Nav groups en fila -->
+      <div class="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-8">
+
+        <!-- Tienda -->
+        <nav aria-label="Tienda">
+          <strong class="block mb-3 text-[10px] font-semibold tracking-widest uppercase text-[#c35b64]">
+            Nuestra Tienda
+          </strong>
+          <ul class="space-y-2">
+            @for (l of storeLinks; track l.label) {
+              <li>
+                <a [routerLink]="l.routerLink"
+                  class="text-xs font-light text-white/60 transition-colors duration-200 hover:text-[#c35b64]">
+                  {{ l.label }}
+                </a>
+              </li>
+            }
+          </ul>
+        </nav>
+
+        <!-- Empresa -->
+        <nav aria-label="Empresa">
+          <strong class="block mb-3 text-[10px] font-semibold tracking-widest uppercase text-[#c35b64]">
+            Nuestra Empresa
+          </strong>
+          <ul class="space-y-2">
+            @for (l of companyLinks; track l.label) {
+              <li>
+                @if (l.routerLink) {
+                  <a [routerLink]="l.routerLink"
+                    class="text-xs font-light text-white/60 transition-colors duration-200 hover:text-[#c35b64]">
+                    {{ l.label }}
+                  </a>
+                } @else {
+                  <a [href]="l.href" target="_blank" rel="noopener noreferrer"
+                    class="text-xs font-light text-white/60 transition-colors duration-200 hover:text-[#c35b64]">
+                    {{ l.label }}
+                  </a>
+                }
+              </li>
+            }
+          </ul>
+        </nav>
+
+        <!-- Contacto -->
+        <div class="col-span-2 sm:col-span-1">
+          <strong class="block mb-3 text-[10px] font-semibold tracking-widest uppercase text-[#c35b64]">
+            Contáctanos
+          </strong>
+          <ul class="space-y-2.5">
+            @for (c of contactItems; track c.label) {
+              <li>
+                <a [href]="c.href"
+                  [attr.target]="c.href.startsWith('http') || c.href.startsWith('mailto') ? '_blank' : null"
+                  [attr.rel]="c.href.startsWith('http') || c.href.startsWith('mailto') ? 'noopener noreferrer' : null"
+                  class="flex items-center gap-2 text-xs font-light text-white/60
+                         transition-colors duration-200 hover:text-[#c35b64] group">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                    class="w-3.5 h-3.5 shrink-0 text-[#c35b64]" aria-hidden="true">
+                    <path [attr.d]="c.svgPath" />
+                  </svg>
+                  {{ c.label }}
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Franja inferior -->
+  <div class="border-t border-white/10">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-8 lg:px-12">
+      <div class="flex flex-col-reverse gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-[11px] text-white/30">
+          © 2026 Vinos Citadel. Todos los derechos reservados.
+        </p>
+        <nav aria-label="Legal" class="flex gap-5">
+          @for (l of legalLinks; track l.label) {
+            <a [routerLink]="l.routerLink"
+              class="text-[11px] text-white/30 transition-colors duration-200 hover:text-[#c35b64]">
+              {{ l.label }}
+            </a>
+          }
+        </nav>
+      </div>
+    </div>
+  </div>
+
+</footer>

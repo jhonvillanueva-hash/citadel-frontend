@@ -14,6 +14,7 @@ export interface CartItem {
   id_carrito_producto?: number;
   nombre: string;
   cantidad: number;
+  stock: number;
   presentacion: string;
   volumen_ml: number;
   url_img_principal: string;
@@ -39,6 +40,7 @@ export class CartService {
 
   private _items = signal<CartItem[]>([]);
   private _carritoActivo = signal<Carrito | null>(null);
+  private _updatingItems = signal<Set<number>>(new Set());
 
   readonly cartItems = this._items.asReadonly();
 
@@ -51,6 +53,7 @@ export class CartService {
   );
 
   private initialized = false;
+
   constructor() {
     if (!isPlatformBrowser(this.platformId)) return;
 
@@ -103,7 +106,10 @@ export class CartService {
     const idx = this._items().findIndex(i => i.id_vino === item.id_vino);
     if (idx !== -1) {
       const curr = this._items()[idx];
-      this._updateLocalQuantity(item.id_vino, curr.cantidad + item.cantidad);
+      const newQty = curr.cantidad + item.cantidad;
+      const stockReal = item.stock;
+      const capped = Math.min(newQty, stockReal);
+      this._updateLocalQuantity(item.id_vino, capped, stockReal);
     } else {
       this._items.update(items => [...items, item]);
       this._saveToLocalStorage();
@@ -111,12 +117,31 @@ export class CartService {
   }
 
   updateQuantity(item: CartItem, change: number): void {
+    if (this.isUpdatingItem(item.id_vino)) {
+      return;
+    }
+
     const newQty = item.cantidad + change;
-    if (newQty < 1) { this.removeItem(item); return; }
+
+    if (newQty < 1) {
+      this.removeItem(item);
+      return;
+    }
+
+    const disponible = this.getStockDisponible(item.stock, item.id_vino);
+
+    if (change > 0 && disponible <= 0) {
+      return;
+    }
+
+    this._setUpdating(item.id_vino, true);
 
     if (this.authService.currentUser()) {
       const carrito = this._carritoActivo();
-      if (!carrito) return;
+      if (!carrito) {
+        this._setUpdating(item.id_vino, false);
+        return;
+      }
 
       this.isLoading.set(true);
       this.apiProductos.addOrUpdate({
@@ -124,13 +149,22 @@ export class CartService {
         id_vino: item.id_vino,
         cantidad: change
       }).pipe(
-        tap(() => this._loadFromApi()),
-        catchError(err => { console.error('updateQuantity', err); this.isLoading.set(false); return of(null); })
+        tap(() => {
+          this._loadFromApi();
+          setTimeout(() => this._setUpdating(item.id_vino, false), 400);
+        }),
+        catchError(err => {
+          console.error('updateQuantity', err);
+          this.isLoading.set(false);
+          setTimeout(() => this._setUpdating(item.id_vino, false), 400);
+          return of(null);
+        })
       ).subscribe();
       return;
     }
 
-    this._updateLocalQuantity(item.id_vino, newQty);
+    this._updateLocalQuantity(item.id_vino, newQty, item.stock);
+    setTimeout(() => this._setUpdating(item.id_vino, false), 400);
   }
 
   removeItem(item: CartItem): void {
@@ -170,6 +204,26 @@ export class CartService {
     return this.getPrecioUnitarioActual(item) < item.precio_base;
   }
 
+  isAtStockLimit(item: CartItem): boolean {
+    return this.getStockDisponible(item.stock, item.id_vino) <= 0;
+  }
+
+  isUpdatingItem(id_vino: number): boolean {
+    return this._updatingItems().has(id_vino);
+  }
+
+  private _setUpdating(id_vino: number, updating: boolean): void {
+    this._updatingItems.update(prev => {
+      const next = new Set(prev);
+      if (updating) {
+        next.add(id_vino);
+      } else {
+        next.delete(id_vino);
+      }
+      return next;
+    });
+  }
+
   private _saveToLocalStorage(): void {
     if (!isPlatformBrowser(this.platformId)) return;
     localStorage.setItem(LS_KEY, JSON.stringify(this._items()));
@@ -182,19 +236,17 @@ export class CartService {
       const raw = localStorage.getItem(LS_KEY);
       this._items.set(raw ? JSON.parse(raw) : []);
       this.initialized = true;
-      console.log('Saving to LS:', this._items());
     } catch {
       this._items.set([]);
       this.initialized = true;
-      console.log('Saving to LS:', this._items());
     }
   }
 
-  private _updateLocalQuantity(id_vino: number, qty: number): void {
+  private _updateLocalQuantity(id_vino: number, qty: number, stock: number): void {
     if (qty <= 0) { this._items.update(items => items.filter(i => i.id_vino !== id_vino)); return; }
     this._items.update(items =>
       items.map(i => i.id_vino === id_vino
-        ? { ...i, cantidad: qty, presentacion: `${qty} ${qty === 1 ? 'botella' : 'botellas'}` }
+        ? { ...i, cantidad: qty, stock, presentacion: `${qty} ${qty === 1 ? 'botella' : 'botellas'}` }
         : i
       )
     );
@@ -211,7 +263,6 @@ export class CartService {
         return this.apiProductos.getByCarrito(activo.id_carrito);
       }),
       tap((productos: any[]) => {
-
         this._items.set(productos.map(p => this._mapApiItem(p)));
         this.isLoading.set(false);
       }),
@@ -240,6 +291,7 @@ export class CartService {
       id_carrito_producto: p.id_carrito_producto,
       nombre: vino.nombre ?? 'Producto',
       cantidad: p.cantidad,
+      stock: vino.stock ?? 0,
       presentacion: `${p.cantidad} ${p.cantidad === 1 ? 'botella' : 'botellas'}`,
       volumen_ml: presentacion.volumen_ml ?? 0,
       url_img_principal: vino.url_img_principal ?? '',
@@ -310,13 +362,21 @@ export class CartService {
     } catch { return []; }
   }
 
-
-
   isLogged(): boolean {
     return !!this.authService.currentUser();
   }
 
   getCarritoActivo(): Carrito | null {
     return this._carritoActivo();
+  }
+
+  getCantidadEnCarrito(id_vino: number): number {
+    const item = this._items().find(i => i.id_vino === id_vino);
+    return item?.cantidad ?? 0;
+  }
+
+  getStockDisponible(stockReal: number, id_vino: number): number {
+    const cantidadEnCarrito = this.getCantidadEnCarrito(id_vino);
+    return Math.max(stockReal - cantidadEnCarrito, 0);
   }
 }

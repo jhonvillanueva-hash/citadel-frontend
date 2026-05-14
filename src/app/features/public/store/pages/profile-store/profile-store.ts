@@ -23,6 +23,7 @@ import { Usuario } from '../../../../../data/models/api.models';
 import { RouterLink } from "@angular/router";
 import { CarritoService } from '../../../../../data/services/cart.service';
 import { CarritoProductoService } from '../../../../../data/services/carrito-producto.service';
+import { finalize } from 'rxjs/operators';
 
 interface Order {
   id: string;
@@ -82,15 +83,17 @@ export class ProfileStore implements OnInit {
 
   activeTab = signal<'profile' | 'orders'>('profile');
   isEditingProfile = signal(false);
+  isSaving = signal(false);
   avatarDb = signal<string | null>(null);
   avatarPreview = signal<string | null>(null);
   isMobileMenuOpen = signal(false);
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   selectedFileName = signal<string | null>(null);
-  fileInputRef!: HTMLInputElement;
+  selectedFile = signal<File | null>(null);
 
   triggerFileInput(input: HTMLInputElement) {
+    if (this.isSaving()) return;
     input.click();
   }
 
@@ -105,6 +108,8 @@ export class ProfileStore implements OnInit {
   fieldErrors = signal<Record<string, string>>({});
 
   ordersSignal = signal<Order[]>([]);
+
+  isInputDisabled = computed(() => !this.isEditingProfile() || this.isSaving());
 
   userInitials = computed((): string => {
     const first = this.userDataProfile().firstName?.charAt(0) || '';
@@ -178,22 +183,26 @@ export class ProfileStore implements OnInit {
 
   onDrop(event: DragEvent): void {
     event.preventDefault();
+    if (this.isSaving()) return;
 
     const file = event.dataTransfer?.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) return;
 
     this.selectedFileName.set(file.name);
+    this.selectedFile.set(file);
     this.processImage(file);
   }
 
   onFileSelected(event: Event): void {
+    if (this.isSaving()) return;
     const input = event.target as HTMLInputElement;
 
     if (input.files && input.files[0]) {
       const file = input.files[0];
 
       this.selectedFileName.set(file.name);
+      this.selectedFile.set(file);
       this.processImage(file);
 
       input.value = '';
@@ -211,8 +220,10 @@ export class ProfileStore implements OnInit {
   }
 
   removeAvatar(): void {
+    if (this.isSaving()) return;
     this.avatarPreview.set(null);
     this.selectedFileName.set(null);
+    this.selectedFile.set(null);
 
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
@@ -226,10 +237,14 @@ export class ProfileStore implements OnInit {
   cancelEditing(): void {
     this.userDataProfile.set({ ...this.originalProfile() });
     this.fieldErrors.set({});
+    this.avatarPreview.set(null);
+    this.selectedFile.set(null);
+    this.selectedFileName.set(null);
     this.isEditingProfile.set(false);
   }
 
   saveProfile(): void {
+    if (this.isSaving()) return;
     if (!this.validateAllFields()) return;
 
     const user = this.usuarioApi();
@@ -237,32 +252,46 @@ export class ProfileStore implements OnInit {
 
     const current = this.userDataProfile();
 
-    const payload: Partial<Usuario> = {
-      nombres: current.firstName,
-      apellidos: current.lastName,
-      email: current.email,
-      telefono: current.phone,
-      dni: current.dni,
-      direccion: current.address,
-      ciudad: current.city,
-      url_img: this.selectedFileName() ? `https://preview.redd.it/mereleona-vs-natsu-from-fairy-tail-who-would-win-v0-uitjwhlhst3e1.jpg?width=640&crop=smart&auto=webp&s=c8ebf0076e6992f19f4cbeb507902ab8ad545faf` : undefined
-    };
+    const formData = new FormData();
+    formData.append('nombres', current.firstName);
+    formData.append('apellidos', current.lastName);
+    formData.append('telefono', current.phone);
+    formData.append('dni', current.dni);
+    formData.append('direccion', current.address);
+    formData.append('ciudad', current.city);
 
-    this.usuarioService.update(user.id_usuario, payload).subscribe({
-      next: () => {
-        this.originalProfile.set({ ...current });
-        this.isEditingProfile.set(false);
+    const file = this.selectedFile();
+    if (file) {
+      formData.append('imagen', file);
+    }
 
-        if (this.avatarPreview()) {
-          this.avatarDb.set(this.avatarPreview()!);
+    this.isSaving.set(true);
+
+    this.usuarioService
+      .updateProfile(user.id_usuario, formData)
+      .pipe(
+        finalize(() => {
+          this.isSaving.set(false);
+        })
+      )
+      .subscribe({
+        next: (updatedUser) => {
+          this.usuarioApi.set(updatedUser);
+          this.originalProfile.set({ ...current });
+          this.isEditingProfile.set(false);
           this.avatarPreview.set(null);
+          this.selectedFile.set(null);
+          this.selectedFileName.set(null);
+
+          if (updatedUser.url_img) {
+            this.avatarDb.set(updatedUser.url_img + '?t=' + Date.now());
+          }
+        },
+        error: (err) => {
+          console.error(err);
+          alert('Error al actualizar perfil');
         }
-      },
-      error: (err) => {
-        console.error(err);
-        alert('Error al actualizar el perfil');
-      }
-    });
+      });
   }
 
   validateField(field: string): void {
@@ -371,7 +400,6 @@ export class ProfileStore implements OnInit {
 
     this.carritoService.getAll().subscribe({
       next: (carritos) => {
-
         const vendidos = carritos.filter(c => c.estado === 'V');
 
         if (vendidos.length === 0) {
@@ -383,7 +411,6 @@ export class ProfileStore implements OnInit {
           this.carritoProductoService
             .getByCarrito(carrito.id_carrito)
             .subscribe(productos => {
-
               const total = productos.reduce((sum, p) =>
                 sum + (p.cantidad * p.precio_venta), 0
               );
@@ -399,7 +426,6 @@ export class ProfileStore implements OnInit {
               ]);
             });
         });
-
       },
       error: () => {
         this.ordersSignal.set([]);

@@ -17,22 +17,32 @@ import { input } from '@angular/core';
 
 import { CartItem, CartService } from '../../../../../core/services/cart.service';
 import { switchMap, of } from 'rxjs';
+import { ToastService } from '../../../../../shared/components/toast/toast.service';
 
 export interface InternalProduct {
   id: number;
+
+  stock: number;
+  estado: 'D' | 'A' | 'P';
+
   flavor: string;
   flavorId: number;
+
   category: string;
   categoryId: number;
+
   name: string;
   description: string;
+
   volumen: string;
   volumen_ml: number;
   botellas_por_caja: number;
-  state: string;
+
   image: string;
+
   iconoFlavor?: string;
   iconoCategory?: string;
+
   prices?: Precio[];
 }
 
@@ -64,7 +74,7 @@ export class ProductStore implements OnInit {
   private vinoService = inject(VinoService);
   private precioService = inject(PrecioService);
 
-
+  private toastService = inject(ToastService);
 
   allProducts = signal<InternalProduct[]>([]);
 
@@ -74,13 +84,18 @@ export class ProductStore implements OnInit {
     if (custom !== undefined) return custom;
 
     const products = this.allProducts();
+
+    const cartItems = this.localCartService.cartItems();
+
     const type = this.filterType();
     const saborId = this.filterSaborId();
     const dulzorId = this.filterDulzorId();
 
     if (!products.length) return [];
 
-    let result = products.filter(p => p.state === 'Disponible');
+    let result = products.filter(product =>
+      product.estado === 'D'
+    );
 
     if (type === 'sabor' && saborId !== undefined) {
       result = result.filter(p => p.flavorId === saborId);
@@ -139,7 +154,8 @@ export class ProductStore implements OnInit {
         volumen: `${volumenMl} ml`,
         volumen_ml: volumenMl,
         botellas_por_caja: botellasPorCaja,
-        state: vino.estado === 'D' ? 'Disponible' : 'No disponible',
+        estado: vino.estado,
+        stock: vino.stock,
         image: vino.url_img_principal,
         prices: preciosDelVino,
         iconoCategory: this.getCategoryIcon(rawCategoryName),
@@ -183,8 +199,33 @@ export class ProductStore implements OnInit {
     return this.loadingProducts().has(id);
   }
 
+  getStockDisponible(product: InternalProduct): number {
+    const cantidadEnCarrito =
+      this.localCartService.getCantidadEnCarrito(product.id);
+
+    return Math.max(product.stock - cantidadEnCarrito, 0);
+  }
+
+  isOutOfStock(product: InternalProduct): boolean {
+    return this.getStockDisponible(product) <= 0;
+  }
+
   addToCart(wine: InternalProduct): void {
+
+    if (this.isLoading(wine.id)) return;
+
+    if (wine.estado !== 'D' || wine.stock <= 0) {
+      return;
+    }
+
+    const stockDisponible = this.getStockDisponible(wine);
+
+    if (stockDisponible <= 0) {
+      return;
+    }
+
     const mainPrice = this.getMainPrice(wine.prices);
+
     if (!mainPrice) return;
 
     const user = this.authService.currentUser();
@@ -192,8 +233,18 @@ export class ProductStore implements OnInit {
     this.setLoading(wine.id, true);
 
     if (!user) {
+
       this.addToLocalCart(wine, mainPrice);
-      this.setLoading(wine.id, false);
+
+      this.toastService.showSuccess(
+        'Producto agregado',
+        `${wine.name} fue añadido al carrito`
+      );
+
+      setTimeout(() => {
+        this.setLoading(wine.id, false);
+      }, 400);
+
       return;
     }
 
@@ -216,12 +267,20 @@ export class ProductStore implements OnInit {
       )
     ).subscribe({
       next: () => {
+
         this.addToLocalCart(wine, mainPrice);
+
+        this.toastService.showSuccess(
+          'Producto agregado',
+          `${wine.name} fue añadido al carrito`
+        );
 
         this.setLoading(wine.id, false);
       },
       error: (err) => {
+
         console.error(err);
+
         this.setLoading(wine.id, false);
       }
     });
@@ -241,6 +300,7 @@ export class ProductStore implements OnInit {
       id_vino: wine.id,
       nombre: wine.name,
       cantidad: 1,
+      stock: wine.stock,
       presentacion: `1 botella`,
       volumen_ml: wine.volumen_ml,
       url_img_principal: wine.image,
