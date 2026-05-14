@@ -4,12 +4,12 @@
       <div class="p-6 border-b border-gray-200">
         <div class="flex items-center space-x-3">
           <div class="w-12 h-12 bg-[#0e0d12] rounded-full flex items-center justify-center text-white font-medium overflow-hidden flex-shrink-0">
-            @if (!avatarDb()) {
+            @if (avatarDb()) {
+              <img [src]="avatarDb()" alt="Avatar" class="w-full h-full object-cover">
+            } @else {
               <div class="w-full h-full flex items-center justify-center">
                 {{ userInitials() }}
               </div>
-            } @else {
-              <img [src]="avatarDb()" alt="Avatar" class="w-full h-full object-cover">
             }
           </div>
           <div class="min-w-0 flex-1">
@@ -88,12 +88,12 @@
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center space-x-3">
             <div class="w-12 h-12 bg-[#0e0d12] rounded-full flex items-center justify-center text-white font-medium overflow-hidden flex-shrink-0">
-              @if (!avatarDb()) {
+              @if (avatarDb()) {
+                <img [src]="avatarDb()" alt="Avatar" class="w-full h-full object-cover">
+              } @else {
                 <div class="w-full h-full flex items-center justify-center">
                   {{ userInitials() }}
                 </div>
-              } @else {
-                <img [src]="avatarDb()" alt="Avatar" class="w-full h-full object-cover">
               }
             </div>
             <div class="min-w-0 flex-1">
@@ -160,11 +160,12 @@
                     }
                   </div>
 
-                  <input type="file" accept="image/*" class="hidden" #fileInput (change)="onFileSelected($event)" />
+                  <input type="file" accept="image/*" class="hidden" #fileInput (change)="onFileSelected($event)" [disabled]="isSaving()" />
 
                   <button
                     (click)="triggerFileInput(fileInput)"
-                    class="absolute bottom-1 right-1 bg-white border border-gray-200 text-[#0e0d12] p-2 rounded-full hover:bg-gray-50 transition-colors shadow-sm"
+                    [disabled]="isSaving()"
+                    class="absolute bottom-1 right-1 bg-white border border-gray-200 text-[#0e0d12] p-2 rounded-full hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <fa-icon [icon]="faCamera" class="text-sm"></fa-icon>
                   </button>
@@ -172,7 +173,8 @@
                   @if (avatarPreview()) {
                     <button
                       (click)="removeAvatar()"
-                      class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white"
+                      [disabled]="isSaving()"
+                      class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white disabled:cursor-not-allowed"
                     >
                       <fa-icon [icon]="faTrash" class="text-base mb-1"></fa-icon>
                       <span class="text-xs font-medium">Eliminar</span>
@@ -182,7 +184,8 @@
 
                 <div class="mt-5 w-full">
                   <div
-                    class="border-2 border-dashed border-gray-300 p-8 text-center hover:border-[#0e0d12] hover:bg-gray-50/50 transition-all duration-200 cursor-pointer flex flex-col items-center justify-center gap-3"
+                    class="border-2 border-dashed border-gray-300 p-8 text-center transition-all duration-200 flex flex-col items-center justify-center gap-3"
+                    [class]="isSaving() ? 'opacity-50 cursor-not-allowed' : 'hover:border-[#0e0d12] hover:bg-gray-50/50 cursor-pointer'"
                     (dragover)="$event.preventDefault()"
                     (drop)="onDrop($event)"
                     (click)="triggerFileInput(fileInput)"
@@ -220,18 +223,19 @@
                   <div class="flex gap-2">
                     <button
                       (click)="cancelEditing()"
-                      class="px-5 py-2 text-sm font-medium text-[#0e0d12] border border-gray-300 hover:bg-gray-50 transition-all duration-200 flex items-center gap-2"
+                      [disabled]="isSaving()"
+                      class="px-5 py-2 text-sm font-medium text-[#0e0d12] border border-gray-300 hover:bg-gray-50 transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <fa-icon [icon]="faTimes"></fa-icon>
                       <span>Cancelar</span>
                     </button>
                     <button
                       (click)="saveProfile()"
-                      [disabled]="!isProfileValid()"
+                      [disabled]="!isProfileValid() || isSaving()"
                       class="px-5 py-2 text-sm font-medium text-white bg-[#0e0d12] hover:bg-[#1c1a24] transition-all duration-200 flex items-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
                     >
                       <fa-icon [icon]="faSave"></fa-icon>
-                      <span>Guardar</span>
+                      <span>{{ isSaving() ? 'Guardando...' : 'Guardar' }}</span>
                     </button>
                   </div>
                 }
@@ -243,10 +247,9 @@
                     <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Nombres</label>
                     <input
                       type="text"
-                      [disabled]="!isEditingProfile()"
-                      [value]="userDataProfile().firstName"
-                      (ngModelChange)="updateField('firstName', $event)"
+                      [disabled]="isInputDisabled()"
                       [ngModel]="userDataProfile().firstName"
+                      (ngModelChange)="updateField('firstName', $event)"
                       [class]="getInputClasses('firstName')"
                     >
                     @if (fieldErrors()['firstName']) {
@@ -257,7 +260,7 @@
                     <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Apellidos</label>
                     <input
                       type="text"
-                      [disabled]="!isEditingProfile()"
+                      [disabled]="isInputDisabled()"
                       [ngModel]="userDataProfile().lastName"
                       (ngModelChange)="updateField('lastName', $event)"
                       [class]="getInputClasses('lastName')"
@@ -284,7 +287,7 @@
                     <input
                       type="tel"
                       maxlength="9"
-                      [disabled]="!isEditingProfile()"
+                      [disabled]="isInputDisabled()"
                       [ngModel]="userDataProfile().phone"
                       (ngModelChange)="updateField('phone', $event)"
                       (keypress)="onlyNumbers($event)"
@@ -299,7 +302,7 @@
                     <input
                       type="text"
                       maxlength="8"
-                      [disabled]="!isEditingProfile()"
+                      [disabled]="isInputDisabled()"
                       [ngModel]="userDataProfile().dni"
                       (ngModelChange)="updateField('dni', $event)"
                       (keypress)="onlyNumbers($event)"
@@ -315,7 +318,7 @@
                   <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Dirección</label>
                   <input
                     type="text"
-                    [disabled]="!isEditingProfile()"
+                    [disabled]="isInputDisabled()"
                     [ngModel]="userDataProfile().address"
                     (ngModelChange)="updateField('address', $event)"
                     (keypress)="onlyLettersAndNumbers($event)"
@@ -330,7 +333,7 @@
                   <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Ciudad</label>
                   <input
                     type="text"
-                    [disabled]="!isEditingProfile()"
+                    [disabled]="isInputDisabled()"
                     [ngModel]="userDataProfile().city"
                     (ngModelChange)="updateField('city', $event)"
                     (keypress)="onlyLettersAndNumbers($event)"

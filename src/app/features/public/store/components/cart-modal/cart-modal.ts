@@ -1,8 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, NavigationStart, Router } from '@angular/router';
 import { CartService, CartItem } from '../../../../../core/services/cart.service';
 import { BodyScrollLockDirective } from '../../../../../shared/directives/body-scroll-lock.directive';
+import { ToastService } from '../../../../../shared/components/toast/toast.service';
 
 @Component({
   selector: 'app-cart-modal',
@@ -10,18 +11,15 @@ import { BodyScrollLockDirective } from '../../../../../shared/directives/body-s
   imports: [CommonModule, RouterLink, BodyScrollLockDirective],
   templateUrl: './cart-modal.html',
 })
-export class CartModal implements OnInit {
+export class CartModal {
   cartService = inject(CartService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
 
   constructor() {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) this.cartService.close();
     });
-  }
-
-  ngOnInit(): void {
-    
   }
 
   getQuantityText(item: CartItem): string {
@@ -45,8 +43,32 @@ export class CartModal implements OnInit {
     return this.cartService.tieneDescuento(item);
   }
 
+  isAtStockLimit(item: CartItem): boolean {
+    return this.cartService.isAtStockLimit(item);
+  }
+
   updateQuantity(item: CartItem, change: number): void {
+    if (change > 0 && this.cartService.isAtStockLimit(item)) {
+      this.toastService.showError(
+        'Stock máximo alcanzado',
+        `Solo hay ${item.stock} unidad${item.stock === 1 ? '' : 'es'} disponible${item.stock === 1 ? '' : 's'}`
+      );
+      return;
+    }
+
     this.cartService.updateQuantity(item, change);
+
+    if (change > 0) {
+      this.toastService.showSuccess(
+        'Cantidad actualizada',
+        `${item.nombre} · ${item.cantidad + 1} ${item.cantidad + 1 === 1 ? 'botella' : 'botellas'}`
+      );
+    } else if (change < 0 && item.cantidad > 1) {
+      this.toastService.showWarning(
+        'Cantidad disminuida',
+        `${item.nombre} · ${item.cantidad - 1} ${item.cantidad - 1 === 1 ? 'botella' : 'botellas'}`
+      );
+    }
   }
 
   removeItem(item: CartItem): void {

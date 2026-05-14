@@ -76,20 +76,35 @@
 
                     <div class="flex items-center justify-between mt-3">
                       <div class="flex items-center border border-gray-300">
-                        <button (click)="updateQuantity(item, -1)"
-                          class="w-7 h-7 text-gray-600 hover:bg-gray-50 transition-colors flex items-center justify-center">
+                        <button
+                          (click)="updateQuantity(item, -1)"
+                          [disabled]="item.cantidad <= 1 || cartService.isUpdatingItem(item.id_vino)"
+                          class="w-7 h-7 text-gray-600 hover:bg-gray-50 transition-colors flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
                           -
                         </button>
                         <span class="w-9 text-center text-[#0e0d12] text-sm">{{ item.cantidad }}</span>
-                        <button (click)="updateQuantity(item, 1)"
-                          class="w-7 h-7 text-gray-600 hover:bg-gray-50 transition-colors flex items-center justify-center">
-                          +
-                        </button>
+                        <div class="relative">
+                          <button
+                            (click)="updateQuantity(item, 1)"
+                            [disabled]="isAtStockLimit(item) || cartService.isUpdatingItem(item.id_vino)"
+                            class="w-7 h-7 text-gray-600 hover:bg-gray-50 transition-colors flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            +
+                          </button>
+                          @if (isAtStockLimit(item)) {
+                            <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full pointer-events-none"></span>
+                          }
+                        </div>
                       </div>
                       <span class="font-semibold text-[#0e0d12] text-sm">
                         S/ {{ getTotalItem(item).toFixed(2) }}
                       </span>
                     </div>
+
+                    @if (isAtStockLimit(item)) {
+                      <p class="text-red-500 text-[10px] mt-1.5">Stock máximo alcanzado</p>
+                    }
 
                     @if (tieneDescuento(item)) {
                       <p class="text-green-700 text-xs mt-2">

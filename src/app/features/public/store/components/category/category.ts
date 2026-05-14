@@ -37,20 +37,28 @@ export class Category implements OnInit {
       dulzores: this.dulzorService.getAll()
     }).subscribe({
       next: ({ vinos, dulzores }) => {
-        const categoriesWithCount = dulzores.map(dulzor => {
-          const amount = vinos.filter(vino => vino.id_dulzor === dulzor.id_dulzor).length
 
-          const formattedName = this.formatDulzorName(dulzor.nombre)
+        const vinosDisponibles = vinos.filter(
+          vino => vino.estado === 'D'
+        );
 
-          return {
-            id: dulzor.id_dulzor,
-            name: formattedName,
-            amount: amount
-          }
-        })
+        const categoriesWithCount = dulzores
+          .map(dulzor => {
 
-        this.internalCategories.set(categoriesWithCount)
-        this.isLoading.set(false)
+            const amount = vinosDisponibles.filter(vino =>
+              vino.id_dulzor === dulzor.id_dulzor
+            ).length;
+
+            return {
+              id: dulzor.id_dulzor,
+              name: this.formatDulzorName(dulzor.nombre),
+              amount
+            };
+          })
+          .filter(category => category.amount > 0);
+
+        this.internalCategories.set(categoriesWithCount);
+        this.isLoading.set(false);
       },
       error: (error) => {
         console.error('Error al cargar categorías:', error)

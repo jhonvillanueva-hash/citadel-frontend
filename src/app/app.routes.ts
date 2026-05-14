@@ -39,53 +39,55 @@ export const routes: Routes = [
   {
     path: 'store',
     component: Store,
-    data: { showHeader: true },
+    data: { showHeader: true, showFooter: true },
     canActivate: [storeGuard],
   },
   {
     path: 'store/profile',
     component: ProfileStore,
-    data: { showHeader: false },
+    data: { showHeader: false, showFooter: false },
+    canActivate: [authGuard]
   },
   {
     path: 'store/search',
     component: SearchStore,
-    data: { showHeader: true },
+    data: { showHeader: true, showFooter: true },
+    canActivate: [storeGuard]
   },
   {
     path: 'store/products/flavors/:name',
     component: FlavorStore,
-    data: { showHeader: true },
+    data: { showHeader: true, showFooter: true },
     canActivate: [storeGuard],
   },
   {
     path: 'store/products/flavors/:name/:id',
     component: FlavorStore,
-    data: { showHeader: true },
+    data: { showHeader: true, showFooter: true },
     canActivate: [storeGuard],
   },
   {
     path: 'store/products/sweetness/:name/:id',
     component: SweetStore,
-    data: { showHeader: true },
+    data: { showHeader: true, showFooter: true },
     canActivate: [storeGuard]
   },
   {
     path: 'store/products/:slug/:id',
     component: DetailsStore,
-    data: { showHeader: true },
+    data: { showHeader: true, showFooter: true },
     canActivate: [storeGuard],
   },
   {
     path: 'store/cart/checkout',
     component: CheckoutStore,
-    data: { showHeader: false },
+    data: { showHeader: false, showFooter: false },
     canActivate: [storeGuard],
   },
   {
     path: 'store/cart',
     component: CartStore,
-    data: { showHeader: false },
+    data: { showHeader: false, showFooter: false },
     canActivate: [storeGuard],
   },
   {

@@ -10,6 +10,8 @@ import { CartService } from '../../../../../core/services/cart.service';
 import { UsuarioService } from '../../../../../data/services/usuario.service';
 import { Usuario } from '../../../../../data/models/api.models';
 import { filter } from 'rxjs/operators';
+import { VinoService } from '../../../../../data/services/vino.service';
+import { forkJoin } from 'rxjs';
 
 export interface InternalNav {
   id?: number
@@ -45,6 +47,7 @@ export class HeaderStore implements OnInit {
   }
 
   private saborService = inject(SaborService);
+  private vinoService = inject(VinoService);
   private router = inject(Router);
 
   currentUser = this.authService.currentUser;
@@ -138,11 +141,25 @@ export class HeaderStore implements OnInit {
   }
 
   private loadFlavors(): void {
-    this.saborService.getAll().subscribe({
-      next: (sabores: Sabor[]) => {
+    forkJoin({
+      sabores: this.saborService.getAll(),
+      vinos: this.vinoService.getAll()
+    }).subscribe({
+      next: ({ sabores, vinos }) => {
+
+        const vinosDisponibles = vinos.filter(
+          vino => vino.estado === 'D'
+        );
+
+        const saboresDisponibles = sabores.filter(sabor =>
+          vinosDisponibles.some(
+            vino => vino.id_sabor === sabor.id_sabor
+          )
+        );
+
         const navItems: InternalNav[] = [
           { name: 'Todos' },
-          ...sabores.map(sabor => ({
+          ...saboresDisponibles.map(sabor => ({
             id: sabor.id_sabor,
             name: this.formatSaborName(sabor.nombre)
           }))

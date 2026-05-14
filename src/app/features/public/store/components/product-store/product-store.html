@@ -8,11 +8,21 @@
 
     @for (wine of filteredProducts(); track trackById($index, wine)) {
 
-    <div class="group overflow-hidden relative">
+<div
+  class="group overflow-hidden relative"
+  [class.opacity-60]="isOutOfStock(wine)">
 
       <a class="block cursor-pointer" [routerLink]="['/store/products', generarSlug(wine.name), wine.id]">
 
         <div class="aspect-[3/4] bg-slate-100 w-full overflow-hidden relative">
+
+          @if (isOutOfStock(wine)) {
+            <div class="absolute inset-0 z-30 bg-black/20 flex items-center justify-center">
+              <span class="bg-white text-slate-900 text-xs font-semibold px-3 py-1">
+                Sin stock
+              </span>
+            </div>
+          }
 
           <div class="absolute top-3 left-3 z-20 flex flex-col gap-2">
 
@@ -75,14 +85,42 @@
 
           <button
             (click)="addToCart(wine); $event.stopPropagation()"
-            [disabled]="isLoading(wine.id)"
+            [disabled]="isLoading(wine.id) || isOutOfStock(wine)"
             class="bg-transparent border-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
 
-            @if (isLoading(wine.id)) {
-              <span class="text-xs">...</span>
-            } @else {
-              <fa-icon [icon]="icons.faCartShopping" class="text-[#515255] text-[18px]"/>
-            }
+@if (isLoading(wine.id)) {
+
+  <svg
+    class="animate-spin h-[18px] w-[18px] text-[#515255]"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24">
+
+    <circle
+      class="opacity-25"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      stroke-width="4">
+    </circle>
+
+    <path
+      class="opacity-75"
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z">
+    </path>
+
+  </svg>
+
+} @else {
+
+  <fa-icon
+    [icon]="icons.faCartShopping"
+    class="text-[#515255] text-[18px]"
+  />
+
+}
 
           </button>
         </div>

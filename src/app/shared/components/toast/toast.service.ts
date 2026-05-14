@@ -7,7 +7,7 @@ export class ToastService {
   private readonly _toasts = signal<ToastMessage[]>([]);
   readonly toasts = this._toasts.asReadonly();
 
-  private readonly duration = 10000;
+  private readonly duration = 5000;
 
   show(
     type: ToastType,
