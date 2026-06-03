@@ -1,12 +1,9 @@
 <footer class="w-full bg-[#0e0d12] text-white" aria-label="Pie de página Vinos Citadel">
 
-  <!-- Franja superior -->
   <div class="max-w-screen-xl mx-auto px-4 sm:px-8 lg:px-12 py-10">
 
-    <!-- Fila principal: logo + nav groups + contacto -->
     <div class="flex flex-col lg:flex-row lg:items-start gap-10">
 
-      <!-- Logo + tagline + redes -->
       <div class="flex-shrink-0 flex flex-col items-start gap-5">
         <a routerLink="/store" aria-label="Ir al inicio de Vinos Citadel">
           <img src="/img/logo.png" alt="Logo Vinos Citadel" loading="lazy" decoding="async"
@@ -14,6 +11,10 @@
         </a>
         <p class="text-xs text-white/50 max-w-[200px] leading-relaxed font-light">
           Vinos de berries artesanales del norte del Perú.
+        </p>
+        <p class="mt-3 text-xs text-white/50 leading-relaxed">
+          Ingeniería, Tecnología y Agricultura S.A.C.<br>
+          RUC: 20609338203
         </p>
         <nav aria-label="Redes sociales" class="flex gap-2.5">
           @for (s of socialLinks; track s.label) {
@@ -32,13 +33,10 @@
         </nav>
       </div>
 
-      <!-- Divisor vertical (solo desktop) -->
       <div class="hidden lg:block w-px bg-white/10 self-stretch mx-4"></div>
 
-      <!-- Nav groups en fila -->
       <div class="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-8">
 
-        <!-- Tienda -->
         <nav aria-label="Tienda">
           <strong class="block mb-3 text-[10px] font-semibold tracking-widest uppercase text-[#c35b64]">
             Nuestra Tienda
@@ -55,7 +53,6 @@
           </ul>
         </nav>
 
-        <!-- Empresa -->
         <nav aria-label="Empresa">
           <strong class="block mb-3 text-[10px] font-semibold tracking-widest uppercase text-[#c35b64]">
             Nuestra Empresa
@@ -79,7 +76,6 @@
           </ul>
         </nav>
 
-        <!-- Contacto -->
         <div class="col-span-2 sm:col-span-1">
           <strong class="block mb-3 text-[10px] font-semibold tracking-widest uppercase text-[#c35b64]">
             Contáctanos
@@ -108,7 +104,6 @@
     </div>
   </div>
 
-  <!-- Franja inferior -->
   <div class="border-t border-white/10">
     <div class="max-w-screen-xl mx-auto px-4 sm:px-8 lg:px-12">
       <div class="flex flex-col-reverse gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
@@ -117,7 +112,7 @@
         </p>
         <nav aria-label="Legal" class="flex gap-5">
           @for (l of legalLinks; track l.label) {
-            <a [routerLink]="l.routerLink"
+            <a [routerLink]="l.routerLink" target="_blank" rel="noopener noreferrer"
               class="text-[11px] text-white/30 transition-colors duration-200 hover:text-[#c35b64]">
               {{ l.label }}
             </a>

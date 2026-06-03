@@ -23,14 +23,12 @@ export class RegisterComponent implements AfterViewInit {
   private platformId = inject(PLATFORM_ID);
   public isServer = isPlatformServer(this.platformId);
 
-  showTermsModal = signal(false);
-  termsAccepted = signal(false);
-
   registerForm = this.fb.group({
     nombres: ['', Validators.required],
     apellidos: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    hash_contrasena: ['', [Validators.required, Validators.minLength(6)]]
+    hash_contrasena: ['', [Validators.required, Validators.minLength(6)]],
+    termsAccepted: [false, Validators.requiredTrue]
   });
 
   get hasLocalSession(): boolean {
@@ -48,40 +46,16 @@ export class RegisterComponent implements AfterViewInit {
       : 'border-gray-300 focus:ring-[#0e0d12] focus:border-[#0e0d12]';
   }
 
-  openTermsModal() {
-    this.showTermsModal.set(true);
-    document.body.style.overflow = 'hidden';
-  }
-
-  closeTermsModal() {
-    this.showTermsModal.set(false);
-    document.body.style.overflow = '';
-  }
-
-  acceptTerms() {
-    this.termsAccepted.set(true);
-    this.closeTermsModal();
-  }
-
-  onTermsCheckboxChange(event: any) {
-    if (event.target.checked) {
-      if (!this.termsAccepted()) {
-        event.target.checked = false;
-        this.openTermsModal();
-      }
-    } else {
-      this.termsAccepted.set(false);
-    }
-  }
-
   onSubmit() {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
       return;
     }
 
-    if (!this.termsAccepted()) {
-      this.errorMessage.set('Debes aceptar los términos y condiciones para registrarte');
+    if (!this.registerForm.get('termsAccepted')?.value) {
+      this.errorMessage.set(
+        'Debes aceptar los términos y condiciones para registrarte'
+      );
       return;
     }
 

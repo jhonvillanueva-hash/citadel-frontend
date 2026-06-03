@@ -39,8 +39,8 @@ export class CheckoutStore implements OnInit {
   numeroCasa   = signal('');
   codigoPostal = signal('');
 
-  pickupAddress = signal('Baltazar Villalonga 1775, El Porvenir, Trujillo, La Libertad, Peru');
-  pickupDetails = signal('Tienda Principal - Horario: Lunes a Sábado 10am-8pm');
+  pickupAddress = signal('Av. Carlos Valderrama 491, Trujillo 13001, La Libertad, Perú');
+  pickupDetails = signal('Punto de recogida oficial - Lunes a Sábado 10:00 AM - 8:00 PM');
 
   paymentMethod = signal<string | null>(null);
   yapeAvailable = signal(true);
@@ -55,10 +55,10 @@ export class CheckoutStore implements OnInit {
   mapUrl = signal<SafeResourceUrl | null>(null);
 
   yapeIcon         = 'https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png';
-  pagoEfectivoIcon = 'https://scontent.flim37-1.fna.fbcdn.net/v/t39.30808-6/462601235_953445320144713_2500571434057430817_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=H1aIIt90Eb0Q7kNvwHgXD-P&_nc_oc=Adpb8_HPIJPJU402lDpiv0Cl86zaBKbuLp8E_e8vKQGJdHDUcrwOKXnw6qqFTDe9bL_m3hixzEwwCeKAhS5Wr8Hs&_nc_zt=23&_nc_ht=scontent.flim37-1.fna&_nc_gid=Inm4oftZ1smwDPkJSQH8Kw&_nc_ss=7b2a8&oh=00_Af7CBiFuCnaXgYa4QGTZSOVSgt2BuFoFitUyfvZRv3KzGA&oe=6A00C71B';
+  pagoEfectivoIcon = '/img/store/icons/pagoefectivo.png';
 
   storeMapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-    'https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d426.276085731222!2d-78.996418!3d-8.072184!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91ad1675558555c1%3A0xfb5efa0732efbb78!2s1173%20113%2C%20Baltazar%20Villalonga%201775%2C%20El%20Porvenir%2013004!5e1!3m2!1ses-419!2spe!4v1777160015031!5m2!1ses-419!2spe'
+    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3950.0034028862783!2d-79.03289702523057!3d-8.101133691927716!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91ad3d8e1edab0b7%3A0xbd166949bab68060!2sAv.%20Carlos%20Valderrama%20491%2C%20Trujillo%2013001!5e0!3m2!1ses-419!2spe!4v1780459041053!5m2!1ses-419!2spe'
   );
 
   departamentos: any[] = [];
@@ -84,7 +84,7 @@ export class CheckoutStore implements OnInit {
   }
 
   get shippingCost(): number {
-    return this.subtotal * 0.05;
+    return this.deliveryType() === 'home' ? 20 : 0;
   }
 
   private isStep1Valid(): boolean {

@@ -211,7 +211,9 @@
                   <span>S/ {{ subtotal.toFixed(2) }}</span>
                 </div>
                 <div class="flex justify-between text-[#0e0d12]/70 text-sm">
-                  <span>Envío (5%)</span>
+                  <span>
+                    {{ deliveryType() === 'home' ? 'Envío' : 'Recogida en tienda' }}
+                  </span>
                   <span>S/ {{ shippingCost.toFixed(2) }}</span>
                 </div>
 
