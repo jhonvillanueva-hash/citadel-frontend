@@ -11,6 +11,10 @@
         <p class="mt-5 text-sm font-light text-text/70 max-w-xs leading-relaxed">
           Vinos de berries artesanales, elaborados con pasión e identidad del norte del Perú.
         </p>
+        <p class="mt-3 text-xs text-text/50 leading-relaxed">
+          Ingeniería, Tecnología y Agricultura S.A.C.<br>
+          RUC: 20609338203
+        </p>
         <nav aria-label="Redes sociales" class="flex gap-3 mt-5">
           @for (s of socialLinks; track s.label) {
           <a [href]="s.href" target="_blank" rel="noopener noreferrer" [attr.aria-label]="s.label"
@@ -97,7 +101,7 @@
       </p>
       <nav aria-label="Legal" class="flex gap-5">
         @for (l of legalLinks; track l.label) {
-        <a [routerLink]="l.routerLink" class="text-xs text-text/50 transition-colors duration-200 hover:text-secondary">
+        <a [routerLink]="l.routerLink" target="_blank" rel="noopener noreferrer" class="text-xs text-text/50 transition-colors duration-200 hover:text-secondary">
           {{ l.label }}
         </a>
         }

@@ -15,6 +15,8 @@ import { CheckoutStore } from './features/public/store/pages/checkout-store/chec
 import { ProfileStore } from './features/public/store/pages/profile-store/profile-store';
 import { storeGuard } from './core/guards/store.guard';
 import { SearchStore } from './features/public/store/pages/search-store/search-store';
+import { TermsAndConditionsComponent } from './features/public/legal/terms-and-conditions/terms-and-conditions';
+import { RefundPolicyComponent } from './features/public/legal/refund-policy/refund-policy';
 
 export const routes: Routes = [
   {
@@ -25,6 +27,24 @@ export const routes: Routes = [
   {
     path: 'libro-de-reclamaciones',
     component: ComplaintsComponent,
+  },
+  {
+    path: 'terms-and-conditions',
+    component: TermsAndConditionsComponent,
+    title: 'Términos y Condiciones | Vinos Citadel',
+    data: {
+      showHeader: true,
+      showFooter: true
+    }
+  },
+  {
+    path: 'refund-policy',
+    component: RefundPolicyComponent,
+    title: 'Cambios y Devoluciones | Vinos Citadel',
+    data: {
+      showHeader: true,
+      showFooter: true
+    }
   },
   {
     path: 'login',
@@ -96,5 +116,5 @@ export const routes: Routes = [
         import('./core/routes/admin.routes').then(m => m.ADMIN_ROUTES),
       canActivate: [authGuard, adminGuard]
   },
-  { path: '**', redirectTo: 'login' }
+  { path: '**', redirectTo: '' }
 ];
