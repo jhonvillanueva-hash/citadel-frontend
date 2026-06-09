@@ -27,11 +27,12 @@ export const routes: Routes = [
   {
     path: 'libro-de-reclamaciones',
     component: ComplaintsComponent,
+    title: 'Libro de reclamaciones',
   },
   {
     path: 'terms-and-conditions',
     component: TermsAndConditionsComponent,
-    title: 'Términos y Condiciones | Vinos Citadel',
+    title: 'Términos y Condiciones',
     data: {
       showHeader: true,
       showFooter: true
@@ -40,7 +41,7 @@ export const routes: Routes = [
   {
     path: 'refund-policy',
     component: RefundPolicyComponent,
-    title: 'Cambios y Devoluciones | Vinos Citadel',
+    title: 'Cambios y Devoluciones',
     data: {
       showHeader: true,
       showFooter: true
@@ -49,24 +50,28 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
-    canActivate: [publicGuard]
+    canActivate: [publicGuard],
+    title: 'Iniciar sesión',
   },
   {
     path: 'register',
     component: RegisterComponent,
-    canActivate: [publicGuard]
+    canActivate: [publicGuard],
+    title: 'Registrarse',
   },
   {
     path: 'store',
     component: Store,
     data: { showHeader: true, showFooter: true },
     canActivate: [storeGuard],
+    title: 'Tienda Citadel',
   },
   {
     path: 'store/profile',
     component: ProfileStore,
     data: { showHeader: false, showFooter: false },
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    title: 'Mi perfil',
   },
   {
     path: 'store/search',
@@ -103,12 +108,14 @@ export const routes: Routes = [
     component: CheckoutStore,
     data: { showHeader: false, showFooter: false },
     canActivate: [storeGuard],
+    title: 'Paga tu carrito',
   },
   {
     path: 'store/cart',
     component: CartStore,
     data: { showHeader: false, showFooter: false },
     canActivate: [storeGuard],
+    title: 'Carrito',
   },
   {
     path: 'admin',

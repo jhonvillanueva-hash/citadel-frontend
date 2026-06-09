@@ -1,5 +1,4 @@
-import { Component, signal, computed, inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, signal, computed, inject, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ViewChild, ElementRef } from '@angular/core';
@@ -15,21 +14,46 @@ import {
   faCheckCircle,
   faBars,
   faCamera,
-  faArrowLeft
+  faArrowLeft,
+  faChevronDown,
+  faChevronUp,
+  faTruck,
+  faStore,
+  faReceipt,
+  faTag,
+  faArrowUpRightFromSquare
 } from '@fortawesome/free-solid-svg-icons';
 import { UsuarioService } from '../../../../../data/services/usuario.service';
 import { AuthService } from '../../../../../core/services/auth.service';
-import { Usuario } from '../../../../../data/models/api.models';
+import { Usuario, Vino, Precio } from '../../../../../data/models/api.models';
 import { RouterLink } from "@angular/router";
 import { CarritoService } from '../../../../../data/services/cart.service';
 import { CarritoProductoService } from '../../../../../data/services/carrito-producto.service';
-import { finalize } from 'rxjs/operators';
+import { finalize, forkJoin, map, switchMap, take } from 'rxjs';
+import { CuponService } from '../../../../../data/services/cupon.service';
+import { VinoService } from '../../../../../data/services/vino.service';
+import { PrecioService } from '../../../../../data/services/precio.service';
+
+interface OrderProduct {
+  id: number
+  name: string;
+  quantity: number;
+  price: number;
+  imageUrl: string;
+}
 
 interface Order {
   id: string;
   date: string;
   total: number;
-  status: 'completed' | 'pending' | 'shipped' | 'cancelled';
+  subtotal: number;
+  shippingFee: number;
+  discount: number;
+  couponCode?: string;
+  status: 'E' | 'V';
+  type: 'D' | 'T';
+  products: OrderProduct[];
+  isExpanded?: boolean;
 }
 
 interface UserProfile {
@@ -62,9 +86,11 @@ export class ProfileStore implements OnInit {
 
   private usuarioService = inject(UsuarioService);
   private authService = inject(AuthService);
-  private router = inject(Router);
   private carritoService = inject(CarritoService);
   private carritoProductoService = inject(CarritoProductoService);
+  private cuponService = inject(CuponService);
+  private vinoService = inject(VinoService);
+  private precioService = inject(PrecioService);
 
   currentUser = this.authService.currentUser;
   usuarioApi = signal<Usuario | null>(null);
@@ -80,10 +106,18 @@ export class ProfileStore implements OnInit {
   faBars = faBars;
   faCamera = faCamera;
   faArrowLeft = faArrowLeft;
+  faChevronDown = faChevronDown;
+  faChevronUp = faChevronUp;
+  faTruck = faTruck;
+  faStore = faStore;
+  faReceipt = faReceipt;
+  faTag = faTag;
+  faArrowUpRightFromSquare = faArrowUpRightFromSquare;
 
   activeTab = signal<'profile' | 'orders'>('profile');
   isEditingProfile = signal(false);
   isSaving = signal(false);
+  isLoadingOrders = signal(false);
   avatarDb = signal<string | null>(null);
   avatarPreview = signal<string | null>(null);
   isMobileMenuOpen = signal(false);
@@ -130,21 +164,44 @@ export class ProfileStore implements OnInit {
 
   constructor() {
     this.loadOrders();
+    effect(() => {
+      const user = this.currentUser();
+      if (user && user.dni) {
+        this.usuarioApi.set(user as any);
+        this.mapUsuarioToProfile(user as any);
+      }
+    });
   }
 
   ngOnInit(): void {
-    this.loadUsuario();
+    const user = this.currentUser();
+    if (user && user.dni) {
+      this.usuarioApi.set(user as any);
+      this.mapUsuarioToProfile(user as any);
+    } else {
+      this.loadUsuario();
+    }
   }
 
   loadUsuario(): void {
-    this.usuarioService.getAll().subscribe({
-      next: (res) => {
-        const user = res[0];
+    this.usuarioService.getProfile().subscribe({
+      next: (user) => {
         this.usuarioApi.set(user);
         this.mapUsuarioToProfile(user);
+        this.authService.setUser(user);
       },
       error: (err) => {
         console.error('Error cargando usuario', err);
+        this.usuarioService.getAll().subscribe({
+          next: (res) => {
+            const user = Array.isArray(res) ? res[0] : res;
+            if (user) {
+              this.usuarioApi.set(user);
+              this.mapUsuarioToProfile(user);
+              this.authService.setUser(user);
+            }
+          }
+        });
       }
     });
   }
@@ -396,64 +453,126 @@ export class ProfileStore implements OnInit {
   orders = (): Order[] => this.ordersSignal();
 
   loadOrders(): void {
+    this.isLoadingOrders.set(true);
     this.ordersSignal.set([]);
 
-    this.carritoService.getAll().subscribe({
-      next: (carritos) => {
+    forkJoin({
+      carritos: this.carritoService.getAll().pipe(take(1)),
+      vinos: this.vinoService.getAll().pipe(take(1)),
+      precios: this.precioService.getAll().pipe(take(1))
+    }).pipe(
+      finalize(() => this.isLoadingOrders.set(false))
+    ).subscribe({
+      next: ({ carritos, vinos, precios }) => {
         const vendidos = carritos.filter(c => c.estado === 'V');
 
         if (vendidos.length === 0) {
-          this.ordersSignal.set([]);
           return;
         }
 
-        vendidos.forEach(carrito => {
-          this.carritoProductoService
-            .getByCarrito(carrito.id_carrito)
-            .subscribe(productos => {
-              const total = productos.reduce((sum, p) =>
-                sum + (p.cantidad * p.precio_venta), 0
-              );
+        const orderObservables = vendidos.map(carrito => {
+          return this.carritoProductoService.getByCarrito(carrito.id_carrito).pipe(
+            switchMap(productos => {
+              const orderProducts: OrderProduct[] = productos.map(p => {
+                const precio = precios.find(pr => pr.id_precio === p.id_precio);
+                const vino = vinos.find(v => v.id_vino === precio?.id_vino);
+                return {
+                  id: vino?.id_vino!,
+                  name: vino?.nombre || 'Producto desconocido',
+                  quantity: p.cantidad,
+                  price: p.precio_venta,
+                  imageUrl: vino?.url_img_principal || ''
+                };
+              });
 
-              this.ordersSignal.update(prev => [
-                ...prev,
-                {
+              const subtotal = orderProducts.reduce((sum, p) => sum + (p.quantity * p.price), 0);
+              const shippingFee = carrito.tipo === 'D' ? 20 : 0;
+
+              if (carrito.id_cupon) {
+                return this.cuponService.getById(carrito.id_cupon).pipe(
+                  map(cupon => {
+                    let discount = 0;
+                    if (subtotal >= cupon.monto_minimo) {
+                      if (cupon.tipo_descuento === 'F') {
+                        discount = cupon.descuento;
+                      } else if (cupon.tipo_descuento === 'P') {
+                        discount = subtotal * (cupon.descuento / 100);
+                      }
+                    }
+
+                    const total = Math.max(0, subtotal + shippingFee - discount);
+
+                    return {
+                      id: carrito.id_carrito.toString(),
+                      date: new Date(carrito.fecha_compra).toLocaleDateString(),
+                      total,
+                      subtotal,
+                      shippingFee,
+                      discount,
+                      couponCode: cupon.codigo.toString(),
+                      status: carrito.estado,
+                      type: carrito.tipo,
+                      products: orderProducts,
+                      isExpanded: false
+                    } as Order;
+                  })
+                );
+              } else {
+                const total = subtotal + shippingFee;
+                return [{
                   id: carrito.id_carrito.toString(),
                   date: new Date(carrito.fecha_compra).toLocaleDateString(),
-                  total: total,
-                  status: 'completed'
-                }
-              ]);
-            });
+                  total,
+                  subtotal,
+                  shippingFee,
+                  discount: 0,
+                  status: carrito.estado,
+                  type: carrito.tipo,
+                  products: orderProducts,
+                  isExpanded: false
+                } as Order];
+              }
+            })
+          );
+        });
+
+        forkJoin(orderObservables).subscribe(orders => {
+          const flattenedOrders = (orders as any).flat() as Order[];
+          flattenedOrders.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          this.ordersSignal.set(flattenedOrders);
         });
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error loading orders:', err);
         this.ordersSignal.set([]);
       }
     });
   }
 
-  getStatusBadgeClass(status: string): string {
-    const classes: Record<string, string> = {
-      completed: 'bg-green-100 text-green-800',
-      pending: 'bg-yellow-100 text-yellow-800',
-      shipped: 'bg-blue-100 text-blue-800',
-      cancelled: 'bg-red-100 text-red-800'
-    };
-    return classes[status] || classes['pending'];
+  toggleOrderExpansion(orderId: string): void {
+    this.ordersSignal.update(orders =>
+      orders.map(o => o.id === orderId ? { ...o, isExpanded: !o.isExpanded } : o)
+    );
   }
 
   getStatusText(status: string): string {
     const texts: Record<string, string> = {
-      completed: 'Completado',
-      pending: 'Pendiente',
-      shipped: 'Enviado',
-      cancelled: 'Cancelado'
+      V: 'Vendido',
+      E: 'En espera'
     };
     return texts[status] || status;
   }
 
   logout(): void {
     this.authService.logout();
+  }
+
+  generarSlug(texto: string): string {
+    return texto
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-');
   }
 }

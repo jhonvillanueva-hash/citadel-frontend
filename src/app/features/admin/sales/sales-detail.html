@@ -1,0 +1,164 @@
+<div class="space-y-6">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="flex items-center gap-4">
+      <button 
+        routerLink="/admin/sales"
+        class="w-10 h-10 rounded-full bg-white border border-admin-pink-light flex items-center justify-center text-admin-brown-light hover:bg-admin-pink-light hover:bg-opacity-20 transition-all"
+      >
+        <fa-icon [icon]="icons.faArrowLeft" />
+      </button>
+      <div>
+        <h2 class="text-2xl font-bold text-admin-brown tracking-tight">Detalle del Pedido #{{ saleId() }}</h2>
+        <p class="text-admin-brown-light text-sm">Información detallada de la transacción y el cliente.</p>
+      </div>
+    </div>
+    
+    @if (carrito()) {
+      <div class="inline-flex items-center px-4 py-2 bg-admin-pink-light bg-opacity-30 border border-admin-pink-light rounded-xl">
+        <span class="text-xs font-bold text-admin-brown uppercase tracking-widest mr-3">Estado:</span>
+        <span class="px-2.5 py-1 text-xs font-bold uppercase tracking-tight border border-gray-200 bg-white text-[#0e0d12]/70">
+          {{ getStatusText(carrito()!.estado) }}
+        </span>
+      </div>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex flex-col items-center justify-center py-32 bg-white rounded-2xl border border-admin-pink-light">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-admin-pink"></div>
+      <p class="mt-4 text-admin-brown-light font-medium">Cargando detalles del pedido...</p>
+    </div>
+  } @else if (carrito()) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-1 space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-admin-pink-light p-6">
+          <h3 class="text-xs font-bold text-admin-brown uppercase tracking-widest mb-6 flex items-center gap-2">
+            <fa-icon [icon]="icons.faUser" class="text-admin-pink" />
+            Información del Cliente
+          </h3>
+          
+          <div class="space-y-4">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-full bg-admin-pink-light flex items-center justify-center text-admin-pink-dark">
+                <fa-icon [icon]="icons.faUser" class="text-lg" />
+              </div>
+              <div>
+                <p class="text-base font-bold text-admin-brown">{{ usuario()?.nombres }} {{ usuario()?.apellidos }}</p>
+                <p class="text-xs text-admin-brown-light italic">DNI: {{ usuario()?.dni || 'N/A' }}</p>
+              </div>
+            </div>
+
+            <div class="pt-4 space-y-3 border-t border-gray-100">
+              <div class="flex items-center gap-3 text-sm text-admin-brown">
+                <fa-icon [icon]="icons.faEnvelope" class="w-4 text-admin-pink opacity-50" />
+                <span>{{ usuario()?.email }}</span>
+              </div>
+              <div class="flex items-center gap-3 text-sm text-admin-brown">
+                <fa-icon [icon]="icons.faPhone" class="w-4 text-admin-pink opacity-50" />
+                <span>{{ usuario()?.telefono || 'N/A' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-admin-pink-light p-6">
+          <h3 class="text-xs font-bold text-admin-brown uppercase tracking-widest mb-6 flex items-center gap-2">
+            <fa-icon [icon]="icons.faMapMarkerAlt" class="text-admin-pink" />
+            Método de Entrega
+          </h3>
+          
+          <div class="space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-admin-brown">
+                <fa-icon [icon]="carrito()?.tipo === 'D' ? icons.faTruck : icons.faStore" />
+              </div>
+              <div>
+                <p class="text-sm font-bold text-admin-brown">{{ carrito()?.tipo === 'D' ? 'Envío a domicilio' : 'Recojo en tienda' }}</p>
+                <p class="text-xs text-admin-brown-light">{{ carrito()?.tipo === 'D' ? 'Costo de envío: S/ 20.00' : 'Sin costo de envío' }}</p>
+              </div>
+            </div>
+
+            @if (carrito()?.tipo === 'D') {
+              <div class="pt-4 border-t border-gray-100">
+                <p class="text-xs font-bold text-admin-brown-light uppercase tracking-wider mb-2">Dirección de envío</p>
+                <p class="text-sm text-admin-brown">{{ usuario()?.direccion }}, {{ usuario()?.ciudad }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-admin-pink-light overflow-hidden">
+          <div class="p-6 border-b border-gray-50">
+            <h3 class="text-xs font-bold text-admin-brown uppercase tracking-widest flex items-center gap-2">
+              <fa-icon [icon]="icons.faReceipt" class="text-admin-pink" />
+              Productos del Pedido
+            </h3>
+          </div>
+          
+          <div class="divide-y divide-gray-50">
+            @for (product of products(); track $index) {
+              <div class="p-4 md:p-6 flex items-center gap-4 md:gap-6">
+                <div class="w-16 h-16 bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-100 rounded-lg">
+                  <img [src]="product.imageUrl" class="w-full h-full object-contain p-1">
+                </div>
+                <div class="flex-1 min-w-0">
+                  <a
+                    class="text-base font-bold text-admin-brown truncate underline mr-1 inline-flex items-center gap-1"
+                    [routerLink]="['/admin/wines/edit', product.id]"
+                  >
+                    {{ product.name }}
+                    <fa-icon [icon]="icons.faArrowUpRightFromSquare" class="text-xs"></fa-icon>
+                  </a>
+                  <p class="text-sm text-admin-brown-light">Cantidad: {{ product.quantity }}</p>
+                </div>
+                <div class="text-right">
+                  <p class="text-base font-bold text-admin-brown">S/ {{ (product.price * product.quantity).toFixed(2) }}</p>
+                  <p class="text-[11px] text-admin-brown-light">S/ {{ (+product.price).toFixed(2) }} c/u</p>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="bg-gray-50/50 p-6">
+            <div class="max-w-sm ml-auto space-y-3">
+              <div class="flex justify-between text-sm">
+                <span class="text-admin-brown-light font-medium">Subtotal</span>
+                <span class="text-admin-brown font-bold">S/ {{ subtotal().toFixed(2) }}</span>
+              </div>
+              
+              <div class="flex justify-between text-sm">
+                <span class="text-admin-brown-light font-medium">Envío</span>
+                <span class="text-admin-brown font-bold">S/ {{ shippingFee().toFixed(2) }}</span>
+              </div>
+
+              @if (discount() > 0) {
+                <div class="flex justify-between text-sm text-green-600">
+                  <div class="flex items-center gap-1.5 font-bold">
+                    <button [routerLink]="['/admin/coupons/edit', cupon()?.id_cupon]">Cupón usado: "{{ cupon()?.codigo }}" <fa-icon [icon]="icons.faArrowUpRightFromSquare" class="text-xs"></fa-icon></button>
+
+                  </div>
+                  <span class="font-bold">- S/ {{ discount().toFixed(2) }}</span>
+                </div>
+              }
+
+              <div class="pt-4 mt-4 border-t border-admin-pink-light flex justify-between items-baseline">
+                <span class="text-base font-black text-admin-brown uppercase tracking-widest">Total</span>
+                <span class="text-2xl font-black text-admin-pink">S/ {{ total().toFixed(2) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="flex flex-col items-center justify-center py-32 bg-white rounded-2xl border border-admin-pink-light">
+      <fa-icon [icon]="icons.faBox" class="text-5xl text-admin-pink-light mb-4" />
+      <p class="text-admin-brown-light font-medium">No se encontró información del pedido.</p>
+      <button routerLink="/admin/sales" class="mt-4 text-admin-pink font-semibold hover:underline">
+        Regresar al listado
+      </button>
+    </div>
+  }
+</div>

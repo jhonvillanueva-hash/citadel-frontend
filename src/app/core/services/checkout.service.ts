@@ -4,6 +4,8 @@ export interface CheckoutProfile {
   email: string;
   nombres: string;
   apellidos: string;
+  dni: string;
+  telefono: string;
   deliveryType: 'home' | 'pickup';
   direccion: string;
   departamento: string;
@@ -19,6 +21,8 @@ const EMPTY_PROFILE: CheckoutProfile = {
   email: '',
   nombres: '',
   apellidos: '',
+  dni: '',
+  telefono: '',
   deliveryType: 'home',
   direccion: '',
   departamento: '',

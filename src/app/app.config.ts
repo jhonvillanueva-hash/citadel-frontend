@@ -7,13 +7,16 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { provideAppInitializer, inject } from '@angular/core';
 import { AuthService } from './core/services/auth.service';
-import { catchError, of } from 'rxjs';
+import { UsuarioLoggedService } from './data/services/usuarioLogged.service';
+import { catchError, of, switchMap } from 'rxjs';
 
 function initializeApp() {
   const authService = inject(AuthService);
+  const usuarioLoggedService = inject(UsuarioLoggedService);
 
   if (authService.hasLoggedInFlag()) {
     return authService.refreshToken().pipe(
+      switchMap(() => usuarioLoggedService.loadProfile()),
       catchError((err) => {
         console.error('Refresh falló: ', err);
         return of(null);

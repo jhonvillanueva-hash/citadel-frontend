@@ -4,6 +4,8 @@ import { AuthService } from '../../../core/services/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule, isPlatformServer } from '@angular/common';
 import { environment } from '../../../../environments/environment';
+import { UsuarioLoggedService } from '../../../data/services/usuarioLogged.service';
+import { switchMap, finalize } from 'rxjs';
 
 declare const google: any;
 
@@ -18,6 +20,7 @@ export class LoginComponent implements AfterViewInit {
   public authService = inject(AuthService);
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
+  private usuarioLoggedService = inject(UsuarioLoggedService);
   public isServer = isPlatformServer(this.platformId);
   errorMessage = signal<string | null>(null);
   isLoading = signal(false);
@@ -47,20 +50,21 @@ export class LoginComponent implements AfterViewInit {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.authService.login(this.loginForm.getRawValue() as any).subscribe({
-      next: () => {
-        const url = this.authService.getRedirectUrl();
-        this.router.navigate([url]);
-      },
-      error: (err) => {
-        this.isLoading.set(false);
-        this.errorMessage.set('Credenciales incorrectas');
-        console.error(err);
-      },
-      complete: () => {
-        this.isLoading.set(false);
-      }
-    });
+    this.authService.login(this.loginForm.getRawValue() as any)
+      .pipe(
+        switchMap(() => this.usuarioLoggedService.loadProfile()),
+        finalize(() => this.isLoading.set(false))
+      )
+      .subscribe({
+        next: () => {
+          const url = this.authService.getRedirectUrl();
+          this.router.navigate([url]);
+        },
+        error: (err) => {
+          this.errorMessage.set('Credenciales incorrectas');
+          console.error(err);
+        }
+      });
   }
 
     ngAfterViewInit() {
@@ -93,20 +97,21 @@ export class LoginComponent implements AfterViewInit {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.authService.loginWithGoogle(idToken).subscribe({
-      next: () => {
-        const url = this.authService.getRedirectUrl();
-        this.router.navigate([url]);
-      },
-      error: (err) => {
-        this.isLoading.set(false);
-        this.errorMessage.set('Error con Google login');
-        console.error(err);
-      },
-      complete: () => {
-        this.isLoading.set(false);
-      }
-    });
+    this.authService.loginWithGoogle(idToken)
+      .pipe(
+        switchMap(() => this.usuarioLoggedService.loadProfile()),
+        finalize(() => this.isLoading.set(false))
+      )
+      .subscribe({
+        next: () => {
+          const url = this.authService.getRedirectUrl();
+          this.router.navigate([url]);
+        },
+        error: (err) => {
+          this.errorMessage.set('Error con Google login');
+          console.error(err);
+        }
+      });
   }
 
   handleCredentialResponse(response: any) {

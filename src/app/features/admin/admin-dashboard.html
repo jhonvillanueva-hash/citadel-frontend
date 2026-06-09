@@ -79,17 +79,21 @@
             (linkClicked)="sidebarOpen = false">
           </app-admin-sidebar-item>
 
-          <app-admin-sidebar-item
+           <app-admin-sidebar-item
             [icon]="icons.faUser"
             label="Usuarios"
-            title="Menú de Usuarios"
+            route="/admin/users"
+            title="Lista de usuarios"
             [sidebarOpen]="sidebarOpen"
-            [children]="[
-              { label:'Ver usuarios', route:'/admin/users', title:'Listado de usuarios' },
-              { label:'Roles y permisos', route:'/admin/roles', title:'Gestión de roles' }
-            ]"
-            menuKey="usuarios"
-            [(expandedMenu)]="expandedMenu"
+            (linkClicked)="sidebarOpen = false">
+          </app-admin-sidebar-item>
+
+          <app-admin-sidebar-item
+            [icon]="icons.faShoppingCart"
+            label="Ventas"
+            route="/admin/sales"
+            title="Lista de pedidos"
+            [sidebarOpen]="sidebarOpen"
             (linkClicked)="sidebarOpen = false">
           </app-admin-sidebar-item>
 

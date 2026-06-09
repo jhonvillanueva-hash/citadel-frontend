@@ -17,6 +17,7 @@ export interface Usuario {
   telefono: string;
   direccion: string;
   ciudad: string;
+  fecha_creacion?: Date;
 }
 
 export interface Carrito {
@@ -25,6 +26,8 @@ export interface Carrito {
   estado: 'E' | 'V';
   fecha_pedido: Date;
   fecha_compra: Date;
+  tipo: 'D' | 'T';
+  id_cupon?: number | null;
 }
 
 export interface CarritoProducto {

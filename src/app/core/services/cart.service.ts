@@ -167,6 +167,43 @@ export class CartService {
     setTimeout(() => this._setUpdating(item.id_vino, false), 400);
   }
 
+  setCoupon(id_cupon: number | null): void {
+    const carrito = this._carritoActivo();
+    if (!carrito) return;
+
+    this.isLoading.set(true);
+    this.apiCarrito.patch(carrito.id_carrito, { id_cupon } as any).pipe(
+      tap(() => {
+        this._loadFromApi();
+      }),
+      catchError(err => {
+        console.error('setCoupon', err);
+        this.isLoading.set(false);
+        return of(null);
+      })
+    ).subscribe();
+  }
+
+  setDeliveryType(tipo: 'D' | 'T'): void {
+    const carrito = this._carritoActivo();
+    if (!carrito) return;
+
+    // Solo actualizar si el tipo es diferente para evitar peticiones innecesarias
+    if (carrito.tipo === tipo) return;
+
+    this.isLoading.set(true);
+    this.apiCarrito.patch(carrito.id_carrito, { tipo } as any).pipe(
+      tap(() => {
+        this._loadFromApi();
+      }),
+      catchError(err => {
+        console.error('setDeliveryType', err);
+        this.isLoading.set(false);
+        return of(null);
+      })
+    ).subscribe();
+  }
+
   removeItem(item: CartItem): void {
     if (this.authService.currentUser()) {
       if (!item.id_carrito_producto) return;

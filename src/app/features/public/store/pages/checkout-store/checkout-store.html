@@ -16,21 +16,69 @@
               <div class="p-6">
                 <div class="space-y-5">
                   <div>
-                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Email *</label>
-                    <input type="email" [ngModel]="email()" (ngModelChange)="onEmailChange($event)" [disabled]="step1Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="cliente@ejemplo.com">
+                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
+                      Email *
+                    </label>
+                    <input type="email" [ngModel]="email()" (ngModelChange)="onEmailChange($event)" [disabled]="step1Completed()"
+                      class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
+                      placeholder="cliente@ejemplo.com">
                   </div>
+              
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                      <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Nombres *</label>
-                      <input type="text" [ngModel]="nombres()" (ngModelChange)="onNombresChange($event)" [disabled]="step1Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="Juan">
+                      <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
+                        Nombres *
+                      </label>
+                      <input type="text" [ngModel]="nombres()" (ngModelChange)="onNombresChange($event)" [disabled]="step1Completed()"
+                        class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
+                        placeholder="Juan">
                     </div>
+              
                     <div>
-                      <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Apellidos *</label>
-                      <input type="text" [ngModel]="apellidos()" (ngModelChange)="onApellidosChange($event)" [disabled]="step1Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="Pérez">
+                      <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
+                        Apellidos *
+                      </label>
+                      <input type="text" [ngModel]="apellidos()" (ngModelChange)="onApellidosChange($event)"
+                        [disabled]="step1Completed()"
+                        class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
+                        placeholder="Pérez">
                     </div>
                   </div>
+              
+                  <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                    <div class="md:col-span-1">
+                      <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
+                        DNI *
+                      </label>
+                      <input type="text" maxlength="8" [ngModel]="dni()" (ngModelChange)="onDniChange($event)"
+                        [disabled]="step1Completed()"
+                        class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
+                        placeholder="87654321">
+                    </div>
+              
+                    <div class="md:col-span-1">
+                      <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
+                        Teléfono *
+                      </label>
+                      <input type="tel" maxlength="9" [ngModel]="telefono()" (ngModelChange)="onTelefonoChange($event)"
+                        [disabled]="step1Completed()"
+                        class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
+                        placeholder="987654321">
+                    </div>
+                  </div>
+              
                   <div class="flex gap-3">
-                    <button (click)="completeStep1()" [disabled]="!email() || !nombres() || !apellidos() || !email().includes('@') || !email().includes('.') || step1Completed()" class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
+                    <button (click)="completeStep1()" [disabled]="
+                      !email() ||
+                      !nombres() ||
+                      !apellidos() ||
+                      !dni() ||
+                      !telefono() ||
+                      !email().includes('@') ||
+                      !email().includes('.') ||
+                      step1Completed()
+                    "
+                      class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
                       Continuar
                     </button>
                   </div>
@@ -58,57 +106,108 @@
 
                   @if (deliveryType() === 'home') {
                     <div class="space-y-4">
-                      <div class="grid grid-cols-1 gap-4">
+
+                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                           <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Departamento *</label>
-                          <select [ngModel]="departamento()" (ngModelChange)="departamento.set($event); onDepartamentoChange()" [disabled]="!step2Enabled() || step2Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
+                          <select
+                            [ngModel]="departamento()"
+                            (ngModelChange)="departamento.set($event); onDepartamentoChange()"
+                            [disabled]="!step2Enabled() || step2Completed()"
+                            class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
                             <option value="" disabled selected>Seleccionar departamento</option>
                             @for (dep of departamentos; track dep.id) {
                               <option [value]="dep.id">{{ dep.departamento }}</option>
                             }
                           </select>
                         </div>
+
                         <div>
                           <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Provincia *</label>
-                          <select [ngModel]="provincia()" (ngModelChange)="provincia.set($event); onProvinciaChange()" [disabled]="!step2Enabled() || step2Completed() || !departamento()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
+                          <select
+                            [ngModel]="provincia()"
+                            (ngModelChange)="provincia.set($event); onProvinciaChange()"
+                            [disabled]="!step2Enabled() || step2Completed() || !departamento()"
+                            class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
                             <option value="" disabled selected>Seleccionar provincia</option>
                             @for (prov of filteredProvincias; track prov.id) {
                               <option [value]="prov.id">{{ prov.provincia }}</option>
                             }
                           </select>
                         </div>
+
                         <div>
                           <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Distrito *</label>
-                          <select [ngModel]="distrito()" (ngModelChange)="onDistritoChange($event)" [disabled]="!step2Enabled() || step2Completed() || !provincia()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
+                          <select
+                            [ngModel]="distrito()"
+                            (ngModelChange)="onDistritoChange($event)"
+                            [disabled]="!step2Enabled() || step2Completed() || !provincia()"
+                            class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
                             <option value="" disabled selected>Seleccionar distrito</option>
                             @for (dist of filteredDistritos; track dist.id) {
                               <option [value]="dist.id">{{ dist.distrito }}</option>
                             }
                           </select>
                         </div>
-                        <div>
-                          <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Avenida / Calle / Jirón *</label>
-                          <input type="text" [ngModel]="direccion()" (ngModelChange)="onDireccionChange($event)" [disabled]="!step2Enabled() || step2Completed()" class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="Av. José Pardo">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                          <div>
-                            <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Número *</label>
-                            <input type="text" [ngModel]="numeroCasa()" (ngModelChange)="onNumeroCasaChange($event)" [disabled]="!step2Enabled() || step2Completed()" class="w-full px-3 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="123">
-                          </div>
-                          <div>
-                            <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Código Postal</label>
-                            <input type="text" [ngModel]="codigoPostal()" (ngModelChange)="onCodigoPostalChange($event)" [disabled]="!step2Enabled() || step2Completed()" class="w-full px-3 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm" placeholder="15001">
-                          </div>
-                        </div>
-                        <div class="flex gap-2">
-                          <button (click)="buscarEnMapa()" [disabled]="!step2Enabled() || step2Completed() || !direccion() || !departamento() || !provincia() || !distrito() || !numeroCasa()" class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed text-sm font-medium">
-                            Buscar en mapa
-                          </button>
-                        </div>
-                        @if (mapUrl()) {
-                          <iframe [src]="mapUrl()" width="100%" height="300" style="border:0" loading="lazy" allowfullscreen></iframe>
-                        }
                       </div>
+
+                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
+                            Avenida / Calle / Jirón *
+                          </label>
+                          <input
+                            type="text"
+                            [ngModel]="direccion()"
+                            (ngModelChange)="onDireccionChange($event)"
+                            [disabled]="!step2Enabled() || step2Completed()"
+                            class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
+                            placeholder="Av. José Pardo">
+                        </div>
+
+                        <div>
+                          <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Número *</label>
+                          <input
+                            type="text"
+                            [ngModel]="numeroCasa()"
+                            (ngModelChange)="onNumeroCasaChange($event)"
+                            [disabled]="!step2Enabled() || step2Completed()"
+                            class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
+                            placeholder="123">
+                        </div>
+
+                        <div>
+                          <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Código Postal</label>
+                          <input
+                            type="text"
+                            [ngModel]="codigoPostal()"
+                            (ngModelChange)="onCodigoPostalChange($event)"
+                            [disabled]="!step2Enabled() || step2Completed()"
+                            class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
+                            placeholder="15001">
+                        </div>
+                      </div>
+
+                      <div class="flex gap-2">
+                        <button
+                          (click)="buscarEnMapa()"
+                          [disabled]="!step2Enabled() || step2Completed() || !direccion() || !departamento() || !provincia() || !distrito() || !numeroCasa()"
+                          class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed text-sm font-medium">
+                          Buscar en mapa
+                        </button>
+                      </div>
+
+                      @if (mapUrl()) {
+                        <iframe
+                          [src]="mapUrl()"
+                          width="100%"
+                          height="300"
+                          style="border:0"
+                          loading="lazy"
+                          allowfullscreen>
+                        </iframe>
+                      }
+
                     </div>
                   }
 
@@ -133,71 +232,6 @@
               </div>
             </div>
 
-            <div class="border border-gray-200 bg-white">
-              <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 flex items-center justify-center text-sm font-medium" [class.bg-[#0e0d12]]="step3Enabled()" [class.text-white]="step3Enabled()" [class.bg-gray-200]="!step3Enabled()" [class.text-gray-500]="!step3Enabled()">3</div>
-                  <span class="font-medium" [class.text-[#0e0d12]]="step3Enabled()" [class.text-gray-400]="!step3Enabled()">Método de pago</span>
-                </div>
-              </div>
-              <div class="p-6">
-                <div class="space-y-4">
-
-                  <div (click)="step3Enabled() && !step3Completed() ? paymentMethod.set('yape') : null"
-                    [class.border-[#0e0d12]]="paymentMethod() === 'yape' && step3Enabled()"
-                    class="border border-gray-200 p-4 cursor-pointer transition-all"
-                    [class.pointer-events-none]="!step3Enabled() || step3Completed()">
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center gap-3">
-                        <img [src]="yapeIcon" alt="Yape" class="w-10 h-10 object-contain rounded-lg">
-                        <div>
-                          <p class="font-medium text-[#0e0d12] text-sm">Yape</p>
-                          <p class="text-xs text-[#0e0d12]/50">Paga con Yape escaneando el código QR</p>
-                        </div>
-                      </div>
-                      <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
-                        [class.border-[#0e0d12]]="paymentMethod() === 'yape'"
-                        [class.border-gray-300]="paymentMethod() !== 'yape'">
-                        @if (paymentMethod() === 'yape') {
-                          <div class="w-2.5 h-2.5 rounded-full bg-[#0e0d12]"></div>
-                        }
-                      </div>
-                    </div>
-                  </div>
-
-                  <div (click)="step3Enabled() && !step3Completed() ? paymentMethod.set('pagoefectivo') : null"
-                    [class.border-[#0e0d12]]="paymentMethod() === 'pagoefectivo' && step3Enabled()"
-                    class="border border-gray-200 p-4 cursor-pointer transition-all"
-                    [class.pointer-events-none]="!step3Enabled() || step3Completed()">
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center gap-3">
-                        <img [src]="pagoEfectivoIcon" alt="PagoEfectivo" class="w-10 h-10 object-contain rounded-lg">
-                        <div>
-                          <p class="font-medium text-[#0e0d12] text-sm">PagoEfectivo</p>
-                          <p class="text-xs text-[#0e0d12]/50">Paga con código QR o referencia</p>
-                        </div>
-                      </div>
-                      <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
-                        [class.border-[#0e0d12]]="paymentMethod() === 'pagoefectivo'"
-                        [class.border-gray-300]="paymentMethod() !== 'pagoefectivo'">
-                        @if (paymentMethod() === 'pagoefectivo') {
-                          <div class="w-2.5 h-2.5 rounded-full bg-[#0e0d12]"></div>
-                        }
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="flex gap-3">
-                    <button (click)="goBackToStep2()" [disabled]="!step3Enabled() || step3Completed()" class="px-6 py-2 border border-gray-300 text-[#0e0d12] hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium">
-                      Regresar
-                    </button>
-                    <button (click)="completeStep3()" [disabled]="!step3Enabled() || step3Completed() || !paymentMethod()" class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
-                      Continuar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -263,7 +297,7 @@
                     <div class="flex justify-between items-center text-sm">
                       <span class="text-[#0e0d12]/70">Descuento</span>
                       <div class="flex items-center gap-3">
-                        <span class="text-[#0e0d12] font-medium">-S/ {{ discountAmount.toFixed(2) }}</span>
+                        <span class="text-[#0e0d12] font-medium">-S/ {{ discountAmount().toFixed(2) }}</span>
                         <button (click)="removeCoupon()" class="text-xs text-red-500 hover:text-red-600 transition">Quitar</button>
                       </div>
                     </div>
@@ -280,9 +314,9 @@
               </div>
 
               <button (click)="handleReservar()"
-                [disabled]="!step1Completed() || !step2Completed() || !step3Completed()"
+                [disabled]="!step1Completed() || !step2Completed()"
                 class="w-full py-2.5 bg-[#0e0d12] text-white font-medium hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm">
-                RESERVAR
+                PAGAR
               </button>
               <button (click)="goBackToStore()" class="w-full mt-3 py-2.5 border border-gray-300 text-[#0e0d12] font-medium hover:bg-gray-50 transition text-sm">
                 REGRESAR A LA TIENDA
