@@ -16,9 +16,18 @@
     @if (carrito()) {
       <div class="inline-flex items-center px-4 py-2 bg-admin-pink-light bg-opacity-30 border border-admin-pink-light rounded-xl">
         <span class="text-xs font-bold text-admin-brown uppercase tracking-widest mr-3">Estado:</span>
-        <span class="px-2.5 py-1 text-xs font-bold uppercase tracking-tight border border-gray-200 bg-white text-[#0e0d12]/70">
-          {{ getStatusText(carrito()!.estado) }}
-        </span>
+        <select 
+          [value]="carrito()!.estado" 
+          (change)="updateStatus($event)"
+          class="px-2.5 py-1 text-xs font-bold uppercase tracking-tight border border-gray-200 bg-white text-[#0e0d12]/70 focus:outline-none focus:ring-1 focus:ring-admin-pink rounded"
+        >
+          <option value="E">En espera</option>
+          <option value="P">Pagado</option>
+          <option value="R">Revisado</option>
+          <option value="A">Alistado</option>
+          <option value="S">Enviado o listo para recoger</option>
+          <option value="C">Completado</option>
+        </select>
       </div>
     }
   </div>

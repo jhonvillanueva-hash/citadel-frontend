@@ -25,7 +25,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { UsuarioService } from '../../../../../data/services/usuario.service';
 import { AuthService } from '../../../../../core/services/auth.service';
-import { Usuario, Vino, Precio } from '../../../../../data/models/api.models';
+import { Usuario, Vino, Precio, HistorialPedido } from '../../../../../data/models/api.models';
 import { RouterLink } from "@angular/router";
 import { CarritoService } from '../../../../../data/services/cart.service';
 import { CarritoProductoService } from '../../../../../data/services/carrito-producto.service';
@@ -50,10 +50,12 @@ interface Order {
   shippingFee: number;
   discount: number;
   couponCode?: string;
-  status: 'E' | 'V';
+  status: 'E' | 'R' | 'P' | 'S' | 'C' | 'A';
   type: 'D' | 'T';
   products: OrderProduct[];
   isExpanded?: boolean;
+  history?: HistorialPedido[];
+  isLoadingHistory?: boolean;
 }
 
 interface UserProfile {
@@ -464,7 +466,7 @@ export class ProfileStore implements OnInit {
       finalize(() => this.isLoadingOrders.set(false))
     ).subscribe({
       next: ({ carritos, vinos, precios }) => {
-        const vendidos = carritos.filter(c => c.estado === 'V');
+        const vendidos = carritos.filter(c => ['E', 'R', 'P', 'S', 'C', 'A'].includes(c.estado));
 
         if (vendidos.length === 0) {
           return;
@@ -551,16 +553,65 @@ export class ProfileStore implements OnInit {
 
   toggleOrderExpansion(orderId: string): void {
     this.ordersSignal.update(orders =>
-      orders.map(o => o.id === orderId ? { ...o, isExpanded: !o.isExpanded } : o)
+      orders.map(o => {
+        if (o.id === orderId) {
+          const newState = !o.isExpanded;
+          if (newState && !o.history) {
+            this.loadOrderHistory(o.id);
+          }
+          return { ...o, isExpanded: newState };
+        }
+        return o;
+      })
     );
+  }
+
+  loadOrderHistory(orderId: string): void {
+    this.ordersSignal.update(orders =>
+      orders.map(o => o.id === orderId ? { ...o, isLoadingHistory: true } : o)
+    );
+
+    this.carritoService.getHistory(Number(orderId)).subscribe({
+      next: (history: any[]) => {
+        this.ordersSignal.update(orders =>
+          orders.map(o => o.id === orderId ? { 
+            ...o, 
+            history: history.sort((a: { fecha_cambio: string | number | Date; }, b: { fecha_cambio: string | number | Date; }) => new Date(a.fecha_cambio).getTime() - new Date(b.fecha_cambio).getTime()), 
+            isLoadingHistory: false 
+          } : o)
+        );
+      },
+      error: (err: any) => {
+        console.error('Error loading history:', err);
+        this.ordersSignal.update(orders =>
+          orders.map(o => o.id === orderId ? { ...o, isLoadingHistory: false } : o)
+        );
+      }
+    });
   }
 
   getStatusText(status: string): string {
     const texts: Record<string, string> = {
-      V: 'Vendido',
-      E: 'En espera'
+      E: 'En espera',
+      P: 'Pagado',
+      R: 'Revisado',
+      A: 'Alistado',
+      S: 'Enviado o listo para recoger',
+      C: 'Completado',
     };
     return texts[status] || status;
+  }
+
+  getStatusDescription(status: string): string {
+    const descriptions: Record<string, string> = {
+      E: 'Los productos de tu carrito pasaron a un pedido oficial.',
+      P: 'Tu pedido fue pagado exitósamente.',
+      R: 'Tu pedido fue revisado por la tienda',
+      A: 'Tu pedido ya está listo.',
+      S: 'Tu pedido fue enviado o está listo para recoger en tienda.',
+      C: 'Pedido completado exitosamente.',
+    };
+    return descriptions[status] || status;
   }
 
   logout(): void {

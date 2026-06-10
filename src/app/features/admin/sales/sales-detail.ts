@@ -151,10 +151,29 @@ export class SalesDetailComponent implements OnInit {
 
   getStatusText(status: string): string {
     const texts: Record<string, string> = {
-      V: 'Vendido',
-      E: 'En espera'
+      E: 'En espera',
+      R: 'Revisado',
+      P: 'Preparado',
+      S: 'Enviado o listo para recoger',
+      C: 'Completado',
     };
     return texts[status] || status;
+  }
+
+  updateStatus(event: any) {
+    const newStatus = event.target.value as any;
+    const id = this.saleId();
+    if (!id) return;
+
+    this.cartService.patch(id, { estado: newStatus }).subscribe({
+      next: (updated) => {
+        this.carrito.set(updated);
+        this.toastService.showSuccess('Estado actualizado correctamente');
+      },
+      error: (err) => {
+        this.toastService.showError('Error al actualizar el estado', err);
+      }
+    });
   }
 }
 

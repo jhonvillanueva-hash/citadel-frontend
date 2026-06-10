@@ -182,7 +182,6 @@ export class CheckoutStore implements OnInit {
         declineCode === 'insufficient_funds'
           ? 'La tarjeta no tiene saldo suficiente.'
           : userMessage || merchantMessage || 'Pago rechazado.';
-      console.log(message);
 
       this.toastService.show(
         'error',

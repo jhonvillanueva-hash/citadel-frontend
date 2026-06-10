@@ -33,7 +33,7 @@ interface Sale {
   subtotal: number;
   shippingFee: number;
   discount: number;
-  status: 'E' | 'V';
+  status: 'E' | 'R' | 'P' | 'S' | 'C' | 'A';
   type: 'D' | 'T';
   itemsCount: number;
 }
@@ -130,10 +130,6 @@ export class SalesListComponent implements OnInit {
       cupones: this.couponService.getAll().pipe(take(1))
     }).subscribe({
       next: ({ carritos, usuarios, cupones }) => {
-        console.log('=== RESULTADO FORKJOIN ===');
-    console.log('Carritos:', carritos);
-    console.log('Usuarios:', usuarios);
-    console.log('Cupones:', cupones);
         const vendidos = carritos.filter(c => c.estado !== 'E');
         
         if (vendidos.length === 0) {
@@ -255,8 +251,12 @@ export class SalesListComponent implements OnInit {
 
   getStatusText(status: string): string {
     const texts: Record<string, string> = {
-      V: 'Vendido',
-      E: 'En espera'
+      E: 'En espera',
+      P: 'Pagado',
+      R: 'Revisado',
+      A: 'Alistado',
+      S: 'Enviado o listo para recoger',
+      C: 'Completado',
     };
     return texts[status] || status;
   }

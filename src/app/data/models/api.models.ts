@@ -23,11 +23,19 @@ export interface Usuario {
 export interface Carrito {
   id_carrito: number;
   id_usuario: number;
-  estado: 'E' | 'V';
+  estado: 'E' | 'P' | 'R' | 'A' | 'S' | 'C';
   fecha_pedido: Date;
   fecha_compra: Date;
   tipo: 'D' | 'T';
   id_cupon?: number | null;
+}
+
+export interface HistorialPedido {
+  id: number;
+  id_carrito: number;
+  estado: 'E' | 'P' | 'R' | 'A' | 'S' | 'C';
+  fecha: string;
+  observaciones?: string;
 }
 
 export interface CarritoProducto {
