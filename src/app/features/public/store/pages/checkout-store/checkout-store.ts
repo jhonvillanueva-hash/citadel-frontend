@@ -362,7 +362,7 @@ export class CheckoutStore implements OnInit {
   }
 
   goBackToStore(): void {
-    this.router.navigate(['/store']);
+    this.router.navigate(['/']);
   }
 
   onEmailChange(value: string): void {
@@ -449,7 +449,16 @@ export class CheckoutStore implements OnInit {
           this.couponCode.set('');
           this.couponError.set('');
           this.appliedCoupon.set(cupon);
-          this.cartService.setCoupon(cupon.id_cupon);
+          this.cartService.setCoupon(cupon.id_cupon)
+            .subscribe({
+              next: () => {
+                // éxito
+              },
+              error: (err) => {
+                this.toastService.showWarning(err.error?.message ??
+                  'Ya has usado este cupón anteriormente.');
+              }
+            });
         },
         error: () => {
           this.couponError.set('Error al validar el cupón. Intente nuevamente.');

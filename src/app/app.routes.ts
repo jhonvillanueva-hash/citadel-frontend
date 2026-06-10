@@ -21,8 +21,20 @@ import { RefundPolicyComponent } from './features/public/legal/refund-policy/ref
 export const routes: Routes = [
   {
     path: '',
+    component: Store,
+    data: { showHeader: true, showFooter: true },
+    canActivate: [storeGuard],
+    title: 'Tienda Citadel',
+  },
+  {
+    path: 'nosotros',
     component: Landing,
-    title: 'Citadel',
+    title: 'Vinos Citadel | Sobre Nosotros',
+  },
+  {
+    path: 'store',
+    redirectTo: '',
+    pathMatch: 'full'
   },
   {
     path: 'libro-de-reclamaciones',
@@ -58,13 +70,6 @@ export const routes: Routes = [
     component: RegisterComponent,
     canActivate: [publicGuard],
     title: 'Registrarse',
-  },
-  {
-    path: 'store',
-    component: Store,
-    data: { showHeader: true, showFooter: true },
-    canActivate: [storeGuard],
-    title: 'Tienda Citadel',
   },
   {
     path: 'store/profile',

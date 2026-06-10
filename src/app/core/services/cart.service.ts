@@ -2,7 +2,7 @@ import {
   Injectable, signal, computed, effect, inject, PLATFORM_ID
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { switchMap, of, tap, catchError, forkJoin } from 'rxjs';
+import { switchMap, of, tap, catchError, forkJoin, finalize, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 import { CarritoService as ApiCarritoService } from '../../data/services/cart.service';
 import { CarritoProductoService } from '../../data/services/carrito-producto.service';
@@ -167,21 +167,16 @@ export class CartService {
     setTimeout(() => this._setUpdating(item.id_vino, false), 400);
   }
 
-  setCoupon(id_cupon: number | null): void {
+  setCoupon(id_cupon: number | null) {
     const carrito = this._carritoActivo();
-    if (!carrito) return;
+    if (!carrito) return throwError(() => new Error('No hay carrito'));
 
     this.isLoading.set(true);
-    this.apiCarrito.patch(carrito.id_carrito, { id_cupon } as any).pipe(
-      tap(() => {
-        this._loadFromApi();
-      }),
-      catchError(err => {
-        console.error('setCoupon', err);
-        this.isLoading.set(false);
-        return of(null);
-      })
-    ).subscribe();
+
+    return this.apiCarrito.patch(carrito.id_carrito, { id_cupon }).pipe(
+      tap(() => this._loadFromApi()),
+      finalize(() => this.isLoading.set(false))
+    );
   }
 
   setDeliveryType(tipo: 'D' | 'T'): void {

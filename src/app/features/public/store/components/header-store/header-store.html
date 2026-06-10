@@ -2,7 +2,7 @@
 
   <div class="flex items-center gap-4 px-4 lg:px-10 h-[60px] lg:h-[70px] bg-[#202125]">
 
-    <a routerLink="/store" class="shrink-0">
+    <a routerLink="/nosotros" class="shrink-0">
       <img src="/img/logo.png" alt="Logo" class="h-8">
     </a>
 
@@ -94,7 +94,7 @@
   @if (isMobileMenuOpen()) {
     <div class="fixed inset-0 bg-[#202125] z-[100] flex flex-col lg:hidden">
       <div class="flex items-center justify-between p-4 border-b border-white/20">
-        <a routerLink="/store" (click)="closeMobileMenu()">
+        <a routerLink="/" (click)="closeMobileMenu()">
           <img src="/img/logo.png" alt="Logo" class="h-8">
         </a>
         <button (click)="toggleMobileMenu()" class="text-white text-2xl hover:text-[#c35b64] transition">

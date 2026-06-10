@@ -88,7 +88,7 @@ export class HeaderStore implements OnInit {
     const url = this.currentUrl();
 
     if (nav.name === 'Todos') {
-      return url === '/store' || url.includes('/store/products/flavors/todos');
+      return url === '/' || url.includes('/store/products/flavors/todos');
     }
 
     if (nav.id) {

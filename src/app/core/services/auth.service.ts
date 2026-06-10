@@ -133,7 +133,7 @@ export class AuthService {
   getRedirectUrl(): string {
     const user = this._currentUser();
     if (!user) return '/login';
-    return user.tipo === 'A' ? '/admin' : '/store';
+    return user.tipo === 'A' ? '/admin' : '/';
   }
 
   loginWithGoogle(idToken: string): Observable<LoginResponse> {
@@ -162,7 +162,7 @@ export class AuthService {
     if (this.isBrowser()) {
       localStorage.removeItem(this.LOGGED_IN_KEY);
     }
-    this.router.navigate(['/store']);
+    this.router.navigate(['/']);
   }
 
   setUser(user: User): void {
