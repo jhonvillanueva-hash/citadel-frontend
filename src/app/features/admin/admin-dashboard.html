@@ -79,17 +79,21 @@
             (linkClicked)="sidebarOpen = false">
           </app-admin-sidebar-item>
 
-          <app-admin-sidebar-item
+           <app-admin-sidebar-item
             [icon]="icons.faUser"
             label="Usuarios"
-            title="Menú de Usuarios"
+            route="/admin/users"
+            title="Lista de usuarios"
             [sidebarOpen]="sidebarOpen"
-            [children]="[
-              { label:'Ver usuarios', route:'/admin/users', title:'Listado de usuarios' },
-              { label:'Roles y permisos', route:'/admin/roles', title:'Gestión de roles' }
-            ]"
-            menuKey="usuarios"
-            [(expandedMenu)]="expandedMenu"
+            (linkClicked)="sidebarOpen = false">
+          </app-admin-sidebar-item>
+
+          <app-admin-sidebar-item
+            [icon]="icons.faShoppingCart"
+            label="Ventas"
+            route="/admin/sales"
+            title="Lista de pedidos"
+            [sidebarOpen]="sidebarOpen"
             (linkClicked)="sidebarOpen = false">
           </app-admin-sidebar-item>
 
@@ -164,9 +168,9 @@
               class="text-base transition-all duration-200"/>
           </button>
           <div class="h-5 w-px bg-[var(--admin-bg-light)]"></div>
-          <h1 class="text-sm font-semibold text-[color:var(--admin-bg-icon)]">
+          <h2 class="text-sm font-semibold text-[color:var(--admin-bg-icon)]">
             Panel de Administración
-          </h1>
+          </h2>
           <div class="flex-1"></div>
           <div class="flex items-center gap-2 bg-[var(--admin-bg)] rounded-full px-3 py-1.5">
             <span class="w-6 h-6 rounded-full bg-[var(--admin-bg-icon)] flex items-center justify-center shrink-0">

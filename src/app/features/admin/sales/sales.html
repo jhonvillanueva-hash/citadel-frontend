@@ -2,11 +2,12 @@
   <!-- Header -->
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
-      <h2 class="text-2xl font-bold text-admin-brown tracking-tight">Gestión de Usuarios</h2>
-      <p class="text-admin-brown-light text-sm">Administre y consulte la información de los usuarios registrados.</p>
+      <h2 class="text-2xl font-bold text-admin-brown tracking-tight">Gestión de Ventas</h2>
+      <p class="text-admin-brown-light text-sm">Consulte y administre el historial de pedidos realizados en la tienda.</p>
     </div>
   </div>
 
+  <!-- Filters Section -->
   <div class="bg-white rounded-2xl shadow-sm border border-admin-pink-light p-5">
     <div class="flex flex-col md:flex-row gap-4 items-end">
       <div class="w-full md:w-48">
@@ -17,13 +18,10 @@
             class="w-full bg-admin-pink-light bg-opacity-20 border border-admin-pink-light rounded-xl px-4 py-2.5 text-admin-brown text-sm focus:outline-none focus:ring-2 focus:ring-admin-pink transition-all appearance-none"
           >
             <option value="all">Todos los campos</option>
-            <option value="id_usuario">ID Usuario</option>
-            <option value="nombres">Nombres</option>
-            <option value="apellidos">Apellidos</option>
-            <option value="dni">DNI</option>
-            <option value="email">Email</option>
-            <option value="telefono">Teléfono</option>
-            <option value="ciudad">Ciudad</option>
+            <option value="id">ID Pedido</option>
+            <option value="customerName">Cliente</option>
+            <option value="customerEmail">Email</option>
+            <option value="date">Fecha</option>
           </select>
           <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-admin-pink">
             <fa-icon [icon]="icons.faFilter" class="text-xs" />
@@ -66,92 +64,76 @@
     </div>
   </div>
 
+  <!-- Table Section -->
   <div class="bg-white rounded-2xl shadow-sm border border-admin-pink-light overflow-hidden">
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <thead>
           <tr class="bg-admin-pink-light bg-opacity-30 border-b border-admin-pink-light">
-            <th class="px-6 py-4 text-xs font-bold text-admin-brown uppercase tracking-widest">ID</th>
-            <th class="px-6 py-4 text-xs font-bold text-admin-brown uppercase tracking-widest">Usuario</th>
-            <th class="px-6 py-4 text-xs font-bold text-admin-brown uppercase tracking-widest">DNI</th>
-            <th class="px-6 py-4 text-xs font-bold text-admin-brown uppercase tracking-widest">Contacto</th>
-            <th class="px-6 py-4 text-xs font-bold text-admin-brown uppercase tracking-widest">Ubicación</th>
-            <th class="px-6 py-4 text-xs font-bold text-admin-brown uppercase tracking-widest text-center">Registro</th>
+            <th class="px-6 py-4 text-xs font-bold text-admin-brown uppercase tracking-widest">ID Pedido</th>
+            <th class="px-6 py-4 text-xs font-bold text-admin-brown uppercase tracking-widest">Cliente</th>
+            <th class="px-6 py-4 text-xs font-bold text-admin-brown uppercase tracking-widest text-center">Fecha</th>
+            <th class="px-6 py-4 text-xs font-bold text-admin-brown uppercase tracking-widest text-center">Tipo</th>
+            <th class="px-6 py-4 text-xs font-bold text-admin-brown uppercase tracking-widest text-right">Total</th>
+            <th class="px-6 py-4 text-xs font-bold text-admin-brown uppercase tracking-widest text-center">Estado</th>
+            <th class="px-6 py-4 text-xs font-bold text-admin-brown uppercase tracking-widest text-center">Detalle</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-admin-pink-light divide-opacity-30">
           @if (isLoading()) {
             <tr>
-              <td colspan="6" class="px-6 py-20 text-center">
+              <td colspan="7" class="px-6 py-20 text-center">
                 <div class="flex flex-col items-center justify-center">
                   <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-admin-pink"></div>
-                  <p class="mt-4 text-admin-brown-light font-medium">Cargando usuarios...</p>
+                  <p class="mt-4 text-admin-brown-light font-medium">Cargando ventas...</p>
                 </div>
               </td>
             </tr>
-          } @else if (paginatedUsers().length === 0) {
+          } @else if (paginatedSales().length === 0) {
             <tr>
-              <td colspan="6" class="px-6 py-20 text-center">
-                <fa-icon [icon]="icons.faUser" class="text-5xl text-admin-pink-light mb-4 block" />
-                <p class="text-admin-brown-light font-medium">No se encontraron usuarios que coincidan con la búsqueda.</p>
+              <td colspan="7" class="px-6 py-20 text-center">
+                <fa-icon [icon]="icons.faMoneyBillWave" class="text-5xl text-admin-pink-light mb-4 block" />
+                <p class="text-admin-brown-light font-medium">No se encontraron ventas que coincidan con la búsqueda.</p>
               </td>
             </tr>
           } @else {
-            @for (usuario of paginatedUsers(); track usuario.id_usuario) {
+            @for (sale of paginatedSales(); track sale.id) {
               <tr class="hover:bg-admin-pink-light hover:bg-opacity-10 transition-colors group">
                 <td class="px-6 py-4">
-                  <span class="text-sm font-bold text-admin-pink">#{{ usuario.id_usuario }}</span>
+                  <span class="text-sm font-bold text-admin-pink">#{{ sale.id }}</span>
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-admin-pink-light flex items-center justify-center text-admin-pink-dark overflow-hidden">
-                      @if (usuario.url_img) {
-                        <img [src]="usuario.url_img" class="w-full h-full object-cover">
-                      } @else {
-                        <fa-icon [icon]="icons.faUser" />
-                      }
+                    <div class="w-8 h-8 rounded-full bg-admin-pink-light flex items-center justify-center text-admin-pink-dark">
+                      <fa-icon [icon]="icons.faUser" class="text-xs" />
                     </div>
                     <div>
-                      <p class="text-sm font-bold text-admin-brown">{{ formatValue(usuario.nombres) }} {{ formatValue(usuario.apellidos) }}</p>
-                      <p class="text-xs text-admin-brown-light flex items-center gap-1">
-                        <fa-icon [icon]="icons.faEnvelope" class="text-[10px] text-admin-pink" />
-                        {{ formatValue(usuario.email) }}
-                      </p>
+                      <p class="text-sm font-bold text-admin-brown">{{ sale.customerName }}</p>
+                      <p class="text-[11px] text-admin-brown-light">{{ sale.customerEmail }}</p>
                     </div>
                   </div>
                 </td>
-                <td class="px-6 py-4">
-                  <div class="flex items-center gap-2 text-sm text-admin-brown font-medium">
-                    <fa-icon [icon]="icons.faIdCard" class="text-admin-pink opacity-50" />
-                    {{ formatValue(usuario.dni) }}
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="flex items-center gap-2 text-sm text-admin-brown font-medium">
-                    <fa-icon [icon]="icons.faPhone" class="text-admin-pink opacity-50" />
-                    {{ formatValue(usuario.telefono) }}
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="space-y-1">
-                    <p class="text-sm text-admin-brown flex items-center gap-2">
-                      <fa-icon [icon]="icons.faMapMarkerAlt" class="text-admin-pink opacity-50" />
-                      {{ formatValue(usuario.ciudad) }}
-                    </p>
-                    <p class="text-[11px] text-admin-brown-light pl-5 line-clamp-1" [title]="usuario.direccion">
-                      {{ usuario.direccion || 'Sin dirección' }}
-                    </p>
-                  </div>
+                <td class="px-6 py-4 text-center text-sm text-admin-brown">
+                  {{ sale.date }}
                 </td>
                 <td class="px-6 py-4 text-center">
-                  <div class="inline-flex flex-col items-center px-3 py-1 bg-gray-50 rounded-lg border border-gray-100">
-                    <span class="text-[11px] font-bold text-admin-brown tracking-tight">
-                      {{ usuario.fecha_creacion ? (usuario.fecha_creacion | date:'dd/MM/yyyy') : 'No establecido' }}
-                    </span>
-                    <span class="text-[10px] text-admin-brown-light">
-                      {{ usuario.fecha_creacion ? (usuario.fecha_creacion | date:'shortTime') : '' }}
-                    </span>
+                  <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-100 text-[#0e0d12]/60" [title]="sale.type === 'D' ? 'Delivery' : 'Recojo en tienda'">
+                    <fa-icon [icon]="sale.type === 'D' ? icons.faTruck : icons.faStore" class="text-[10px]"></fa-icon>
+                    <span class="text-[9px] font-bold uppercase tracking-tight">{{ sale.type === 'D' ? 'D' : 'T' }}</span>
                   </div>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <span class="text-sm font-black text-admin-brown">S/ {{ sale.total.toFixed(2) }}</span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-tight border border-gray-200 bg-gray-50 text-[#0e0d12]/70">
+                    {{ getStatusText(sale.status) }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <a [routerLink]="['/admin/sales', sale.id]" class="p-2 text-admin-brown-light hover:text-admin-pink hover:bg-admin-pink-light hover:bg-opacity-20 rounded-lg transition-colors inline-flex items-center justify-center">
+                    <fa-icon [icon]="icons.faEye" />
+                  </a>
                 </td>
               </tr>
             }
@@ -160,9 +142,10 @@
       </table>
     </div>
 
+    <!-- Pagination Footer -->
     <div class="bg-gray-50 px-6 py-4 border-t border-admin-pink-light flex flex-col sm:flex-row justify-between items-center gap-4">
       <p class="text-xs font-medium text-admin-brown-light">
-        Mostrando <span class="font-bold text-admin-brown">{{ paginatedUsers().length }}</span> de <span class="font-bold text-admin-brown">{{ filteredUsers().length }}</span> usuarios
+        Mostrando <span class="font-bold text-admin-brown">{{ paginatedSales().length }}</span> de <span class="font-bold text-admin-brown">{{ filteredSales().length }}</span> ventas
       </p>
 
       <div class="flex items-center gap-2">

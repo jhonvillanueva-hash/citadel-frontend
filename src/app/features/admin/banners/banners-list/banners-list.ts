@@ -49,9 +49,7 @@ export class BannersListComponent implements OnInit {
       ].join('-');
 
       this.editedDate.set(localDate);
-    } else {
-      console.log(this.minDate);
-      
+    } else {      
       this.editedDate.set(this.minDate);
     }
   }

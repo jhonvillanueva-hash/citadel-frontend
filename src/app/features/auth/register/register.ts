@@ -4,6 +4,8 @@ import { AuthService } from '../../../core/services/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule, isPlatformServer } from '@angular/common';
 import { environment } from '../../../../environments/environment';
+import { UsuarioLoggedService } from '../../../data/services/usuarioLogged.service';
+import { switchMap, finalize } from 'rxjs';
 
 declare const google: any;
 
@@ -18,6 +20,7 @@ export class RegisterComponent implements AfterViewInit {
   public authService = inject(AuthService);
   currentUser = this.authService.currentUser;
   private router = inject(Router);
+  private usuarioLoggedService = inject(UsuarioLoggedService);
   errorMessage = signal<string | null>(null);
   isLoading = signal(false);
   private platformId = inject(PLATFORM_ID);
@@ -60,28 +63,22 @@ export class RegisterComponent implements AfterViewInit {
     }
 
     this.isLoading.set(true);
-    this.authService.register(this.registerForm.getRawValue()).subscribe({
-      next: () => {
+    this.authService.register(this.registerForm.getRawValue()).pipe(
+      switchMap(() => {
         const formValue = this.registerForm.getRawValue();
         const email = formValue.email || '';
         const hash_contrasena = formValue.hash_contrasena || '';
-        this.authService.login({ email, contrasena: hash_contrasena }).subscribe({
-          next: () => {
-            const url = this.authService.getRedirectUrl();
-            this.router.navigate([url]);
-          },
-          error: () => {
-            this.isLoading.set(false);
-            this.errorMessage.set('Registro exitoso, pero no se pudo iniciar sesión automáticamente. Inicia sesión manualmente.');
-          },
-          complete: () => {
-            this.isLoading.set(false);
-          }
-        });
+        return this.authService.login({ email, contrasena: hash_contrasena });
+      }),
+      switchMap(() => this.usuarioLoggedService.loadProfile()),
+      finalize(() => this.isLoading.set(false))
+    ).subscribe({
+      next: () => {
+        const url = this.authService.getRedirectUrl();
+        this.router.navigate([url]);
       },
       error: () => {
-        this.isLoading.set(false);
-        this.errorMessage.set('Error al registrar usuario.');
+        this.errorMessage.set('Error en el proceso de registro o inicio de sesión.');
       }
     });
   }
@@ -116,20 +113,21 @@ export class RegisterComponent implements AfterViewInit {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.authService.loginWithGoogle(idToken).subscribe({
-      next: () => {
-        const url = this.authService.getRedirectUrl();
-        this.router.navigate([url]);
-      },
-      error: (err) => {
-        this.isLoading.set(false);
-        this.errorMessage.set('Error con Google login');
-        console.error(err);
-      },
-      complete: () => {
-        this.isLoading.set(false);
-      }
-    });
+    this.authService.loginWithGoogle(idToken)
+      .pipe(
+        switchMap(() => this.usuarioLoggedService.loadProfile()),
+        finalize(() => this.isLoading.set(false))
+      )
+      .subscribe({
+        next: () => {
+          const url = this.authService.getRedirectUrl();
+          this.router.navigate([url]);
+        },
+        error: (err) => {
+          this.errorMessage.set('Error con Google login');
+          console.error(err);
+        }
+      });
   }
 
   handleCredentialResponse(response: any) {

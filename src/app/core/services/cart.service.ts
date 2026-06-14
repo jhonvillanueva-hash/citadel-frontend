@@ -2,7 +2,7 @@ import {
   Injectable, signal, computed, effect, inject, PLATFORM_ID
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { switchMap, of, tap, catchError, forkJoin } from 'rxjs';
+import { switchMap, of, tap, catchError, forkJoin, finalize, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 import { CarritoService as ApiCarritoService } from '../../data/services/cart.service';
 import { CarritoProductoService } from '../../data/services/carrito-producto.service';
@@ -165,6 +165,38 @@ export class CartService {
 
     this._updateLocalQuantity(item.id_vino, newQty, item.stock);
     setTimeout(() => this._setUpdating(item.id_vino, false), 400);
+  }
+
+  setCoupon(id_cupon: number | null) {
+    const carrito = this._carritoActivo();
+    if (!carrito) return throwError(() => new Error('No hay carrito'));
+
+    this.isLoading.set(true);
+
+    return this.apiCarrito.patch(carrito.id_carrito, { id_cupon }).pipe(
+      tap(() => this._loadFromApi()),
+      finalize(() => this.isLoading.set(false))
+    );
+  }
+
+  setDeliveryType(tipo: 'D' | 'T'): void {
+    const carrito = this._carritoActivo();
+    if (!carrito) return;
+
+    // Solo actualizar si el tipo es diferente para evitar peticiones innecesarias
+    if (carrito.tipo === tipo) return;
+
+    this.isLoading.set(true);
+    this.apiCarrito.patch(carrito.id_carrito, { tipo } as any).pipe(
+      tap(() => {
+        this._loadFromApi();
+      }),
+      catchError(err => {
+        console.error('setDeliveryType', err);
+        this.isLoading.set(false);
+        return of(null);
+      })
+    ).subscribe();
   }
 
   removeItem(item: CartItem): void {

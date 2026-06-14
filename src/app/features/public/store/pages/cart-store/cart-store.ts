@@ -98,6 +98,6 @@ export class CartStore {
   }
 
   volverATienda(): void {
-    this.router.navigate(['/store']);
+    this.router.navigate(['/']);
   }
 }

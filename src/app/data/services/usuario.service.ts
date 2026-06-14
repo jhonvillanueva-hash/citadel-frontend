@@ -24,4 +24,11 @@ export class UsuarioService extends BaseHttpService<Usuario> {
       }
     );
   }
+
+  getProfile(): Observable<Usuario> {
+    return this.http.get<Usuario>(
+      `${this.fullUrl}/perfil`,
+      { withCredentials: true }
+    );
+  }
 }

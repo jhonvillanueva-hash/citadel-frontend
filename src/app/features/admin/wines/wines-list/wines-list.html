@@ -29,7 +29,7 @@
           </p>
         </div>
 
-        <div class="border-t pt-3 grid grid-cols-2 gap-4">
+        <div class="border-t pt-3 grid grid-cols-2 gap-1">
 
           <div class="text-sm text-gray-600 space-y-1">
             <p>
@@ -65,15 +65,25 @@
 
           <div class="border-l pl-4">
             <p class="text-xs font-medium text-gray-500 mb-1 uppercase tracking-wide">
-              Precios / Unid.
+              Precios / Caja
             </p>
 
             @if (wine.Precios?.length) {
             <ul class="text-xs text-gray-600 space-y-1">
-              @for (precio of wine.Precios?.sort((a, b) => a.cantidad_minima - b.cantidad_minima); track
-              precio.id_precio) {
+              @for (precio of wine.Precios?.sort((a, b) => a.cantidad_minima - b.cantidad_minima);track precio.id_precio;let i = $index) {
               <li class="flex justify-between">
-                <span>Desde {{ precio.cantidad_minima }}</span>
+                <span>
+                  {{
+                    i === 0
+                      ? 'Base'
+                      : '+ ' +
+                        (
+                          precio.cantidad_minima /
+                          (wine.Presentacion?.botellas_por_caja || 1)
+                        ) +
+                        ' cajas'
+                  }}
+                </span>
                 <span class="font-semibold text-gray-800">
                   S/ {{ precio.precio }}
                 </span>

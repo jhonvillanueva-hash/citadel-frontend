@@ -10,6 +10,11 @@ export interface User {
   nombres: string;
   apellidos: string;
   email: string;
+  dni: string;
+  telefono: string;
+  direccion?: string;
+  ciudad?: string;
+  url_img?: string;
   tipo: 'A' | 'U';
 }
 
@@ -128,7 +133,7 @@ export class AuthService {
   getRedirectUrl(): string {
     const user = this._currentUser();
     if (!user) return '/login';
-    return user.tipo === 'A' ? '/admin' : '/store';
+    return user.tipo === 'A' ? '/admin' : '/';
   }
 
   loginWithGoogle(idToken: string): Observable<LoginResponse> {
@@ -157,7 +162,11 @@ export class AuthService {
     if (this.isBrowser()) {
       localStorage.removeItem(this.LOGGED_IN_KEY);
     }
-    this.router.navigate(['/store']);
+    this.router.navigate(['/']);
+  }
+
+  setUser(user: User): void {
+    this._currentUser.set(user);
   }
 
   private setSession(token: string): void {
@@ -169,7 +178,9 @@ export class AuthService {
         email: payload.email,
         tipo: payload.tipo,
         nombres: payload.nombres || '',
-        apellidos: payload.apellidos || ''
+        apellidos: payload.apellidos || '',
+        dni: payload.dni || '',
+        telefono: payload.telefono || '',
       });
     } catch {
       this.clearSession();

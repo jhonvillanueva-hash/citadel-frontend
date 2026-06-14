@@ -39,7 +39,7 @@ export class FooterStore {
 
   readonly companyLinks: NavLink[] = [
     { label: 'Nosotros',               href: 'https://www.facebook.com/vinoscitadel?locale=es_LA' },
-    { label: 'Catálogo',               routerLink: '/store' },
+    { label: 'Catálogo',               routerLink: '/' },
     { label: 'Proceso de Elaboración', href: 'https://www.instagram.com/vinoscitadel?utm_source=qr&igsh=dWc5dWZ4MHlqeXpq' }
   ];
 

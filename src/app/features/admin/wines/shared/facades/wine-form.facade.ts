@@ -14,9 +14,14 @@ export class WineFormFacade {
   wineData = signal<VinoForm>(this.initialForm());
   principalImage = signal<WineImage>({ file: null, preview: null });
   additionalImages = signal<WineImage[]>([{ file: null, preview: null }]);
+  
+  // Precios
   basePrice = signal(12);
+  basePriceId = signal<number | null>(null); // ID del precio base en DB
   priceRows = signal<PriceRow[]>([{ cantidad: null, precio: null }]);
+  
   isLoading = signal(false);
+  private initialPricesJSON = ''; // Snapshot para detección de cambios
 
   resetForCreate() {
     this.wineId.set(null);
@@ -24,7 +29,9 @@ export class WineFormFacade {
     this.principalImage.set({ file: null, preview: null });
     this.additionalImages.set([{ file: null, preview: null }]);
     this.basePrice.set(12);
+    this.basePriceId.set(null);
     this.priceRows.set([{ cantidad: null, precio: null }]);
+    this.initialPricesJSON = '';
   }
 
   initializeForEdit(wine: Vino) {
@@ -32,6 +39,16 @@ export class WineFormFacade {
     this._mapBasicData(wine);
     this._mapImages(wine);
     this._mapPrices(wine);
+    
+    // Tomar snapshot inicial de los precios
+    const bottlesPerBox = wine.Presentacion?.botellas_por_caja || 1;
+    const initialPrices = formatPricesForBackend(
+      this.basePrice(),
+      this.basePriceId(),
+      this.priceRows(),
+      bottlesPerBox
+    );
+    this.initialPricesJSON = JSON.stringify(initialPrices);
   }
 
   private _mapBasicData(wine: Vino) {
@@ -48,12 +65,13 @@ export class WineFormFacade {
   }
 
   private _mapImages(wine: Vino) {
-    this.principalImage.set({
-      file: null,
-      preview: wine.url_img_principal,
-      url: wine.url_img_principal
+    this.principalImage.set({ 
+      file: null, 
+      preview: wine.url_img_principal, 
+      url: wine.url_img_principal 
     });
 
+    // Singular ImagenAdicionalVino según api.models.ts
     const additional: WineImage[] = (wine.ImagenAdicionalVinos || []).map(img => ({
       file: null,
       preview: img.url_img,
@@ -64,39 +82,19 @@ export class WineFormFacade {
 
   private _mapPrices(wine: Vino) {
     const bottlesPerBox = wine.Presentacion?.botellas_por_caja || 1;
-    const base = wine.Precios?.find(p => p.cantidad_minima === 1)?.precio || 12;
-    this.basePrice.set(base);
-    this.priceRows.set(mapBackendToPriceRows(wine.Precios, bottlesPerBox));
-  }
-
-  validatePriceRows(): string | null {
-    const rows = this.priceRows();
-    const cantidades = new Set<number>();
-    const precios = new Set<number>();
-    const basePrice = Number(this.basePrice());
-
-    for (const row of rows) {
-      const cantidad = Number(row.cantidad);
-      const precio = Number(row.precio);
-      if (
-        cantidad == null || cantidad <= 0 ||
-        precio == null || precio <= 0
-      ) {
-        return 'Todas las filas deben tener valores mayores a 0';
-      }
-      if (precio === basePrice) {
-        return `El precio ${precio} ya corresponde al precio base`;
-      }
-      if (cantidades.has(cantidad)) {
-        return `La cantidad ${cantidad} ya existe`;
-      }
-      if (precios.has(precio)) {
-        return `El precio ${precio} ya existe`;
-      }
-      cantidades.add(cantidad);
-      precios.add(precio);
+    
+    // Buscar precio base (cantidad_minima = 1)
+    const basePriceObj = wine.Precios?.find(p => p.cantidad_minima === 1);
+    
+    if (basePriceObj) {
+      this.basePrice.set(basePriceObj.precio);
+      this.basePriceId.set(basePriceObj.id_precio);
+    } else {
+      this.basePrice.set(12);
+      this.basePriceId.set(null);
     }
-    return null;
+
+    this.priceRows.set(mapBackendToPriceRows(wine.Precios, bottlesPerBox));
   }
 
   updateField<K extends keyof VinoForm>(field: K, value: VinoForm[K]) {
@@ -120,13 +118,29 @@ export class WineFormFacade {
     this.additionalImages.update(list => list.filter((_, i) => i !== index));
   }
 
+  validatePriceRows(): string | null {
+    const rows = this.priceRows();
+    const lastRow = rows[rows.length - 1];
+
+    if (rows.length > 0 && lastRow) {
+      if (lastRow.cantidad == null || lastRow.cantidad <= 0) {
+        return 'La cantidad en la última fila de precios debe ser mayor a 0';
+      }
+      if (lastRow.precio == null || lastRow.precio <= 0) {
+        return 'El precio en la última fila debe ser mayor a 0';
+      }
+    }
+
+    return null;
+  }
+
   submit(bottlesPerBox: number) {
     this.isLoading.set(true);
     const formData = this.buildFormData(bottlesPerBox);
     const id = this.wineId();
 
-    const request = id
-      ? this.wineService.updateWithImage(id, formData)
+    const request = id 
+      ? this.wineService.updateWithImage(id, formData) 
       : this.wineService.createWithImage(formData);
 
     return request.pipe(finalize(() => this.isLoading.set(false)));
@@ -135,7 +149,7 @@ export class WineFormFacade {
   private buildFormData(bottlesPerBox: number): FormData {
     const data = this.wineData();
     const formData = new FormData();
-
+    
     Object.entries(data).forEach(([key, val]) => {
       if (val !== null && val !== undefined) formData.append(key, val.toString());
     });
@@ -145,7 +159,7 @@ export class WineFormFacade {
     } else if (this.principalImage().url) {
       formData.append('url_img_principal', this.principalImage().url!);
     }
-
+    
     this.additionalImages().filter(img => img.file).forEach(img => {
       formData.append('imagen_adicionales', img.file!);
     });
@@ -153,24 +167,31 @@ export class WineFormFacade {
     const existingUrls = this.additionalImages()
       .filter(img => img.url && !img.file)
       .map(img => ({ url_img: img.url }));
-
-    if (this.wineId()) {
-      formData.append(
-        'imagen_adicionales',
-        JSON.stringify(existingUrls)
-      );
+    
+    if (this.wineId() && existingUrls.length > 0) {
+      formData.append('imagen_adicionales_existentes', JSON.stringify(existingUrls));
     }
 
-    const prices = formatPricesForBackend(this.basePrice(), this.priceRows(), bottlesPerBox);
-    formData.append('precios', JSON.stringify(prices));
+    const currentPrices = formatPricesForBackend(
+      this.basePrice(), 
+      this.basePriceId(), 
+      this.priceRows(), 
+      bottlesPerBox
+    );
+    const currentPricesJSON = JSON.stringify(currentPrices);
+
+    // Solo enviamos los precios si han cambiado (evita el DELETE en el backend)
+    if (currentPricesJSON !== this.initialPricesJSON) {
+      formData.append('precios', currentPricesJSON);
+    }
 
     return formData;
   }
 
   private initialForm(): VinoForm {
     return {
-      sku: '', nombre: '', descripcion: '', stock: 0,
-      estado: 'D', id_sabor: null, id_dulzor: null, id_presentacion: null
+      sku: '', nombre: '', descripcion: '', stock: 0, 
+      estado: 'D', id_sabor: null, id_dulzor: null, id_presentacion: null 
     };
   }
 }

@@ -5,6 +5,7 @@ export interface WineImage {
 }
 
 export interface PriceRow {
+  id_precio?: number; // PK de la base de datos
   cantidad: number | null;
   precio: number | null;
 }

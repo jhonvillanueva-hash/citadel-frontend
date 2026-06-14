@@ -6,14 +6,14 @@
     >
 
       <div class="flex items-start justify-between gap-3">
-        <div class="flex gap-2">
+        <div class="flex gap-2 min-w-0 flex-1">
           <fa-icon class="text-lg mt-0.5" [icon]="getStyles(toast).icon"/>
           <div>
             <h3 class="text-sm font-semibold">
               {{ toast.title }}
             </h3>
             @if (toast.message) {
-              <p class="text-xs mt-1 opacity-90">
+              <p class="text-xs mt-1 opacity-90 break-words">
                 {{ toast.message }}
               </p>
             }

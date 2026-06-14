@@ -13,6 +13,8 @@ import { ComplaintsComponent } from '../../features/admin/complaints/complaints'
 import { CouponsListComponent } from '../../features/admin/coupons/coupons-list/coupons-list';
 import { CouponsEditComponent } from '../../features/admin/coupons/coupons-edit/coupons-edit';
 import { CouponsCreateComponent } from '../../features/admin/coupons/coupons-create/coupons-create';
+import { SalesListComponent } from '../../features/admin/sales/sales';
+import { SalesDetailComponent } from '../../features/admin/sales/sales-detail';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -71,6 +73,14 @@ export const ADMIN_ROUTES: Routes = [
       {
         path: 'coupons/edit/:id',
         component: CouponsEditComponent
+      },
+      {
+        path: 'sales',
+        component: SalesListComponent
+      },
+      {
+        path: 'sales/:id',
+        component: SalesDetailComponent
       },
       {
         path: '',
