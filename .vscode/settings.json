@@ -1,4 +1,6 @@
 {
   "css.lint.unknownAtRules": "ignore",
-  "postcss.language": "postcss"
+  "postcss.language": "postcss",
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.preferences.includePackageJsonAutoImports": "auto"
 }
