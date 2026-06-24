@@ -84,9 +84,6 @@ export class ProductStore implements OnInit {
     if (custom !== undefined) return custom;
 
     const products = this.allProducts();
-
-    const cartItems = this.localCartService.cartItems();
-
     const type = this.filterType();
     const saborId = this.filterSaborId();
     const dulzorId = this.filterDulzorId();

@@ -10,6 +10,9 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
+    <div class="flex items-center justify-between mb-3">
+      <h1 class="text-2xl md:text-3xl font-bold text-slate-800">Reclamos y quejas de los clientes</h1>
+    </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         @for (complaint of dataComplaints(); track complaint.id_reclamo) {
           <div class="bg-white shadow-md rounded-2xl p-4 border border-gray-200">

@@ -9,7 +9,7 @@ export default defineConfig({
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 2 : 0,
   workers: process.env['CI'] ? 1 : undefined,
-  reporter: 'html',
+  reporter: process.env['CI'] || process.env['GEMINI_CLI'] ? 'list' : 'html',
   globalSetup: './tests/config/setup.ts',
 
   use: {

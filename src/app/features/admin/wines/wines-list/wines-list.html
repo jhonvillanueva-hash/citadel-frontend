@@ -70,7 +70,7 @@
 
             @if (wine.Precios?.length) {
             <ul class="text-xs text-gray-600 space-y-1">
-              @for (precio of wine.Precios?.sort((a, b) => a.cantidad_minima - b.cantidad_minima);track precio.id_precio;let i = $index) {
+              @for (precio of wine.Precios.sort((a, b) => a.cantidad_minima - b.cantidad_minima);track precio.id_precio;let i = $index) {
               <li class="flex justify-between">
                 <span>
                   {{
@@ -104,7 +104,7 @@
             <fa-icon [icon]="icons.faPen"></fa-icon>
             Editar
           </a>
-          <button class="flex-1 flex items-center justify-center gap-2 
+          <button (click)="deleteWine(wine.id_vino)" class="flex-1 flex items-center justify-center gap-2 
             bg-[var(--admin-bg-aside)] text-white text-sm font-medium py-2 rounded-lg 
             transition hover:brightness-150"><fa-icon [icon]="icons.faTrash"></fa-icon>
             Eliminar

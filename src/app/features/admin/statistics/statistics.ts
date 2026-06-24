@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBasketShopping, faCalculator, faCircleCheck, faSackDollar, faUserPlus, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { NgApexchartsModule } from 'ng-apexcharts';
-import { ApexChart, ApexXAxis, ApexAxisChartSeries,  } from 'ng-apexcharts';
+import { ApexChart, ApexXAxis, ApexAxisChartSeries, ApexDataLabels } from 'ng-apexcharts';
 
 @Component({
   selector: 'app-statistics',
@@ -16,9 +16,12 @@ export class Statistics {
   datos: ApexAxisChartSeries = [
     {
       name: "Ventas",
-      data: [1200, 1500, 1800, 2000, 2200, 2500, 2700, 3000, 3200, 3500, 3700, 4000]
+      data: [1, 5, 3, 2, 1, 6, 3, 2, 1, 4, 6, 10]
     }
   ];
+  dataLabels: ApexDataLabels = {
+  enabled: true
+};
 
   grafico: ApexChart = {
     type: "line",
@@ -29,8 +32,25 @@ export class Statistics {
   };
 
   xaxis: ApexXAxis = {
-    categories: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+    categories: this.obtenerUltimos12Meses()
   };
+
+  obtenerUltimos12Meses(): string[] {
+  const meses = [
+    'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+    'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+  ];
+
+  const resultado: string[] = [];
+  const fecha = new Date();
+
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(fecha.getFullYear(), fecha.getMonth() - i, 1);
+    resultado.push(meses[d.getMonth()]);
+  }
+
+  return resultado;
+}
 
   topProductosDatos: number[] = [40, 30, 20, 10];
 
@@ -110,12 +130,12 @@ export class Statistics {
   productosBajoStockCategorias: string[] = ["Producto A", "Producto B", "Producto C", "Producto D", "Producto E"];
 
   kpiData = {
-    totalSales: 500,
-    productsSold: 1200,
-    totalUsers: 800,
-    usersPurchased: 300,
-    newClients: 50,
-    avgSaleCost: 42
+    totalSales: 5,
+    productsSold: 12,
+    totalUsers: 9,
+    usersPurchased: 5,
+    newClients: 3,
+    avgSaleCost: 42.4
   };
 
   icons = {
