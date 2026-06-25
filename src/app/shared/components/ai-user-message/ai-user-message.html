@@ -9,7 +9,8 @@
       'bg-[var(--admin-bg-icon)] text-white rounded-br-[4px]': role === 'user',
       'bg-gray-100 text-gray-900 rounded-bl-[4px]': role === 'ai',
       'italic animate-pulse text-gray-400': status === 'thinking'
-    }">
+    }"
+    (click)="onMessageClick($event)">
 
     @if(status === 'thinking') {
       <span>Consultando...</span>

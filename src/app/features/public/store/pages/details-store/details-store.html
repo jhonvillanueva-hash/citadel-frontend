@@ -308,4 +308,15 @@
       </div>
     </div>
   </div>
+  <app-fab-stack>
+    <app-ai-button
+      (toggle)="toggleAi()"
+      class="relative z-[110]"
+    />
+  </app-fab-stack>
+
+  <app-ai-chat-widget
+    [open]="aiOpen"
+    (close)="closeAi()"
+  />
 }

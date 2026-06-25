@@ -70,7 +70,7 @@
 
             @if (wine.Precios?.length) {
             <ul class="text-xs text-gray-600 space-y-1">
-              @for (precio of wine.Precios.sort((a, b) => a.cantidad_minima - b.cantidad_minima);track precio.id_precio;let i = $index) {
+              @for (precio of wine.Precios?.sort((a, b) => a.cantidad_minima - b.cantidad_minima);track precio.id_precio;let i = $index) {
               <li class="flex justify-between">
                 <span>
                   {{

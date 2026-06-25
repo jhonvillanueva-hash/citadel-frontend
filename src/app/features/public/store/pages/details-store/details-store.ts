@@ -10,6 +10,9 @@ import { Vino, ImagenAdicionalVino } from '../../../../../data/models/api.models
 import { CartItem, CartService } from '../../../../../core/services/cart.service';
 
 import { ToastService } from '../../../../../shared/components/toast/toast.service';
+import { AiButtonComponent } from "../../../../../shared/components/ai-button/ai-button";
+import { FabStackComponent } from "../../../../../shared/layouts/fab-stack/fab-stack";
+import { AiChatWidgetComponent } from "../../../../../shared/layouts/ai-chat-widget/ai-chat-widget";
 
 export interface InternalWine {
   id_vino: number;
@@ -35,7 +38,7 @@ export interface InternalWine {
 @Component({
   selector: 'app-details-store',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AiButtonComponent, FabStackComponent, AiChatWidgetComponent],
   templateUrl: './details-store.html'
 })
 
@@ -60,7 +63,15 @@ export class DetailsStore implements OnInit {
   addingToCart      = signal(false);
 
   isOutOfStock = computed(() => this.stockDisponible() <= 0);
+  aiOpen = false;
 
+  toggleAi() {
+    this.aiOpen = !this.aiOpen;
+  }
+
+  closeAi() {
+    this.aiOpen = false;
+  }
   stockDisponible = computed(() => {
     const wine = this.wineData();
     if (!wine) return 0;
