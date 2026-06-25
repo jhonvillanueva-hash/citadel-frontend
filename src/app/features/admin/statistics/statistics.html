@@ -1,86 +1,144 @@
-<div class="min-h-screen">
-
+<div #pdfContainer class="min-h-screen">
   <div class="max-w-7xl mx-auto space-y-6 md:space-y-8">
 
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
       <h1 class="text-2xl md:text-3xl font-bold text-slate-800">Resumen General</h1>
+      
+      <div class="flex flex-wrap items-center gap-4">
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Desde:</label>
+          <input type="date" [(ngModel)]="globalStartDate" (change)="onGlobalFilterChange()"
+            class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Hasta:</label>
+          <input type="date" [(ngModel)]="globalEndDate" (change)="onGlobalFilterChange()"
+            class="border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+        </div>
+        <div class="flex gap-2">
+          <button (click)="resetGlobalFilters()"
+            class="px-4 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-sm font-semibold transition">
+            Reestablecer
+          </button>
+        </div>
+        <button (click)="exportToPdf()"
+          class="px-4 py-1.5 bg-slate-800 text-white rounded-lg hover:bg-slate-900 text-sm font-semibold">
+          Exportar Reporte
+        </button>
+      </div>
     </div>
 
-    <div class="mx-auto">
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-6 justify-content-center">
+    @if (isKpiMock || isVentasMock || isTopProductosMock || isEstadosPedidosMock || isSaboresMock || isCiudadesMock || isBajoStockMock) {
+      <div class="bg-amber-50/80 backdrop-blur-sm border border-amber-200/60 text-amber-800 px-4 py-3 rounded-xl flex items-center gap-3 shadow-sm">
+        <div class="flex-shrink-0 p-1.5 bg-amber-100/80 text-amber-600 rounded-full">
+          <fa-icon [icon]="icons.faCalculator" class="w-4 h-4"/>
+        </div>
+        <div>
+          <p class="text-sm font-bold text-amber-900">Modo de Demostración</p>
+          <p class="text-xs text-amber-700 font-medium">No se detectaron transacciones registradas en el período seleccionado. Se muestran gráficos simulados para previsualizar el diseño.</p>
+        </div>
+      </div>
+    }
 
-        <div
-          class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
+    <div class="mx-auto">
+      <div id="kpi-section" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 gap-3 xl:gap-4">
+
+        <div class="bg-white shadow-sm border border-slate-100 rounded-lg p-3 flex items-center gap-2 hover:shadow-md transition relative">
           <div class="flex-shrink-0 p-2 sm:p-3 rounded-full bg-indigo-50 text-indigo-600">
             <fa-icon [icon]="icons.faSackDollar" class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"/>
           </div>
           <div class="min-w-0">
-            <h3 class="text-xs sm:text-sm font-medium text-slate-500">Ventas Totales</h3>
+            <h3 class="text-xs sm:text-sm font-medium text-slate-500 flex items-center gap-1">
+              Ventas Totales
+              @if (isKpiMock) {
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400" title="Dato de demostración"></span>
+              }
+            </h3>
             <p class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">
               {{ kpiData.totalSales | currency }}
             </p>
           </div>
         </div>
 
-        <div
-          class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
+        <div class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
           <div class="flex-shrink-0 p-2 sm:p-3 rounded-full bg-emerald-50 text-emerald-600">
             <fa-icon [icon]="icons.faBasketShopping" class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"/>
           </div>
           <div>
-            <h3 class="text-xs sm:text-sm font-medium text-slate-500">Productos Vendidos</h3>
+            <h3 class="text-xs sm:text-sm font-medium text-slate-500 flex items-center gap-1">
+              Productos Vendidos
+              @if (isKpiMock) {
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400" title="Dato de demostración"></span>
+              }
+            </h3>
             <p class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">
               {{ kpiData.productsSold }}
             </p>
           </div>
         </div>
 
-        <div
-          class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
+        <div class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
           <div class="flex-shrink-0 p-2 sm:p-3 rounded-full bg-blue-50 text-blue-600">
             <fa-icon [icon]="icons.faUsers" class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"/>
           </div>
           <div>
-            <h3 class="text-xs sm:text-sm font-medium text-slate-500">Total Usuarios</h3>
+            <h3 class="text-xs sm:text-sm font-medium text-slate-500 flex items-center gap-1">
+              Total Usuarios
+              @if (isKpiMock) {
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400" title="Dato de demostración"></span>
+              }
+            </h3>
             <p class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">
               {{ kpiData.totalUsers }}
             </p>
           </div>
         </div>
 
-        <div
-          class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
+        <div class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
           <div class="flex-shrink-0 p-2 sm:p-3 rounded-full bg-rose-50 text-rose-600">
             <fa-icon [icon]="icons.faCircleCheck" class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"/>
           </div>
           <div>
-            <h3 class="text-xs sm:text-sm font-medium text-slate-500">Compraron</h3>
+            <h3 class="text-xs sm:text-sm font-medium text-slate-500 flex items-center gap-1">
+              Compradores
+              @if (isKpiMock) {
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400" title="Dato de demostración"></span>
+              }
+            </h3>
             <p class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">
               {{ kpiData.usersPurchased }}
             </p>
           </div>
         </div>
 
-        <div
-          class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
+        <div class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
           <div class="flex-shrink-0 p-2 sm:p-3 rounded-full bg-amber-50 text-amber-600">
             <fa-icon [icon]="icons.faUserPlus" class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"/>
           </div>
           <div>
-            <h3 class="text-xs sm:text-sm font-medium text-slate-500">Clientes Nuevos</h3>
+            <h3 class="text-xs sm:text-sm font-medium text-slate-500 flex items-center gap-1">
+              Usuarios nuevos
+              @if (isKpiMock) {
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400" title="Dato de demostración"></span>
+              }
+            </h3>
             <p class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">
               {{ kpiData.newClients }}
             </p>
           </div>
         </div>
 
-        <div
-          class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
+        <div class="bg-white shadow-sm border border-slate-100 rounded-xl p-3 sm:p-4 md:p-5 flex items-center gap-3 hover:shadow-md transition">
           <div class="flex-shrink-0 p-2 sm:p-3 rounded-full bg-slate-100 text-slate-600">
             <fa-icon [icon]="icons.faCalculator" class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"/>
           </div>
           <div>
-            <h3 class="text-xs sm:text-sm font-medium text-slate-500">Costo Promedio</h3>
+            <h3 class="text-xs sm:text-sm font-medium text-slate-500 flex items-center gap-1">
+              Costo Promedio
+              @if (isKpiMock) {
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400" title="Dato de demostración"></span>
+              }
+            </h3>
             <p class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">
               {{ kpiData.avgSaleCost | currency }}
             </p>
@@ -92,41 +150,118 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      <div class="bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 lg:col-span-2 min-w-0 overflow-hidden">
-        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-4">Total de Ventas (Últimos 12 meses)</h3>
+      <div class="evitar-corte bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 lg:col-span-2 min-w-0 overflow-hidden">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <h3 class="text-base md:text-lg font-bold text-slate-800">Pedidos totales</h3>
+            @if (isVentasMock) {
+              <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-50 text-amber-600 rounded-full border border-amber-100 uppercase tracking-wider">Demostración</span>
+            }
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="date" [(ngModel)]="ventasStartDate" (change)="cargarVentas()"
+              class="border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700 focus:outline-none focus:border-indigo-500">
+            <span class="text-xs text-slate-400">a</span>
+            <input type="date" [(ngModel)]="ventasEndDate" (change)="cargarVentas()"
+              class="border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700 focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
         <apx-chart [series]="datos" [chart]="grafico" [xaxis]="xaxis" [dataLabels]="dataLabels"></apx-chart>
       </div>
 
-      <div class="bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
-        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-4">Top Productos</h3>
+      <div class="evitar-corte bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <h3 class="text-base md:text-lg font-bold text-slate-800">Top Productos</h3>
+            @if (isTopProductosMock) {
+              <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-50 text-amber-600 rounded-full border border-amber-100 uppercase tracking-wider">Demostración</span>
+            }
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="date" [(ngModel)]="topProductosStartDate" (change)="cargarTopProductos()"
+              class="border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700 focus:outline-none focus:border-indigo-500">
+            <span class="text-xs text-slate-400">a</span>
+            <input type="date" [(ngModel)]="topProductosEndDate" (change)="cargarTopProductos()"
+              class="border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700 focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
         <apx-chart [series]="topProductosDatos" [chart]="topProductosGrafico" [labels]="topProductosLabels"></apx-chart>
       </div>
 
-      <div class="bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
-        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-4">Estados de Pedidos</h3>
-        <apx-chart [series]="estadosPedidosDatos" [chart]="estadosPedidosGrafico"
-          [labels]="estadosPedidosLabels"></apx-chart>
+      <div class="evitar-corte bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <h3 class="text-base md:text-lg font-bold text-slate-800">Estados de Pedidos</h3>
+            @if (isEstadosPedidosMock) {
+              <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-50 text-amber-600 rounded-full border border-amber-100 uppercase tracking-wider">Demostración</span>
+            }
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="date" [(ngModel)]="estadosPedidosStartDate" (change)="cargarEstadosPedidos()"
+              class="border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700 focus:outline-none focus:border-indigo-500">
+            <span class="text-xs text-slate-400">a</span>
+            <input type="date" [(ngModel)]="estadosPedidosEndDate" (change)="cargarEstadosPedidos()"
+              class="border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700 focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
+        <apx-chart [series]="estadosPedidosDatos" [chart]="estadosPedidosGrafico" [labels]="estadosPedidosLabels"></apx-chart>
       </div>
 
-      <div class="bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
-        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-4">Métodos de Pago</h3>
-        <apx-chart [series]="metodosPagoDatos" [chart]="metodosPagoGrafico" [labels]="metodosPagoLabels"></apx-chart>
+      <div class="evitar-corte bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <h3 class="text-base md:text-lg font-bold text-slate-800">Pedidos por sabor</h3>
+            @if (isSaboresMock) {
+              <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-50 text-amber-600 rounded-full border border-amber-100 uppercase tracking-wider">Demostración</span>
+            }
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="date" [(ngModel)]="saboresStartDate" (change)="cargarVentasSabores()"
+              class="border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700 focus:outline-none focus:border-indigo-500">
+            <span class="text-xs text-slate-400">a</span>
+            <input type="date" [(ngModel)]="saboresEndDate" (change)="cargarVentasSabores()"
+              class="border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700 focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
+        <apx-chart [series]="tiposProductosDatos" [chart]="tiposProductosGrafico" [labels]="tiposProductosLabels"></apx-chart>
       </div>
 
-      <div class="bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
-        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-4">Tipos de Productos Vendidos</h3>
-        <apx-chart [series]="tiposProductosDatos" [chart]="tiposProductosGrafico"
-          [labels]="tiposProductosLabels"></apx-chart>
-      </div>
-
-      <div class="bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
-        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-4">Departamentos con Más Ventas</h3>
+      <div class="evitar-corte bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <h3 class="text-base md:text-lg font-bold text-slate-800">Ciudades con Más Ventas</h3>
+            @if (isCiudadesMock) {
+              <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-50 text-amber-600 rounded-full border border-amber-100 uppercase tracking-wider">Demostración</span>
+            }
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="date" [(ngModel)]="ciudadesStartDate" (change)="cargarCiudadesVentas()"
+              class="border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700 focus:outline-none focus:border-indigo-500">
+            <span class="text-xs text-slate-400">a</span>
+            <input type="date" [(ngModel)]="ciudadesEndDate" (change)="cargarCiudadesVentas()"
+              class="border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700 focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
         <apx-chart [series]="departamentosVentasDatos" [chart]="departamentosVentasGrafico"
           [xaxis]="{ categories: departamentosVentasCategorias }"></apx-chart>
       </div>
 
-      <div class="bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
-        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-4">Productos con Menos Stock</h3>
+      <div class="evitar-corte bg-white shadow-sm border border-slate-100 rounded-2xl p-5 md:p-6 min-w-0 overflow-hidden">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <h3 class="text-base md:text-lg font-bold text-slate-800">Productos con Menos Stock</h3>
+            @if (isBajoStockMock) {
+              <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-50 text-amber-600 rounded-full border border-amber-100 uppercase tracking-wider">Demostración</span>
+            }
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="date" [(ngModel)]="bajoStockStartDate" (change)="cargarProductosBajoStock()"
+              class="border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700 focus:outline-none focus:border-indigo-500">
+            <span class="text-xs text-slate-400">a</span>
+            <input type="date" [(ngModel)]="bajoStockEndDate" (change)="cargarProductosBajoStock()"
+              class="border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700 focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
         <apx-chart [series]="productosBajoStockDatos" [chart]="productosBajoStockGrafico"
           [xaxis]="{ categories: productosBajoStockCategorias }"></apx-chart>
       </div>
