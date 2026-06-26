@@ -24,16 +24,13 @@ test.describe('Admin Wines Configuration CRUD', () => {
     await page.click('button[type="submit"]');
 
     await expect(page).toHaveURL(/.*\/admin/);
+    await page.waitForLoadState('networkidle');
 
     // Navigate to Wines Config
     await page.goto('/admin/wines/config');
+    await page.waitForLoadState('networkidle');
 
-    console.log('DEBUG');
-    console.log(await page.url());
-
-    await expect(page.locator('h1')).toContainText(
-      'Configuraciones de Vinos'
-    );
+    await expect(page.getByRole('heading', { name: 'Configuraciones de Vinos', exact: true })).toBeVisible();
   });
 
   test.describe('Flavors (Sabores)', () => {

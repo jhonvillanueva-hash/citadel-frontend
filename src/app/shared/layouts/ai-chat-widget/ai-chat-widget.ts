@@ -5,6 +5,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { AiUserMessageComponent } from '../../components/ai-user-message/ai-user-message';
 import { AiService } from '../../../core/services/ai.service';
+import { Router } from '@angular/router';
 
 interface ChatMessage {
   id: number;
@@ -53,6 +54,7 @@ export class AiChatWidgetComponent {
   @Input() open = false;
   @Output() close = new EventEmitter<void>();
   private aiService = inject(AiService);
+  private router = inject(Router);
 
   text: string = '';
   isFocused: boolean = false;
@@ -89,12 +91,23 @@ export class AiChatWidgetComponent {
     const content = this.text.trim();
     if (!content) return;
 
+    const currentUrl = this.router.url.split('?')[0];
+    const basePath = '/store/products/';
+    let urlSuffix = '';
+
+    if (currentUrl.includes(basePath)) {
+      urlSuffix = currentUrl.split(basePath)[1]; 
+    }
+    const promptForAI = urlSuffix 
+    ? `${content} \n(Ruta: ${urlSuffix})` 
+    : content;
+
     this.messages.update(msgs => [
       ...msgs,
       {
         id: ++this.idCounter,
         role: 'user',
-        text: content,
+        text: content, 
         status: 'done'
       }
     ]);
@@ -115,7 +128,7 @@ export class AiChatWidgetComponent {
       }
     ]);
 
-    this.aiService.sendPrompt(content).subscribe({
+    this.aiService.sendPrompt(promptForAI).subscribe({
       next: (res) => {
         this.messages.update(msgs =>
           msgs.map(m =>

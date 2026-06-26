@@ -43,6 +43,12 @@ export class VinoService extends BaseHttpService<Vino> {
       );
   }
 
+  override delete(id: number | string): Observable<void> {
+    return super.delete(id).pipe(
+      tap(() => this.invalidateCache())
+    );
+  }
+
   private invalidateCache(): void {
     this.vinosCache.set(null);
   }

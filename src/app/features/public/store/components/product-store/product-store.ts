@@ -18,6 +18,9 @@ import { input } from '@angular/core';
 import { CartItem, CartService } from '../../../../../core/services/cart.service';
 import { switchMap, of } from 'rxjs';
 import { ToastService } from '../../../../../shared/components/toast/toast.service';
+import { FabStackComponent } from '../../../../../shared/layouts/fab-stack/fab-stack';
+import { AiButtonComponent } from '../../../../../shared/components/ai-button/ai-button';
+import { AiChatWidgetComponent } from '../../../../../shared/layouts/ai-chat-widget/ai-chat-widget';
 
 export interface InternalProduct {
   id: number;
@@ -49,7 +52,7 @@ export interface InternalProduct {
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [CommonModule, RouterModule, FontAwesomeModule],
+  imports: [CommonModule, RouterModule, FontAwesomeModule, FabStackComponent, AiButtonComponent, AiChatWidgetComponent],
   templateUrl: './product-store.html',
 })
 
@@ -84,9 +87,6 @@ export class ProductStore implements OnInit {
     if (custom !== undefined) return custom;
 
     const products = this.allProducts();
-
-    const cartItems = this.localCartService.cartItems();
-
     const type = this.filterType();
     const saborId = this.filterSaborId();
     const dulzorId = this.filterDulzorId();
@@ -184,6 +184,16 @@ export class ProductStore implements OnInit {
     if (!prices || prices.length === 0) return null;
     const unitPrice = prices.find(p => p.cantidad_minima === 1);
     return unitPrice || prices[0];
+  }
+
+  aiOpen = false;
+
+  toggleAi() {
+    this.aiOpen = !this.aiOpen;
+  }
+
+  closeAi() {
+    this.aiOpen = false;
   }
 
   loadingProducts = signal<Set<number>>(new Set());
