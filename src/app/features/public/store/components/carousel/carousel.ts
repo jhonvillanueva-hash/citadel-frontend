@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -6,24 +6,44 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './carousel.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styles: ``,
 })
 export class Carousel implements OnInit, OnDestroy {
-  @Input() images: string[] = [];
+  private _images: string[] = [];
+
+  @Input()
+  set images(value: string[]) {
+    this._images = value || [];
+    this.currentIndex.set(0);
+    this.manageAutoSlide();
+  }
+  get images(): string[] {
+    return this._images;
+  }
+
   @Input() autoSlide: boolean = true;
   @Input() slideInterval: number = 5000;
 
-  currentIndex = 0;
+  currentIndex = signal(0);
   private intervalId: any;
 
+  constructor(private cdr: ChangeDetectorRef) { }
+
   ngOnInit() {
-    if (this.autoSlide && this.images.length > 1) {
-      this.startAutoSlide();
-    }
+    this.manageAutoSlide();
   }
 
   ngOnDestroy() {
     this.stopAutoSlide();
+  }
+
+  private manageAutoSlide() {
+    if (this.autoSlide && this.images.length > 1) {
+      this.startAutoSlide();
+    } else {
+      this.stopAutoSlide();
+    }
   }
 
   startAutoSlide() {
@@ -41,15 +61,20 @@ export class Carousel implements OnInit, OnDestroy {
   }
 
   next() {
-    this.currentIndex = (this.currentIndex + 1) % this.images.length;
+    if (this.images.length === 0) return;
+    this.currentIndex.update(idx => (idx + 1) % this.images.length);
+    this.cdr.markForCheck();
   }
 
   prev() {
-    this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
+    if (this.images.length === 0) return;
+    this.currentIndex.update(idx => (idx - 1 + this.images.length) % this.images.length);
+    this.cdr.markForCheck();
   }
 
   goToSlide(index: number) {
-    this.currentIndex = index;
+    this.currentIndex.set(index);
+    this.cdr.markForCheck();
   }
 
   pause() {
@@ -57,8 +82,6 @@ export class Carousel implements OnInit, OnDestroy {
   }
 
   resume() {
-    if (this.autoSlide && this.images.length > 1) {
-      this.startAutoSlide();
-    }
+    this.manageAutoSlide();
   }
 }

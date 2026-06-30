@@ -308,7 +308,7 @@ export class CartService {
   }
 
   private _mapApiItem(p: any): CartItem {
-    const vino = p.Precio?.Vino ?? {};
+    const vino = p.precio?.Vino ?? {};
     const presentacion = vino.Presentacion ?? {};
     const precios = (vino.Precios ?? []).map((pr: any) => ({
       cantidad: Number(pr.cantidad_minima),
@@ -360,8 +360,7 @@ export class CartService {
       switchMap((carritos: Carrito[]) => {
         const activo = carritos.find(c => c.estado === 'E');
         if (activo) return of(activo);
-        const user = this.authService.currentUser()!;
-        return this.apiCarrito.create({ id_usuario: user.id_usuario, estado: 'E' });
+        return this.apiCarrito.create({ estado: 'E' });
       }),
       switchMap((carrito: Carrito) => {
         this._carritoActivo.set(carrito);

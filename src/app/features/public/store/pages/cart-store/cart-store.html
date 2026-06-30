@@ -30,7 +30,7 @@
           </div>
 
           <div class="divide-y divide-gray-200">
-            @for (item of cartItems(); track item.id_vino + item.presentacion) {
+            @for (item of cartItems(); track $index) {
             <div class="py-6 md:py-8 first:pt-0">
               <div class="flex gap-4 md:gap-6">
 

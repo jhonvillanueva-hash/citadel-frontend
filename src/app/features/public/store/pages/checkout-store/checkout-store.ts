@@ -11,12 +11,33 @@ import { Cupon } from '../../../../../data/models/api.models';
 import { CheckoutService } from '../../../../../core/services/checkout.service';
 import { CulqiService } from '../../../../../core/services/culqi.service';
 import { ToastService } from '../../../../../shared/components/toast/toast.service';
+import { UsuarioService } from '../../../../../data/services/usuario.service';
+import { DireccionService } from '../../../../../data/services/direccion.service';
 
 @Component({
   selector: 'app-checkout-store',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './checkout-store.html',
+  styles: `
+    @keyframes borderPulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+
+    50% {
+      box-shadow: 0 0 0 8px rgba(239, 68, 68, 0.15);
+    }
+
+    100% {
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+  }
+
+  .border-pulse {
+    animation: borderPulse 1.6s infinite;
+  }
+  `,
 })
 export class CheckoutStore implements OnInit {
   private authService = inject(AuthService);
@@ -28,6 +49,8 @@ export class CheckoutStore implements OnInit {
   private router = inject(Router);
   private culqiService = inject(CulqiService);
   private toastService = inject(ToastService);
+  private userService = inject(UsuarioService);
+  private directionService = inject(DireccionService);
 
   cartItems = this.cartService.cartItems;
 
@@ -38,10 +61,10 @@ export class CheckoutStore implements OnInit {
   telefono = signal('');
   deliveryType = signal<'home' | 'pickup'>('home');
 
-  direccion = signal('');
   departamento = signal('');
   provincia = signal('');
   distrito = signal('');
+  direccion = signal('');
   numeroCasa = signal('');
   codigoPostal = signal('');
 
@@ -57,6 +80,15 @@ export class CheckoutStore implements OnInit {
   step2Enabled = signal(false);
 
   mapUrl = signal<SafeResourceUrl | null>(null);
+
+  private initialStep2Values = {
+    departamento: '',
+    provincia: '',
+    distrito: '',
+    direccion: '',
+    numeroCasa: '',
+    codigoPostal: ''
+  };
 
   storeMapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
     'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3950.0034028862783!2d-79.03289702523057!3d-8.101133691927716!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91ad3d8e1edab0b7%3A0xbd166949bab68060!2sAv.%20Carlos%20Valderrama%20491%2C%20Trujillo%2013001!5e0!3m2!1ses-419!2spe!4v1780459041053!5m2!1ses-419!2spe'
@@ -235,8 +267,6 @@ export class CheckoutStore implements OnInit {
   }
 
   private restoreFromProfile(): void {
-
-    // 1. Si el usuario está logueado → usar datos reales
     const user = this.authService.currentUser();
 
     if (user) {
@@ -245,7 +275,17 @@ export class CheckoutStore implements OnInit {
       this.apellidos.set(user.apellidos || '');
       this.dni.set(user.dni || '');
       this.telefono.set(user.telefono || '');
-      this.direccion.set(user.direccion || '');
+
+      this.userService.getProfile().subscribe({
+        next: (profileUser) => {
+          const principalAddress = profileUser.direcciones?.find(d => d.principal) || profileUser.direcciones?.[0] || null;
+          this.applyStep2DataFromAddress(principalAddress);
+          this.updateStepState();
+        },
+        error: () => {
+          this.updateStepState();
+        }
+      });
 
       return;
     }
@@ -264,25 +304,58 @@ export class CheckoutStore implements OnInit {
     this.codigoPostal.set(p.codigoPostal);
 
     if (p.departamento) {
-      this.departamento.set(p.departamento);
+      const departamentoId = String(p.departamento);
+      this.departamento.set(departamentoId);
 
       this.filteredProvincias = this.provincias.filter(
-        pr => pr.departamento_id == Number(p.departamento)
+        pr => pr.departamento_id == Number(departamentoId)
       );
     }
 
     if (p.provincia) {
-      this.provincia.set(p.provincia);
+      const provinciaId = String(p.provincia);
+      this.provincia.set(provinciaId);
 
       this.filteredDistritos = this.distritos.filter(
-        d => d.provincia_id == Number(p.provincia)
+        d => d.provincia_id == Number(provinciaId)
       );
     }
 
     if (p.distrito) {
-      this.distrito.set(p.distrito);
+      this.distrito.set(String(p.distrito));
     }
 
+    this.updateStepState();
+  }
+
+  private applyStep2DataFromAddress(address: {
+    id_departamento?: number;
+    id_provincia?: number;
+    id_distrito?: number;
+    calle?: string;
+    numero?: string;
+    cp?: number | string;
+  } | null): void {
+    if (!address) {
+      return;
+    }
+
+    this.departamento.set(address.id_departamento != null ? String(address.id_departamento) : '');
+    this.provincia.set(address.id_provincia != null ? String(address.id_provincia) : '');
+    this.distrito.set(address.id_distrito != null ? String(address.id_distrito) : '');
+    this.direccion.set(address.calle ?? '');
+    this.numeroCasa.set(address.numero ?? '');
+    this.codigoPostal.set(address.cp != null ? String(address.cp) : '');
+
+    this.filteredProvincias = this.provincias.filter(
+      pr => pr.departamento_id == Number(this.departamento())
+    );
+    this.filteredDistritos = this.distritos.filter(
+      d => d.provincia_id == Number(this.provincia())
+    );
+  }
+
+  private updateStepState(): void {
     if (this.isStep1Valid()) {
       this.step1Completed.set(true);
       this.step2Enabled.set(true);
@@ -291,6 +364,8 @@ export class CheckoutStore implements OnInit {
       this.step2Enabled.set(false);
     }
 
+    this.syncStep2Snapshot();
+
     if (this.step1Completed() && this.isStep2Valid()) {
       this.step2Completed.set(true);
     } else {
@@ -298,24 +373,48 @@ export class CheckoutStore implements OnInit {
     }
   }
 
-  onDepartamentoChange(): void {
+  private syncStep2Snapshot(): void {
+    this.initialStep2Values = {
+      departamento: String(this.departamento() ?? ''),
+      provincia: String(this.provincia() ?? ''),
+      distrito: String(this.distrito() ?? ''),
+      direccion: String(this.direccion() ?? ''),
+      numeroCasa: String(this.numeroCasa() ?? ''),
+      codigoPostal: String(this.codigoPostal() ?? '')
+    };
+  }
+
+  private hasStep2AddressChanged(): boolean {
+    return (
+      this.initialStep2Values.departamento !== String(this.departamento() ?? '') ||
+      this.initialStep2Values.provincia !== String(this.provincia() ?? '') ||
+      this.initialStep2Values.distrito !== String(this.distrito() ?? '') ||
+      this.initialStep2Values.direccion !== String(this.direccion() ?? '') ||
+      this.initialStep2Values.numeroCasa !== String(this.numeroCasa() ?? '') ||
+      this.initialStep2Values.codigoPostal !== String(this.codigoPostal() ?? '')
+    );
+  }
+
+  onDepartamentoChange(value: string): void {
+    this.departamento.set(value);
     this.provincia.set('');
     this.distrito.set('');
     this.filteredDistritos = [];
     this.filteredProvincias = this.provincias.filter(p =>
-      p.departamento_id == Number(this.departamento())
+      p.departamento_id == Number(value)
     );
-    this.checkoutService.updateField('departamento', this.departamento());
+    this.checkoutService.updateField('departamento', value);
     this.checkoutService.updateField('provincia', '');
     this.checkoutService.updateField('distrito', '');
   }
 
-  onProvinciaChange(): void {
+  onProvinciaChange(value: string): void {
+    this.provincia.set(value);
     this.distrito.set('');
     this.filteredDistritos = this.distritos.filter(d =>
-      d.provincia_id == Number(this.provincia())
+      d.provincia_id == Number(value)
     );
-    this.checkoutService.updateField('provincia', this.provincia());
+    this.checkoutService.updateField('provincia', value);
     this.checkoutService.updateField('distrito', '');
   }
 
@@ -333,32 +432,50 @@ export class CheckoutStore implements OnInit {
 
   completeStep1(): void {
     if (this.isStep1Valid()) {
-      this.step1Completed.set(true);
-      this.step2Enabled.set(true);
+      const user = this.authService.currentUser();
+      if (user) {
+        this.userService.patch(user.id_usuario, {
+          dni: this.dni(),
+          telefono: this.telefono()
+        }).subscribe({
+          next: (resp) => {
+            this.toastService.showSuccess('¡Datos guardados correctamente!');
+          },
+          error: (err) => {
+            console.error(err);
+          }
+        });
+        this.step1Completed.set(true);
+        this.step2Enabled.set(true);
+      } 
     }
   }
 
   completeStep2(): void {
     if (this.isStep2Valid()) {
+      const shouldSaveAddress = this.deliveryType() === 'home' && this.hasStep2AddressChanged();
+
+      if (shouldSaveAddress) {
+        this.directionService.actualizarPrincipal({
+          id_departamento: Number(this.departamento()),
+          id_provincia: Number(this.provincia()),
+          id_distrito: Number(this.distrito()),
+          calle: this.direccion(),
+          numero: this.numeroCasa(),
+          cp: Number(this.codigoPostal())
+        }).subscribe({
+          next: () => {
+            this.syncStep2Snapshot();
+            this.toastService.showSuccess('¡Datos actualizados correctamente!');
+          },
+          error: (err) => {
+            console.error(err);
+          }
+        });
+      }
+
       this.step2Completed.set(true);
     }
-  }
-
-  buscarEnMapa(): void {
-    const dep = this.departamentos.find(
-      d => String(d.id) === String(this.departamento())
-    );
-    const prov = this.filteredProvincias.find(
-      p => String(p.id) === String(this.provincia())
-    );
-    const dist = this.filteredDistritos.find(
-      d => String(d.id) === String(this.distrito())
-    );
-    const dir = `${this.direccion()} ${this.numeroCasa()}, ${dist?.distrito}, ${prov?.provincia}, ${dep?.departamento}, Perú`;
-    const url = `https://maps.google.com/maps?q=${encodeURIComponent(dir)}&t=&z=17&ie=UTF8&iwloc=&output=embed`;
-    this.mapUrl.set(
-      this.sanitizer.bypassSecurityTrustResourceUrl(url)
-    );
   }
 
   goBackToStore(): void {
@@ -472,7 +589,14 @@ export class CheckoutStore implements OnInit {
     this.couponCode.set('');
     this.couponError.set('');
     this.appliedCoupon.set(null);
-    this.cartService.setCoupon(null);
+    this.cartService.setCoupon(null).subscribe({
+      next: () => {
+        this.toastService.showSuccess('Cupón eliminado correctamente.');
+      },
+      error: err => {
+        console.error(err);
+      }
+    });
   }
 
   cancelCoupon(): void {

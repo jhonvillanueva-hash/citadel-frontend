@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -56,6 +56,9 @@ export class SalesDetailComponent implements OnInit {
   products = signal<DetailProduct[]>([]);
   cupon = signal<Cupon | null>(null);
   isLoading = signal(true);
+  direccionPrincipal = computed(() =>
+    this.usuario()?.direcciones?.find(d => d.principal)
+  );
 
   // Summary values
   subtotal = signal(0);
@@ -95,7 +98,7 @@ export class SalesDetailComponent implements OnInit {
       switchMap(carrito => {
         this.carrito.set(carrito);
         return forkJoin({
-          usuario: this.userService.getById(carrito.id_usuario).pipe(take(1)),
+          usuario: this.userService.getById(carrito.direccion.id_usuario).pipe(take(1)),
           productos: this.cartProductService.findByField('id_carrito', id).pipe(map((p: any) => Array.isArray(p) ? p : [p]), take(1)),
           cupon: carrito.id_cupon ? this.couponService.getById(carrito.id_cupon).pipe(take(1)) : of(null),
           vinos: this.vinoService.getAll().pipe(take(1)),
@@ -145,6 +148,7 @@ export class SalesDetailComponent implements OnInit {
       },
       error: (err) => {
         this.toastService.showError('Error cargando detalle de venta', err);
+        console.error(err);
       }
     });
   }

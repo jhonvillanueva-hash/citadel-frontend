@@ -6,9 +6,9 @@
   <div class="relative w-full" style="padding-top: 40%;">
     @for (img of images; track img; let i = $index) {
       <div class="absolute top-0 left-0 w-full h-full transition-opacity duration-700 ease-in-out"
-           [class.opacity-0]="currentIndex !== i"
-           [class.opacity-100]="currentIndex === i"
-           [class.z-10]="currentIndex === i">
+           [class.opacity-0]="currentIndex() !== i"
+           [class.opacity-100]="currentIndex() === i"
+           [class.z-10]="currentIndex() === i">
         <img [src]="img"
              [alt]="'Slide ' + (i + 1)"
              class="w-full h-full object-cover">
@@ -44,9 +44,9 @@
         <button
           (click)="goToSlide(i)"
           class="w-2.5 h-2.5 rounded-full transition-all duration-300 hover:scale-125"
-          [class.bg-white]="currentIndex === i"
-          [class.bg-white/60]="currentIndex !== i"
-          [class.w-6]="currentIndex === i"
+          [class.bg-white]="currentIndex() === i"
+          [class.bg-white/60]="currentIndex() !== i"
+          [class.w-6]="currentIndex() === i"
           aria-label="Ir al slide {{ i + 1 }}">
         </button>
       }

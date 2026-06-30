@@ -25,7 +25,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { UsuarioService } from '../../../../../data/services/usuario.service';
 import { AuthService } from '../../../../../core/services/auth.service';
-import { Usuario, Vino, Precio, HistorialPedido } from '../../../../../data/models/api.models';
+import { Usuario, HistorialPedido } from '../../../../../data/models/api.models';
 import { RouterLink } from "@angular/router";
 import { CarritoService } from '../../../../../data/services/cart.service';
 import { CarritoProductoService } from '../../../../../data/services/carrito-producto.service';
@@ -33,6 +33,7 @@ import { finalize, forkJoin, map, switchMap, take } from 'rxjs';
 import { CuponService } from '../../../../../data/services/cupon.service';
 import { VinoService } from '../../../../../data/services/vino.service';
 import { PrecioService } from '../../../../../data/services/precio.service';
+import { ToastService } from '../../../../../shared/components/toast/toast.service';
 
 interface OrderProduct {
   id: number
@@ -44,7 +45,7 @@ interface OrderProduct {
 
 interface Order {
   id: string;
-  date: string;
+  date: Date;
   total: number;
   subtotal: number;
   shippingFee: number;
@@ -64,8 +65,6 @@ interface UserProfile {
   email: string;
   phone: string;
   dni: string;
-  address: string;
-  city: string;
 }
 
 const EMPTY_PROFILE: UserProfile = {
@@ -74,8 +73,6 @@ const EMPTY_PROFILE: UserProfile = {
   email: '',
   phone: '',
   dni: '',
-  address: '',
-  city: ''
 };
 
 @Component({
@@ -93,6 +90,7 @@ export class ProfileStore implements OnInit {
   private cuponService = inject(CuponService);
   private vinoService = inject(VinoService);
   private precioService = inject(PrecioService);
+  private toastService = inject(ToastService);
 
   currentUser = this.authService.currentUser;
   usuarioApi = signal<Usuario | null>(null);
@@ -120,13 +118,7 @@ export class ProfileStore implements OnInit {
   isEditingProfile = signal(false);
   isSaving = signal(false);
   isLoadingOrders = signal(false);
-  avatarDb = signal<string | null>(null);
-  avatarPreview = signal<string | null>(null);
   isMobileMenuOpen = signal(false);
-
-  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
-  selectedFileName = signal<string | null>(null);
-  selectedFile = signal<File | null>(null);
 
   triggerFileInput(input: HTMLInputElement) {
     if (this.isSaving()) return;
@@ -215,16 +207,10 @@ export class ProfileStore implements OnInit {
       email: user.email || '',
       phone: user.telefono || '',
       dni: user.dni || '',
-      address: user.direccion || '',
-      city: user.ciudad || ''
     };
 
     this.userDataProfile.set(profile);
     this.originalProfile.set({ ...profile });
-
-    if (user.url_img) {
-      this.avatarDb.set(user.url_img);
-    }
   }
 
   updateField(field: keyof UserProfile, value: string): void {
@@ -240,55 +226,6 @@ export class ProfileStore implements OnInit {
     this.isMobileMenuOpen.set(false);
   }
 
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    if (this.isSaving()) return;
-
-    const file = event.dataTransfer?.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) return;
-
-    this.selectedFileName.set(file.name);
-    this.selectedFile.set(file);
-    this.processImage(file);
-  }
-
-  onFileSelected(event: Event): void {
-    if (this.isSaving()) return;
-    const input = event.target as HTMLInputElement;
-
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-
-      this.selectedFileName.set(file.name);
-      this.selectedFile.set(file);
-      this.processImage(file);
-
-      input.value = '';
-    }
-  }
-
-  processImage(file: File): void {
-    if (file.size > 5 * 1024 * 1024) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      this.avatarPreview.set(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-  }
-
-  removeAvatar(): void {
-    if (this.isSaving()) return;
-    this.avatarPreview.set(null);
-    this.selectedFileName.set(null);
-    this.selectedFile.set(null);
-
-    if (this.fileInput) {
-      this.fileInput.nativeElement.value = '';
-    }
-  }
-
   enableEditing(): void {
     this.isEditingProfile.set(true);
   }
@@ -296,9 +233,6 @@ export class ProfileStore implements OnInit {
   cancelEditing(): void {
     this.userDataProfile.set({ ...this.originalProfile() });
     this.fieldErrors.set({});
-    this.avatarPreview.set(null);
-    this.selectedFile.set(null);
-    this.selectedFileName.set(null);
     this.isEditingProfile.set(false);
   }
 
@@ -311,23 +245,17 @@ export class ProfileStore implements OnInit {
 
     const current = this.userDataProfile();
 
-    const formData = new FormData();
-    formData.append('nombres', current.firstName);
-    formData.append('apellidos', current.lastName);
-    formData.append('telefono', current.phone);
-    formData.append('dni', current.dni);
-    formData.append('direccion', current.address);
-    formData.append('ciudad', current.city);
-
-    const file = this.selectedFile();
-    if (file) {
-      formData.append('imagen', file);
-    }
+    const payload = {
+      nombres: current.firstName,
+      apellidos: current.lastName,
+      telefono: current.phone,
+      dni: current.dni,
+    };
 
     this.isSaving.set(true);
 
     this.usuarioService
-      .updateProfile(user.id_usuario, formData)
+      .updateProfile(user.id_usuario, payload)
       .pipe(
         finalize(() => {
           this.isSaving.set(false);
@@ -338,17 +266,10 @@ export class ProfileStore implements OnInit {
           this.usuarioApi.set(updatedUser);
           this.originalProfile.set({ ...current });
           this.isEditingProfile.set(false);
-          this.avatarPreview.set(null);
-          this.selectedFile.set(null);
-          this.selectedFileName.set(null);
-
-          if (updatedUser.url_img) {
-            this.avatarDb.set(updatedUser.url_img + '?t=' + Date.now());
-          }
+          this.toastService.showSuccess('Información actualizada correctamente.');
         },
         error: (err) => {
-          console.error(err);
-          alert('Error al actualizar perfil');
+          this.toastService.showError(err.error?.error ?? 'Error al actualizar perfil');
         }
       });
   }
@@ -398,27 +319,13 @@ export class ProfileStore implements OnInit {
           delete errors['dni'];
         }
         break;
-      case 'address':
-        if (profile.address && /[^a-zA-Z0-9\s]/.test(profile.address)) {
-          errors['address'] = 'No se permiten signos';
-        } else {
-          delete errors['address'];
-        }
-        break;
-      case 'city':
-        if (profile.city && /[^a-zA-Z\s]/.test(profile.city)) {
-          errors['city'] = 'No se permiten signos';
-        } else {
-          delete errors['city'];
-        }
-        break;
     }
 
     this.fieldErrors.set(errors);
   }
 
   validateAllFields(): boolean {
-    ['firstName', 'lastName', 'email', 'phone', 'dni', 'address', 'city'].forEach(f => this.validateField(f));
+    ['firstName', 'lastName', 'email', 'phone', 'dni'].forEach(f => this.validateField(f));
     return Object.keys(this.fieldErrors()).length === 0;
   }
 
@@ -466,7 +373,7 @@ export class ProfileStore implements OnInit {
       finalize(() => this.isLoadingOrders.set(false))
     ).subscribe({
       next: ({ carritos, vinos, precios }) => {
-        const vendidos = carritos.filter(c => ['E', 'R', 'P', 'S', 'C', 'A'].includes(c.estado));
+        const vendidos = carritos.filter(c => ['R', 'P', 'S', 'C', 'A'].includes(c.estado));
 
         if (vendidos.length === 0) {
           return;
@@ -489,6 +396,7 @@ export class ProfileStore implements OnInit {
 
               const subtotal = orderProducts.reduce((sum, p) => sum + (p.quantity * p.price), 0);
               const shippingFee = carrito.tipo === 'D' ? 20 : 0;
+              const date = new Date(carrito.fecha_compra);
 
               if (carrito.id_cupon) {
                 return this.cuponService.getById(carrito.id_cupon).pipe(
@@ -503,10 +411,9 @@ export class ProfileStore implements OnInit {
                     }
 
                     const total = Math.max(0, subtotal + shippingFee - discount);
-
                     return {
                       id: carrito.id_carrito.toString(),
-                      date: new Date(carrito.fecha_compra).toLocaleDateString(),
+                      date: date,
                       total,
                       subtotal,
                       shippingFee,
@@ -523,7 +430,7 @@ export class ProfileStore implements OnInit {
                 const total = subtotal + shippingFee;
                 return [{
                   id: carrito.id_carrito.toString(),
-                  date: new Date(carrito.fecha_compra).toLocaleDateString(),
+                  date: date,
                   total,
                   subtotal,
                   shippingFee,
@@ -574,10 +481,10 @@ export class ProfileStore implements OnInit {
     this.carritoService.getHistory(Number(orderId)).subscribe({
       next: (history: any[]) => {
         this.ordersSignal.update(orders =>
-          orders.map(o => o.id === orderId ? { 
-            ...o, 
-            history: history.sort((a: { fecha_cambio: string | number | Date; }, b: { fecha_cambio: string | number | Date; }) => new Date(a.fecha_cambio).getTime() - new Date(b.fecha_cambio).getTime()), 
-            isLoadingHistory: false 
+          orders.map(o => o.id === orderId ? {
+            ...o,
+            history: history.sort((a: { fecha_cambio: string | number | Date; }, b: { fecha_cambio: string | number | Date; }) => new Date(a.fecha_cambio).getTime() - new Date(b.fecha_cambio).getTime()),
+            isLoadingHistory: false
           } : o)
         );
       },

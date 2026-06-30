@@ -21,7 +21,7 @@ import { CarritoProductoService } from '../../../data/services/carrito-producto.
 import { UsuarioService } from '../../../data/services/usuario.service';
 import { CuponService } from '../../../data/services/cupon.service';
 import { ToastService } from '../../../shared/components/toast/toast.service';
-import { forkJoin, take, map } from 'rxjs';
+import { forkJoin, take, map, tap } from 'rxjs';
 
 interface Sale {
   id: number;
@@ -131,7 +131,6 @@ export class SalesListComponent implements OnInit {
     }).subscribe({
       next: ({ carritos, usuarios, cupones }) => {
         const vendidos = carritos.filter(c => c.estado !== 'E');
-        
         if (vendidos.length === 0) {
           this.allSales.set([]);
           this.isLoading.set(false);
@@ -139,7 +138,7 @@ export class SalesListComponent implements OnInit {
         }
 
         const saleObservables = vendidos.map(carrito => {
-          const user = usuarios.find(u => u.id_usuario === carrito.id_usuario);
+          const user = usuarios.find(u => u.id_usuario === carrito.direccion.id_usuario);
           
           return this.cartProductService.findByField('id_carrito', carrito.id_carrito).pipe(
             map((productos: any) => {
@@ -165,7 +164,7 @@ export class SalesListComponent implements OnInit {
 
               return {
                 id: carrito.id_carrito,
-                id_usuario: carrito.id_usuario,
+                id_usuario: carrito.direccion.id_usuario,
                 customerName: user ? `${user.nombres} ${user.apellidos}` : 'Usuario desconocido',
                 customerEmail: user?.email || 'N/A',
                 date: new Date(carrito.fecha_compra).toLocaleDateString(),
