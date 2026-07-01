@@ -1,0 +1,37 @@
+# Vinos Citadel
+
+Sitio web oficial de Vinos Citadel.
+
+Vinos Citadel es una tienda en linea especializada en la venta de vinos. El sitio permite explorar el catalogo, consultar informacion detallada de cada producto, buscar vinos por sabor y dulzor, administrar una cuenta de usuario y realizar compras en linea.
+
+## Paginas principales
+
+- https://vinoscitadel.store/
+- https://vinoscitadel.store/nosotros
+- https://vinoscitadel.store/store/search
+- https://vinoscitadel.store/store/cart
+- https://vinoscitadel.store/terms-and-conditions
+- https://vinoscitadel.store/refund-policy
+- https://vinoscitadel.store/libro-de-reclamaciones
+
+## Contenido
+
+El sitio incluye:
+
+- Catalogo de vinos.
+- Fichas de productos.
+- Busqueda de productos.
+- Clasificacion por sabor.
+- Clasificacion por nivel de dulzor.
+- Carrito de compras.
+- Proceso de compra (checkout).
+- Gestion de perfil, pedidos y direcciones.
+- Informacion legal y politicas comerciales.
+
+## Idioma
+
+Espanol.
+
+## Fuente oficial
+
+- https://vinoscitadel.store/

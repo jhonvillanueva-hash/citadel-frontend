@@ -23,6 +23,8 @@ export interface CartItem {
   precios_por_cantidad: Array<{ cantidad: number; precio: number }>;
   botellas_por_caja: number;
   esCaja: boolean;
+  animationDirection?: 'up' | 'down' | null;
+  oldCantidad?: number;
 }
 
 const LS_KEY = 'shopping_cart';
@@ -183,7 +185,6 @@ export class CartService {
     const carrito = this._carritoActivo();
     if (!carrito) return;
 
-    // Solo actualizar si el tipo es diferente para evitar peticiones innecesarias
     if (carrito.tipo === tipo) return;
 
     this.isLoading.set(true);
@@ -285,7 +286,7 @@ export class CartService {
     this._saveToLocalStorage();
   }
 
-  private _loadFromApi(): void {
+  private _loadFromApi(): void {    
     this.isLoading.set(true);
     this.apiCarrito.getAll().pipe(
       switchMap((carritos: Carrito[]) => {

@@ -1,45 +1,39 @@
 <div class="fixed bottom-4 right-4 left-4 sm:right-4 sm:left-auto z-[99999] space-y-3 max-w-full sm:w-96">
   @for (toast of toasts(); track toast.id) {
-    <div
-      class="rounded-lg shadow-xl p-4 text-white transition-all duration-300 ease-in-out opacity-0 animate-toast-in"
-      [ngClass]="getStyles(toast).bg"
-    >
+  <div class="rounded-lg shadow-xl p-4 text-white transition-all duration-300 ease-in-out opacity-0 animate-toast-in"
+    [ngClass]="getStyles(toast).bg">
 
-      <div class="flex items-start justify-between gap-3">
-        <div class="flex gap-2 min-w-0 flex-1">
-          <fa-icon class="text-lg mt-0.5" [icon]="getStyles(toast).icon"/>
-          <div>
-            <h3 class="text-sm font-semibold">
-              {{ toast.title }}
-            </h3>
-            @if (toast.message) {
-              <p class="text-xs mt-1 opacity-90 break-words">
-                {{ toast.message }}
-              </p>
-            }
-          </div>
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex gap-2 min-w-0 flex-1">
+        <fa-icon class="text-lg mt-0.5" [icon]="getStyles(toast).icon" />
+        <div>
+          <h3 class="text-sm font-semibold">
+            {{ toast.title }}
+          </h3>
+          @if (toast.message) {
+          <p class="text-xs mt-1 opacity-90 break-words">
+            {{ toast.message }}
+          </p>
+          }
         </div>
-
-        <button
-          class="text-white hover:opacity-70"
-          (click)="close(toast.id)">
-          <fa-icon [icon]="icons.faXmark"/>
-        </button>
       </div>
 
-      @if (toast.stack) {
-        <button
-          class="text-xs mt-2 underline"
-          (click)="toggle(toast.id)">
-          Ver más
-        </button>
+      <button class="text-white hover:opacity-70" (click)="close(toast.id)">
+        <fa-icon [icon]="icons.faXmark" />
+      </button>
+    </div>
 
-        @if (expanded() === toast.id) {
-          <pre class="mt-2 text-[10px] bg-black/30 p-2 rounded overflow-auto max-h-40">
+    @if (toast.stack) {
+    <button class="text-xs mt-2 underline" (click)="toggle(toast.id)">
+      Ver más
+    </button>
+
+    @if (expanded() === toast.id) {
+    <pre class="mt-2 text-[10px] bg-black/30 p-2 rounded overflow-auto max-h-40">
             {{ toast.stack }}
           </pre>
-        }
-      }
-    </div>
+    }
+    }
+  </div>
   }
 </div>

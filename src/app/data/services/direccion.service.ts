@@ -27,4 +27,20 @@ export class DireccionService extends BaseHttpService<Direccion> {
       }
     );
   }
+
+  override getAll(): Observable<Direccion[]> {
+    return this.http.get<Direccion[]>(this.fullUrl, { withCredentials: true });
+  }
+
+  override create(direccion: Partial<Direccion>): Observable<Direccion> {
+    return this.http.post<Direccion>(this.fullUrl, direccion, { withCredentials: true });
+  }
+
+  override update(id: number, direccion: Partial<Direccion>): Observable<Direccion> {
+    return this.http.put<Direccion>(`${this.fullUrl}/${id}`, direccion, { withCredentials: true });
+  }
+
+  override delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.fullUrl}/${id}`, { withCredentials: true });
+  }
 }

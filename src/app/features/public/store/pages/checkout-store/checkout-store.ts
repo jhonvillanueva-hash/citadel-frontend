@@ -100,6 +100,26 @@ export class CheckoutStore implements OnInit {
   filteredProvincias: any[] = [];
   filteredDistritos: any[] = [];
 
+  isEditingStep1 = signal(false);
+  isEditingStep2 = signal(false);
+
+  private step1DataBackup = {
+    email: '',
+    nombres: '',
+    apellidos: '',
+    dni: '',
+    telefono: ''
+  };
+
+  private step2DataBackup = {
+    departamento: '',
+    provincia: '',
+    distrito: '',
+    direccion: '',
+    numeroCasa: '',
+    codigoPostal: ''
+  };
+
   showCouponInput = signal(false);
   couponCode = signal('');
   couponApplied = signal(false);
@@ -126,7 +146,6 @@ export class CheckoutStore implements OnInit {
     effect(() => {
       const carrito = this.cartService.getCarritoActivo();
 
-      // Sincronizar tipo de envío desde el carrito activo
       if (carrito?.tipo) {
         const type = carrito.tipo === 'D' ? 'home' : 'pickup';
         if (this.deliveryType() !== type) {
@@ -447,7 +466,7 @@ export class CheckoutStore implements OnInit {
         });
         this.step1Completed.set(true);
         this.step2Enabled.set(true);
-      } 
+      }
     }
   }
 
@@ -608,5 +627,54 @@ export class CheckoutStore implements OnInit {
   activateCoupon(): void {
     if (!this.isLogged) { this.router.navigate(['/login']); return; }
     this.showCouponInput.set(true);
+  }
+
+  enableEditingStep1(): void {
+    this.isEditingStep1.set(true);
+    this.step1DataBackup = {
+      email: this.email(),
+      nombres: this.nombres(),
+      apellidos: this.apellidos(),
+      dni: this.dni(),
+      telefono: this.telefono()
+    };
+  }
+
+  cancelEditingStep1(): void {
+    this.isEditingStep1.set(false);
+    this.email.set(this.step1DataBackup.email);
+    this.nombres.set(this.step1DataBackup.nombres);
+    this.apellidos.set(this.step1DataBackup.apellidos);
+    this.dni.set(this.step1DataBackup.dni);
+    this.telefono.set(this.step1DataBackup.telefono);
+  }
+
+  enableEditingStep2(): void {
+    this.isEditingStep2.set(true);
+    this.step2DataBackup = {
+      departamento: this.departamento(),
+      provincia: this.provincia(),
+      distrito: this.distrito(),
+      direccion: this.direccion(),
+      numeroCasa: this.numeroCasa(),
+      codigoPostal: this.codigoPostal()
+    };
+  }
+
+  cancelEditingStep2(): void {
+    this.isEditingStep2.set(false);
+    this.departamento.set(this.step2DataBackup.departamento);
+    this.provincia.set(this.step2DataBackup.provincia);
+    this.distrito.set(this.step2DataBackup.distrito);
+    this.direccion.set(this.step2DataBackup.direccion);
+    this.numeroCasa.set(this.step2DataBackup.numeroCasa);
+    this.codigoPostal.set(this.step2DataBackup.codigoPostal);
+
+    this.filteredProvincias = this.provincias.filter(
+      pr => pr.departamento_id == Number(this.departamento())
+    );
+    this.filteredDistritos = this.distritos.filter(
+      d => d.provincia_id == Number(this.provincia())
+    );
   }
 }

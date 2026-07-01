@@ -79,6 +79,20 @@ export const routes: Routes = [
     title: 'Mi perfil',
   },
   {
+    path: 'store/profile/orders',
+    component: ProfileStore,
+    data: { showHeader: false, showFooter: false },
+    canActivate: [authGuard],
+    title: 'Mis pedidos',
+  },
+  {
+    path: 'store/profile/addresses',
+    component: ProfileStore,
+    data: { showHeader: false, showFooter: false },
+    canActivate: [authGuard],
+    title: 'Mis direcciones',
+  },
+  {
     path: 'store/search',
     component: SearchStore,
     data: { showHeader: true, showFooter: true },

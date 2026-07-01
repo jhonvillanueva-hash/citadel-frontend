@@ -28,7 +28,7 @@
       <nav class="flex-1 p-4 space-y-1 mt-4">
         @for (tab of tabs; track tab.id) {
           <button
-            (click)="activeTab.set(tab.id)"
+            (click)="switchTab(tab.id)"
             class="w-full text-left px-3 py-2 text-sm font-medium transition-all duration-200 flex items-center space-x-3"
             [class]="activeTab() === tab.id
               ? 'bg-gray-100 text-[#0e0d12]'
@@ -110,7 +110,7 @@
         <nav class="flex-1 p-4 space-y-1 mt-4">
           @for (tab of tabs; track tab.id) {
             <button
-              (click)="activeTab.set(tab.id); closeMobileMenu()"
+              (click)="switchTab(tab.id); closeMobileMenu()"
               class="w-full text-left px-3 py-2 text-sm font-medium transition-all duration-200 flex items-center space-x-3"
               [class]="activeTab() === tab.id
                 ? 'bg-gray-100 text-[#0e0d12]'
@@ -318,6 +318,26 @@
                         }
                       </h4>
                       <p class="text-sm text-[#0e0d12]/50 mt-0.5">{{ order.date | date:'dd/MM/yyyy HH:mm' }}</p>
+                      @if (order.type === 'D' && order.destinationAddress) {
+                        <div class="mt-2 text-xs text-[#0e0d12]/60">
+                          <span class="font-semibold text-[#0e0d12]/70">Destino:</span>
+                          {{ order.destinationAddress.calle }} {{ order.destinationAddress.numero }}
+                          @if (order.destinationAddress.cp) {
+                            <span> - CP {{ order.destinationAddress.cp }}</span>
+                          }
+                          <div class="mt-0.5">
+                            @if (getDepartamentoName(order.destinationAddress.id_departamento)) {
+                              <span>{{ getDepartamentoName(order.destinationAddress.id_departamento) }}</span>
+                            }
+                            @if (getProvinciaName(order.destinationAddress.id_provincia)) {
+                              <span> - {{ getProvinciaName(order.destinationAddress.id_provincia) }}</span>
+                            }
+                            @if (getDistritoName(order.destinationAddress.id_distrito)) {
+                              <span> - {{ getDistritoName(order.destinationAddress.id_distrito) }}</span>
+                            }
+                          </div>
+                        </div>
+                      }
                     </div>
 
                     <!-- Precio y Acciones -->
@@ -469,6 +489,208 @@
                       </div>
                     </div>
                   }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @if (activeTab() === 'addresses') {
+        <div class="max-w-4xl mx-auto">
+          <div class="flex justify-between items-start mb-8">
+            <div>
+              <h2 class="text-2xl font-bold text-[#0e0d12]">Mis Direcciones</h2>
+              <p class="text-sm text-[#0e0d12]/50">Gestiona tus direcciones de envío y recojo</p>
+            </div>
+            @if (!isEditingAddressForm()) {
+              <button
+                (click)="openNewAddressForm()"
+                class="px-5 py-2 text-sm font-medium text-white bg-[#0e0d12] hover:bg-[#1c1a24] transition-all duration-200 flex items-center gap-2"
+              >
+                <fa-icon [icon]="faPlus"></fa-icon>
+                <span>Nueva Dirección</span>
+              </button>
+            }
+          </div>
+
+          @if (isEditingAddressForm()) {
+            <div class="bg-white border border-gray-200 p-6 mb-8 shadow-sm">
+              <h3 class="text-lg font-bold text-[#0e0d12] mb-6">
+                {{ currentAddressId() ? 'Editar Dirección' : 'Nueva Dirección' }}
+              </h3>
+              
+              <form [formGroup]="addressForm" (ngSubmit)="saveAddress()" class="space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div>
+                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Departamento</label>
+                    <select
+                      formControlName="id_departamento"
+                      class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#0e0d12] focus:border-[#0e0d12] transition-all duration-200 disabled:opacity-50 text-sm"
+                    >
+                      <option value="">Seleccione...</option>
+                      @for (dep of departamentos(); track $index) {
+                        <option [value]="dep.id_ubigeo">{{ dep.nombre_ubigeo }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Provincia</label>
+                    <select
+                      formControlName="id_provincia"
+                      class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#0e0d12] focus:border-[#0e0d12] transition-all duration-200 disabled:opacity-50 text-sm"
+                    >
+                      <option value="">Seleccione...</option>
+                      @for (prov of provinciasFiltradas(); track $index) {
+                        <option [value]="prov.id_ubigeo">{{ prov.nombre_ubigeo }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Distrito</label>
+                    <select
+                      formControlName="id_distrito"
+                      class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#0e0d12] focus:border-[#0e0d12] transition-all duration-200 disabled:opacity-50 text-sm"
+                    >
+                      <option value="">Seleccione...</option>
+                      @for (dist of distritosFiltrados(); track $index) {
+                        <option [value]="dist.id_ubigeo">{{ dist.nombre_ubigeo }}</option>
+                      }
+                    </select>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div class="md:col-span-2">
+                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Calle / Avenida</label>
+                    <input
+                      type="text"
+                      formControlName="calle"
+                      placeholder="Ej. Av. Larco"
+                      class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#0e0d12] focus:border-[#0e0d12] transition-all duration-200 text-sm"
+                    >
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Número / Dpto</label>
+                    <input
+                      type="text"
+                      formControlName="numero"
+                      placeholder="Ej. 123 Dpto 401"
+                      class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#0e0d12] focus:border-[#0e0d12] transition-all duration-200 text-sm"
+                    >
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Código Postal</label>
+                    <input
+                      type="text"
+                      formControlName="cp"
+                      placeholder="Ej. 15074"
+                      maxlength="5"
+                      (keypress)="onlyNumbers($event)"
+                      class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#0e0d12] focus:border-[#0e0d12] transition-all duration-200 text-sm"
+                    >
+                  </div>
+                </div>
+
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="principal"
+                    formControlName="principal"
+                    class="w-4 h-4 text-[#0e0d12] bg-gray-100 border-gray-300 rounded focus:ring-[#0e0d12]"
+                  >
+                  <label for="principal" class="ml-2 text-sm font-medium text-[#0e0d12]">
+                    Establecer como dirección principal
+                  </label>
+                </div>
+
+                <div class="flex gap-3 justify-end pt-4 border-t border-gray-100">
+                  <button
+                    type="button"
+                    (click)="cancelEditAddress()"
+                    [disabled]="isSaving()"
+                    class="px-5 py-2 text-sm font-medium text-[#0e0d12] border border-gray-300 hover:bg-gray-50 transition-all duration-200 disabled:opacity-50"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    [disabled]="addressForm.invalid || isSaving()"
+                    class="px-5 py-2 text-sm font-medium text-white bg-[#0e0d12] hover:bg-[#1c1a24] transition-all duration-200 disabled:bg-gray-300"
+                  >
+                    {{ isSaving() ? 'Guardando...' : 'Guardar' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          }
+
+          @if (isLoadingAddresses()) {
+            <div class="flex flex-col items-center justify-center py-20">
+              <div class="w-10 h-10 border-2 border-[#0e0d12] border-t-transparent rounded-full animate-spin mb-4"></div>
+              <p class="text-sm text-[#0e0d12]/50 font-medium">Cargando direcciones...</p>
+            </div>
+          } @else if (direcciones().length === 0 && !isEditingAddressForm()) {
+            <div class="py-16 text-center border-2 border-dashed border-gray-200 bg-gray-50/50">
+              <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <fa-icon [icon]="faMapMarkerAlt" class="text-2xl text-gray-300"></fa-icon>
+              </div>
+              <h3 class="text-base font-semibold text-[#0e0d12]">Sin direcciones</h3>
+              <p class="text-sm text-[#0e0d12]/50 mt-1 mb-6">No tienes ninguna dirección registrada.</p>
+              <button
+                (click)="openNewAddressForm()"
+                class="px-6 py-2.5 bg-[#0e0d12] text-white text-sm font-medium hover:bg-[#1c1a24] transition-all duration-200"
+              >
+                Agregar mi primera dirección
+              </button>
+            </div>
+          } @else if (!isEditingAddressForm()) {
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              @for (dir of direcciones(); track dir.id_direccion) {
+                <div class="border transition-colors relative"
+                     [class]="dir.principal ? 'border-[#0e0d12] shadow-sm bg-white' : 'border-gray-200 bg-gray-50 hover:border-gray-300'">
+                  @if (dir.principal) {
+                    <div class="absolute top-0 right-0 bg-[#0e0d12] text-white text-[10px] font-bold px-2 py-1 uppercase flex items-center gap-1">
+                      <fa-icon [icon]="faStar"></fa-icon> Principal
+                    </div>
+                  }
+                  
+                  <div class="p-5">
+                    <p class="font-bold text-[#0e0d12] text-lg mb-1">{{ dir.calle }} {{ dir.numero }}</p>
+                    <p class="text-sm text-[#0e0d12]/60 mb-0.5">
+                      {{ getDistritoName(dir.id_distrito) }}, {{ getProvinciaName(dir.id_provincia) }}
+                    </p>
+                    <p class="text-sm text-[#0e0d12]/60 mb-4">
+                      {{ getDepartamentoName(dir.id_departamento) }} - {{ dir.cp }}
+                    </p>
+                    
+                    <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
+                      <button
+                        (click)="editAddress(dir)"
+                        class="text-sm font-medium text-[#0e0d12] hover:underline flex items-center gap-1.5"
+                      >
+                        <fa-icon [icon]="faEdit" class="text-xs"></fa-icon> Editar
+                      </button>
+                      <span class="text-gray-300">|</span>
+                      <button
+                        (click)="deleteAddress(dir.id_direccion)"
+                        class="text-sm font-medium text-red-600 hover:underline flex items-center gap-1.5"
+                      >
+                        <fa-icon [icon]="faTrash" class="text-xs"></fa-icon> Eliminar
+                      </button>
+                      
+                      @if (!dir.principal) {
+                        <div class="ml-auto">
+                          <button
+                            (click)="setPrincipal(dir.id_direccion)"
+                            class="text-xs font-bold uppercase tracking-wider text-[#0e0d12] hover:underline"
+                          >
+                            Hacer principal
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  </div>
                 </div>
               }
             </div>
