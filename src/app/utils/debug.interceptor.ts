@@ -3,7 +3,7 @@ import { tap } from 'rxjs';
 
 export const debugInterceptor: HttpInterceptorFn = (req, next) => {
 
-  console.log("===== HTTP REQUEST =====");
+  console.log("▲▲▲▲▲===== HTTP REQUEST =====▲▲▲▲▲");
   console.log("URL:", req.url);
   console.log("Method:", req.method);
   console.log("Headers:", req.headers.keys().map(k => ({ [k]: req.headers.get(k) })));
@@ -20,14 +20,14 @@ export const debugInterceptor: HttpInterceptorFn = (req, next) => {
     tap({
       next: (event) => {
         if (event instanceof HttpResponse) {
-          console.log("===== HTTP RESPONSE =====");
+          console.log("▼▼▼▼▼===== HTTP RESPONSE =====▼▼▼▼▼");
           console.log("Status:", event.status);
           console.log("Body:", event.body);
           console.log("Headers:", event.headers);
         }
       },
       error: (err) => {
-        console.error("===== HTTP ERROR =====");
+        console.error("XXXXX===== HTTP ERROR =====XXXXX");
         console.error(err);
       }
     })

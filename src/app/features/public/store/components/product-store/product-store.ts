@@ -264,7 +264,6 @@ export class ProductStore implements OnInit {
         if (carritoActivo) return of(carritoActivo);
 
         return this.apiCartService.create({
-          id_usuario: user.id_usuario,
           estado: 'E'
         });
       }),

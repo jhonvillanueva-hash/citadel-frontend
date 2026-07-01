@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BaseHttpService, PathConfig } from '../../core/services/base-http.service';
 import { Usuario } from '../models/api.models';
-import { Observable } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService extends BaseHttpService<Usuario> {
@@ -13,15 +14,19 @@ export class UsuarioService extends BaseHttpService<Usuario> {
 
   updateProfile(
     id: number,
-    formData: FormData
+    data: Partial<Usuario>
   ): Observable<Usuario> {
 
-    return this.http.put<Usuario>(
+    return this.http.patch<Usuario>(
       `${this.fullUrl}/${id}`,
-      formData,
+      data,
       {
         withCredentials: true
       }
+    ).pipe(
+      catchError((error: HttpErrorResponse) => {
+        return throwError(() => error);
+      })
     );
   }
 

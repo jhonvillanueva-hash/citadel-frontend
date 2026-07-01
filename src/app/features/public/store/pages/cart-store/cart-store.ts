@@ -11,6 +11,58 @@ import { ToastService } from '../../../../../shared/components/toast/toast.servi
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './cart-store.html',
+styles: `
+  /* Contenedor que oculta los números cuando salen de su área */
+  .quantity-wrapper {
+    position: relative;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    height: 24px;     /* Ajusta según el tamaño de tu fuente */
+    min-width: 20px;  /* Evita que el contenedor cambie de ancho */
+  }
+
+  /* El número viejo se superpone para salir */
+  .qty-old {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .qty-new {
+    display: inline-flex;
+  }
+
+  /* CLASES DINÁMICAS - SUBIR */
+  .up-out { animation: slideUpOut 200ms ease-out forwards; }
+  .up-in  { animation: slideUpIn 200ms ease-out forwards; }
+
+  /* CLASES DINÁMICAS - BAJAR */
+  .down-out { animation: slideDownOut 200ms ease-out forwards; }
+  .down-in  { animation: slideDownIn 200ms ease-out forwards; }
+
+  /* KEYFRAMES */
+  @keyframes slideUpOut {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-100%); opacity: 0; }
+  }
+  @keyframes slideUpIn {
+    0% { transform: translateY(100%); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes slideDownOut {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(100%); opacity: 0; }
+  }
+  @keyframes slideDownIn {
+    0% { transform: translateY(-100%); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+`
 })
 export class CartStore {
   cartService = inject(CartService);
@@ -63,7 +115,12 @@ export class CartStore {
       return;
     }
 
-    this.cartService.updateQuantity(item, change);
+    item.oldCantidad = item.cantidad;
+    item.animationDirection = null;
+    setTimeout(() => {
+      item.animationDirection = change > 0 ? 'up' : 'down';
+      this.cartService.updateQuantity(item, change);
+    }, 0);
 
     if (change > 0) {
       this.toastService.showSuccess(

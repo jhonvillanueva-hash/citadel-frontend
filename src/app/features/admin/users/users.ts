@@ -53,8 +53,7 @@ export class Users implements OnInit {
             u.apellidos?.toLowerCase().includes(text) ||
             u.dni?.toLowerCase().includes(text) ||
             u.email?.toLowerCase().includes(text) ||
-            u.telefono?.toLowerCase().includes(text) ||
-            u.ciudad?.toLowerCase().includes(text)
+            u.telefono?.toLowerCase().includes(text)
           );
         }
         

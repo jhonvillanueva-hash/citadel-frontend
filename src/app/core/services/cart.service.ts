@@ -23,6 +23,8 @@ export interface CartItem {
   precios_por_cantidad: Array<{ cantidad: number; precio: number }>;
   botellas_por_caja: number;
   esCaja: boolean;
+  animationDirection?: 'up' | 'down' | null;
+  oldCantidad?: number;
 }
 
 const LS_KEY = 'shopping_cart';
@@ -183,7 +185,6 @@ export class CartService {
     const carrito = this._carritoActivo();
     if (!carrito) return;
 
-    // Solo actualizar si el tipo es diferente para evitar peticiones innecesarias
     if (carrito.tipo === tipo) return;
 
     this.isLoading.set(true);
@@ -285,7 +286,7 @@ export class CartService {
     this._saveToLocalStorage();
   }
 
-  private _loadFromApi(): void {
+  private _loadFromApi(): void {    
     this.isLoading.set(true);
     this.apiCarrito.getAll().pipe(
       switchMap((carritos: Carrito[]) => {
@@ -308,7 +309,7 @@ export class CartService {
   }
 
   private _mapApiItem(p: any): CartItem {
-    const vino = p.Precio?.Vino ?? {};
+    const vino = p.precio?.Vino ?? {};
     const presentacion = vino.Presentacion ?? {};
     const precios = (vino.Precios ?? []).map((pr: any) => ({
       cantidad: Number(pr.cantidad_minima),
@@ -360,8 +361,7 @@ export class CartService {
       switchMap((carritos: Carrito[]) => {
         const activo = carritos.find(c => c.estado === 'E');
         if (activo) return of(activo);
-        const user = this.authService.currentUser()!;
-        return this.apiCarrito.create({ id_usuario: user.id_usuario, estado: 'E' });
+        return this.apiCarrito.create({ estado: 'E' });
       }),
       switchMap((carrito: Carrito) => {
         this._carritoActivo.set(carrito);

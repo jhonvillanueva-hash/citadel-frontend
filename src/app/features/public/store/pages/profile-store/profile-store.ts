@@ -1,6 +1,6 @@
 import { Component, signal, computed, inject, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { ViewChild, ElementRef } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -21,18 +21,24 @@ import {
   faStore,
   faReceipt,
   faTag,
-  faArrowUpRightFromSquare
+  faArrowUpRightFromSquare,
+  faMapMarkerAlt,
+  faPlus,
+  faStar
 } from '@fortawesome/free-solid-svg-icons';
 import { UsuarioService } from '../../../../../data/services/usuario.service';
+import { DireccionService } from '../../../../../data/services/direccion.service';
+import { UbigeoService, Departamento, Provincia, Distrito } from '../../../../../data/services/ubigeo.service';
 import { AuthService } from '../../../../../core/services/auth.service';
-import { Usuario, Vino, Precio, HistorialPedido } from '../../../../../data/models/api.models';
-import { RouterLink } from "@angular/router";
+import { Usuario, HistorialPedido, Direccion } from '../../../../../data/models/api.models';
+import { RouterLink, Router } from "@angular/router";
 import { CarritoService } from '../../../../../data/services/cart.service';
 import { CarritoProductoService } from '../../../../../data/services/carrito-producto.service';
 import { finalize, forkJoin, map, switchMap, take } from 'rxjs';
 import { CuponService } from '../../../../../data/services/cupon.service';
 import { VinoService } from '../../../../../data/services/vino.service';
 import { PrecioService } from '../../../../../data/services/precio.service';
+import { ToastService } from '../../../../../shared/components/toast/toast.service';
 
 interface OrderProduct {
   id: number
@@ -44,7 +50,7 @@ interface OrderProduct {
 
 interface Order {
   id: string;
-  date: string;
+  date: Date;
   total: number;
   subtotal: number;
   shippingFee: number;
@@ -53,6 +59,7 @@ interface Order {
   status: 'E' | 'R' | 'P' | 'S' | 'C' | 'A';
   type: 'D' | 'T';
   products: OrderProduct[];
+  destinationAddress?: Direccion | null;
   isExpanded?: boolean;
   history?: HistorialPedido[];
   isLoadingHistory?: boolean;
@@ -64,8 +71,6 @@ interface UserProfile {
   email: string;
   phone: string;
   dni: string;
-  address: string;
-  city: string;
 }
 
 const EMPTY_PROFILE: UserProfile = {
@@ -74,14 +79,12 @@ const EMPTY_PROFILE: UserProfile = {
   email: '',
   phone: '',
   dni: '',
-  address: '',
-  city: ''
 };
 
 @Component({
   selector: 'app-profile-store',
   standalone: true,
-  imports: [CommonModule, FormsModule, FontAwesomeModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, FontAwesomeModule, RouterLink],
   templateUrl: './profile-store.html'
 })
 export class ProfileStore implements OnInit {
@@ -93,6 +96,11 @@ export class ProfileStore implements OnInit {
   private cuponService = inject(CuponService);
   private vinoService = inject(VinoService);
   private precioService = inject(PrecioService);
+  private toastService = inject(ToastService);
+  private router = inject(Router);
+  private direccionService = inject(DireccionService);
+  private ubigeoService = inject(UbigeoService);
+  private fb = inject(FormBuilder);
 
   currentUser = this.authService.currentUser;
   usuarioApi = signal<Usuario | null>(null);
@@ -115,18 +123,15 @@ export class ProfileStore implements OnInit {
   faReceipt = faReceipt;
   faTag = faTag;
   faArrowUpRightFromSquare = faArrowUpRightFromSquare;
+  faMapMarkerAlt = faMapMarkerAlt;
+  faPlus = faPlus;
+  faStar = faStar;
 
-  activeTab = signal<'profile' | 'orders'>('profile');
+  activeTab = signal<'profile' | 'orders' | 'addresses'>('profile');
   isEditingProfile = signal(false);
   isSaving = signal(false);
   isLoadingOrders = signal(false);
-  avatarDb = signal<string | null>(null);
-  avatarPreview = signal<string | null>(null);
   isMobileMenuOpen = signal(false);
-
-  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
-  selectedFileName = signal<string | null>(null);
-  selectedFile = signal<File | null>(null);
 
   triggerFileInput(input: HTMLInputElement) {
     if (this.isSaving()) return;
@@ -135,7 +140,8 @@ export class ProfileStore implements OnInit {
 
   tabs = [
     { id: 'profile' as const, name: 'Perfil', icon: faUser },
-    { id: 'orders' as const, name: 'Pedidos', icon: faBox }
+    { id: 'orders' as const, name: 'Pedidos', icon: faBox },
+    { id: 'addresses' as const, name: 'Mis Direcciones', icon: faMapMarkerAlt }
   ];
 
   userDataProfile = signal<UserProfile>({ ...EMPTY_PROFILE });
@@ -164,8 +170,30 @@ export class ProfileStore implements OnInit {
     return `${maskedLocal}@${domain}`;
   });
 
+  direcciones = signal<Direccion[]>([]);
+  isLoadingAddresses = signal(false);
+  isEditingAddressForm = signal(false);
+  currentAddressId = signal<number | null>(null);
+
+  departamentos = signal<Departamento[]>([]);
+  provincias = signal<Provincia[]>([]);
+  distritos = signal<Distrito[]>([]);
+  provinciasFiltradas = signal<Provincia[]>([]);
+  distritosFiltrados = signal<Distrito[]>([]);
+
+  addressForm: FormGroup;
+
   constructor() {
-    this.loadOrders();
+    this.addressForm = this.fb.group({
+      id_departamento: ['', Validators.required],
+      id_provincia: [{ value: '', disabled: true }, Validators.required],
+      id_distrito: [{ value: '', disabled: true }, Validators.required],
+      calle: ['', [Validators.required, Validators.minLength(3)]],
+      numero: ['', Validators.required],
+      cp: ['', [Validators.required, Validators.pattern('^[0-9]{5}$')]],
+      principal: [false]
+    });
+
     effect(() => {
       const user = this.currentUser();
       if (user && user.dni) {
@@ -173,15 +201,75 @@ export class ProfileStore implements OnInit {
         this.mapUsuarioToProfile(user as any);
       }
     });
+
+    this.setupUbigeoCascade();
+  }
+
+  setupUbigeoCascade() {
+    this.addressForm.get('id_departamento')?.valueChanges.subscribe(depId => {
+      if (depId) {
+        this.provinciasFiltradas.set(this.provincias().filter(p => p.departamento_id == Number(depId)));
+        this.addressForm.get('id_provincia')?.enable();
+      } else {
+        this.provinciasFiltradas.set([]);
+        this.addressForm.get('id_provincia')?.disable();
+      }
+      this.addressForm.patchValue({ id_provincia: '', id_distrito: '' }, { emitEvent: false });
+      this.distritosFiltrados.set([]);
+      this.addressForm.get('id_distrito')?.disable();
+    });
+
+    this.addressForm.get('id_provincia')?.valueChanges.subscribe(provId => {
+      if (provId) {
+        this.distritosFiltrados.set(this.distritos().filter(d => d.provincia_id == Number(provId)));
+        this.addressForm.get('id_distrito')?.enable();
+      } else {
+        this.distritosFiltrados.set([]);
+        this.addressForm.get('id_distrito')?.disable();
+      }
+      this.addressForm.patchValue({ id_distrito: '' }, { emitEvent: false });
+    });
   }
 
   ngOnInit(): void {
+    this.checkRouteAndLoadData();
     const user = this.currentUser();
     if (user && user.dni) {
       this.usuarioApi.set(user as any);
       this.mapUsuarioToProfile(user as any);
     } else {
       this.loadUsuario();
+    }
+  }
+
+  checkRouteAndLoadData() {
+    if (this.router.url.includes('/orders')) {
+      this.activeTab.set('orders');
+      this.loadOrders();
+    } else if (this.router.url.includes('/addresses')) {
+      this.activeTab.set('addresses');
+      this.loadAddresses();
+      this.loadUbigeo();
+    } else {
+      this.activeTab.set('profile');
+    }
+  }
+
+  switchTab(tabId: 'profile' | 'orders' | 'addresses'): void {
+    this.activeTab.set(tabId);
+    if (tabId === 'orders') {
+      this.router.navigate(['/store/profile/orders']);
+      if (this.ordersSignal().length === 0 && !this.isLoadingOrders()) {
+        this.loadOrders();
+      }
+    } else if (tabId === 'addresses') {
+      this.router.navigate(['/store/profile/addresses']);
+      if (this.direcciones().length === 0 && !this.isLoadingAddresses()) {
+        this.loadAddresses();
+        this.loadUbigeo();
+      }
+    } else {
+      this.router.navigate(['/store/profile']);
     }
   }
 
@@ -215,16 +303,10 @@ export class ProfileStore implements OnInit {
       email: user.email || '',
       phone: user.telefono || '',
       dni: user.dni || '',
-      address: user.direccion || '',
-      city: user.ciudad || ''
     };
 
     this.userDataProfile.set(profile);
     this.originalProfile.set({ ...profile });
-
-    if (user.url_img) {
-      this.avatarDb.set(user.url_img);
-    }
   }
 
   updateField(field: keyof UserProfile, value: string): void {
@@ -240,55 +322,6 @@ export class ProfileStore implements OnInit {
     this.isMobileMenuOpen.set(false);
   }
 
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    if (this.isSaving()) return;
-
-    const file = event.dataTransfer?.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) return;
-
-    this.selectedFileName.set(file.name);
-    this.selectedFile.set(file);
-    this.processImage(file);
-  }
-
-  onFileSelected(event: Event): void {
-    if (this.isSaving()) return;
-    const input = event.target as HTMLInputElement;
-
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-
-      this.selectedFileName.set(file.name);
-      this.selectedFile.set(file);
-      this.processImage(file);
-
-      input.value = '';
-    }
-  }
-
-  processImage(file: File): void {
-    if (file.size > 5 * 1024 * 1024) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      this.avatarPreview.set(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-  }
-
-  removeAvatar(): void {
-    if (this.isSaving()) return;
-    this.avatarPreview.set(null);
-    this.selectedFileName.set(null);
-    this.selectedFile.set(null);
-
-    if (this.fileInput) {
-      this.fileInput.nativeElement.value = '';
-    }
-  }
-
   enableEditing(): void {
     this.isEditingProfile.set(true);
   }
@@ -296,9 +329,6 @@ export class ProfileStore implements OnInit {
   cancelEditing(): void {
     this.userDataProfile.set({ ...this.originalProfile() });
     this.fieldErrors.set({});
-    this.avatarPreview.set(null);
-    this.selectedFile.set(null);
-    this.selectedFileName.set(null);
     this.isEditingProfile.set(false);
   }
 
@@ -311,23 +341,17 @@ export class ProfileStore implements OnInit {
 
     const current = this.userDataProfile();
 
-    const formData = new FormData();
-    formData.append('nombres', current.firstName);
-    formData.append('apellidos', current.lastName);
-    formData.append('telefono', current.phone);
-    formData.append('dni', current.dni);
-    formData.append('direccion', current.address);
-    formData.append('ciudad', current.city);
-
-    const file = this.selectedFile();
-    if (file) {
-      formData.append('imagen', file);
-    }
+    const payload = {
+      nombres: current.firstName,
+      apellidos: current.lastName,
+      telefono: current.phone,
+      dni: current.dni,
+    };
 
     this.isSaving.set(true);
 
     this.usuarioService
-      .updateProfile(user.id_usuario, formData)
+      .updateProfile(user.id_usuario, payload)
       .pipe(
         finalize(() => {
           this.isSaving.set(false);
@@ -338,17 +362,10 @@ export class ProfileStore implements OnInit {
           this.usuarioApi.set(updatedUser);
           this.originalProfile.set({ ...current });
           this.isEditingProfile.set(false);
-          this.avatarPreview.set(null);
-          this.selectedFile.set(null);
-          this.selectedFileName.set(null);
-
-          if (updatedUser.url_img) {
-            this.avatarDb.set(updatedUser.url_img + '?t=' + Date.now());
-          }
+          this.toastService.showSuccess('Información actualizada correctamente.');
         },
         error: (err) => {
-          console.error(err);
-          alert('Error al actualizar perfil');
+          this.toastService.showError(err.error?.error ?? 'Error al actualizar perfil');
         }
       });
   }
@@ -398,27 +415,13 @@ export class ProfileStore implements OnInit {
           delete errors['dni'];
         }
         break;
-      case 'address':
-        if (profile.address && /[^a-zA-Z0-9\s]/.test(profile.address)) {
-          errors['address'] = 'No se permiten signos';
-        } else {
-          delete errors['address'];
-        }
-        break;
-      case 'city':
-        if (profile.city && /[^a-zA-Z\s]/.test(profile.city)) {
-          errors['city'] = 'No se permiten signos';
-        } else {
-          delete errors['city'];
-        }
-        break;
     }
 
     this.fieldErrors.set(errors);
   }
 
   validateAllFields(): boolean {
-    ['firstName', 'lastName', 'email', 'phone', 'dni', 'address', 'city'].forEach(f => this.validateField(f));
+    ['firstName', 'lastName', 'email', 'phone', 'dni'].forEach(f => this.validateField(f));
     return Object.keys(this.fieldErrors()).length === 0;
   }
 
@@ -452,11 +455,181 @@ export class ProfileStore implements OnInit {
     return phoneValid && dniValid && requiredValid && Object.keys(this.fieldErrors()).length === 0;
   });
 
+  loadUbigeo() {
+    if (this.departamentos().length > 0) return;
+
+    forkJoin({
+      deps: this.ubigeoService.getDepartamentos().pipe(take(1)),
+      provs: this.ubigeoService.getProvincias().pipe(take(1)),
+      dists: this.ubigeoService.getDistritos().pipe(take(1))
+    }).subscribe({
+      next: ({ deps, provs, dists }) => {
+        this.departamentos.set(deps);
+        this.provincias.set(provs);
+        this.distritos.set(dists);
+      },
+      error: err => console.error('Error loading ubigeo', err)
+    });
+  }
+
+  loadAddresses() {
+    this.isLoadingAddresses.set(true);
+    this.direccionService.getAll().pipe(
+      finalize(() => this.isLoadingAddresses.set(false))
+    ).subscribe({
+      next: (dirs) => {
+        this.direcciones.set(dirs);
+      },
+      error: (err) => {
+        console.error('Error loading addresses', err);
+        this.toastService.showError('No se pudieron cargar las direcciones');
+      }
+    });
+  }
+
+  openNewAddressForm() {
+    this.isEditingAddressForm.set(true);
+    this.currentAddressId.set(null);
+    this.addressForm.reset();
+    this.addressForm.patchValue({ principal: false });
+    this.addressForm.get('id_provincia')?.disable();
+    this.addressForm.get('id_distrito')?.disable();
+  }
+
+  editAddress(direccion: Direccion) {
+    this.isEditingAddressForm.set(true);
+    this.currentAddressId.set(direccion.id_direccion);
+
+    this.addressForm.patchValue({
+      id_departamento: direccion.id_departamento?.toString(),
+    }, { emitEvent: true });
+
+    this.addressForm.patchValue({
+      id_provincia: direccion.id_provincia?.toString(),
+    }, { emitEvent: true });
+
+    this.addressForm.patchValue({
+      id_distrito: direccion.id_distrito?.toString(),
+      calle: direccion.calle,
+      numero: direccion.numero,
+      cp: direccion.cp,
+      principal: direccion.principal
+    });
+  }
+
+  cancelEditAddress() {
+    this.isEditingAddressForm.set(false);
+    this.currentAddressId.set(null);
+    this.addressForm.reset();
+  }
+
+  saveAddress() {
+    if (this.addressForm.invalid || this.isSaving()) return;
+    this.isSaving.set(true);
+
+    const formData = this.addressForm.getRawValue();
+    const addressId = this.currentAddressId();
+
+    if (addressId) {
+      this.direccionService.update(addressId, formData).pipe(
+        finalize(() => this.isSaving.set(false))
+      ).subscribe({
+        next: (updatedDir) => {
+          this.toastService.showSuccess('Dirección actualizada');
+          this.isEditingAddressForm.set(false);
+          this.updateAddressInList(addressId, updatedDir);
+        },
+        error: (err) => this.toastService.showError(err.error?.error || 'Error al actualizar')
+      });
+    } else {
+      this.direccionService.create(formData).pipe(
+        finalize(() => this.isSaving.set(false))
+      ).subscribe({
+        next: (newDir) => {
+          this.toastService.showSuccess('Dirección agregada');
+          this.isEditingAddressForm.set(false);
+          if (newDir.principal) {
+            this.direcciones.update(dirs => dirs.map(d => ({ ...d, principal: false })));
+          }
+          this.direcciones.update(dirs => [newDir, ...dirs]);
+        },
+        error: (err) => this.toastService.showError(err.error?.error || 'Error al crear')
+      });
+    }
+  }
+
+  private updateAddressInList(originalId: number, updatedDir: Direccion) {
+    this.direcciones.update(dirs => {
+      let newDirs = [...dirs];
+
+      if (originalId !== updatedDir.id_direccion) {
+        newDirs = newDirs.filter(d => d.id_direccion !== originalId);
+      } else {
+        newDirs = newDirs.filter(d => d.id_direccion !== originalId);
+      }
+
+      if (updatedDir.principal) {
+        newDirs = newDirs.map(d => ({ ...d, principal: false }));
+      }
+
+      return [updatedDir, ...newDirs].sort((a, b) => b.id_direccion - a.id_direccion);
+    });
+  }
+
+  deleteAddress(id: number) {
+    if (!confirm('¿Estás seguro de eliminar esta dirección?')) return;
+
+    this.direccionService.delete(id).subscribe({
+      next: () => {
+        this.toastService.showSuccess('Dirección eliminada');
+        this.direcciones.update(dirs => dirs.filter(d => d.id_direccion !== id));
+      },
+      error: (err) => this.toastService.showError(err.error?.error || 'Error al eliminar')
+    });
+  }
+
+  setPrincipal(id: number) {
+    const dir = this.direcciones().find(d => d.id_direccion === id);
+    if (!dir || dir.principal) return;
+
+    this.direccionService.actualizarPrincipal({
+      id_departamento: dir.id_departamento,
+      id_provincia: dir.id_provincia,
+      id_distrito: dir.id_distrito,
+      calle: dir.calle,
+      numero: dir.numero,
+      cp: dir.cp
+    }).subscribe({
+      next: (updatedDir) => {
+        this.toastService.showSuccess('Dirección principal actualizada');
+        this.updateAddressInList(dir.id_direccion, updatedDir);
+      },
+      error: (err) => this.toastService.showError(err.error?.error || 'Error al actualizar')
+    });
+  }
+
+  getDepartamentoName(id: string | number): string {
+    return this.departamentos().find(d => d.id_ubigeo === id?.toString())?.nombre_ubigeo || '';
+  }
+
+  getProvinciaName(id: string | number): string {
+    return this.provincias().find(d => d.id_ubigeo === id?.toString())?.nombre_ubigeo || '';
+  }
+
+  getDistritoName(id: string | number): string {
+    return this.distritos().find(d => d.id_ubigeo === id?.toString())?.nombre_ubigeo || '';
+  }
+
   orders = (): Order[] => this.ordersSignal();
 
   loadOrders(): void {
+    this.isLoadingAddresses.set(false);
     this.isLoadingOrders.set(true);
     this.ordersSignal.set([]);
+
+    if (this.departamentos().length === 0) {
+      this.loadUbigeo();
+    }
 
     forkJoin({
       carritos: this.carritoService.getAll().pipe(take(1)),
@@ -466,7 +639,7 @@ export class ProfileStore implements OnInit {
       finalize(() => this.isLoadingOrders.set(false))
     ).subscribe({
       next: ({ carritos, vinos, precios }) => {
-        const vendidos = carritos.filter(c => ['E', 'R', 'P', 'S', 'C', 'A'].includes(c.estado));
+        const vendidos = carritos.filter(c => ['R', 'P', 'S', 'C', 'A'].includes(c.estado));
 
         if (vendidos.length === 0) {
           return;
@@ -489,6 +662,7 @@ export class ProfileStore implements OnInit {
 
               const subtotal = orderProducts.reduce((sum, p) => sum + (p.quantity * p.price), 0);
               const shippingFee = carrito.tipo === 'D' ? 20 : 0;
+              const date = new Date(carrito.fecha_compra);
 
               if (carrito.id_cupon) {
                 return this.cuponService.getById(carrito.id_cupon).pipe(
@@ -503,10 +677,9 @@ export class ProfileStore implements OnInit {
                     }
 
                     const total = Math.max(0, subtotal + shippingFee - discount);
-
                     return {
                       id: carrito.id_carrito.toString(),
-                      date: new Date(carrito.fecha_compra).toLocaleDateString(),
+                      date: date,
                       total,
                       subtotal,
                       shippingFee,
@@ -515,6 +688,7 @@ export class ProfileStore implements OnInit {
                       status: carrito.estado,
                       type: carrito.tipo,
                       products: orderProducts,
+                      destinationAddress: carrito.direccion ?? null,
                       isExpanded: false
                     } as Order;
                   })
@@ -523,7 +697,7 @@ export class ProfileStore implements OnInit {
                 const total = subtotal + shippingFee;
                 return [{
                   id: carrito.id_carrito.toString(),
-                  date: new Date(carrito.fecha_compra).toLocaleDateString(),
+                  date: date,
                   total,
                   subtotal,
                   shippingFee,
@@ -531,6 +705,7 @@ export class ProfileStore implements OnInit {
                   status: carrito.estado,
                   type: carrito.tipo,
                   products: orderProducts,
+                  destinationAddress: carrito.direccion ?? null,
                   isExpanded: false
                 } as Order];
               }
@@ -574,10 +749,10 @@ export class ProfileStore implements OnInit {
     this.carritoService.getHistory(Number(orderId)).subscribe({
       next: (history: any[]) => {
         this.ordersSignal.update(orders =>
-          orders.map(o => o.id === orderId ? { 
-            ...o, 
-            history: history.sort((a: { fecha_cambio: string | number | Date; }, b: { fecha_cambio: string | number | Date; }) => new Date(a.fecha_cambio).getTime() - new Date(b.fecha_cambio).getTime()), 
-            isLoadingHistory: false 
+          orders.map(o => o.id === orderId ? {
+            ...o,
+            history: history.sort((a: { fecha_cambio: string | number | Date; }, b: { fecha_cambio: string | number | Date; }) => new Date(a.fecha_cambio).getTime() - new Date(b.fecha_cambio).getTime()),
+            isLoadingHistory: false
           } : o)
         );
       },

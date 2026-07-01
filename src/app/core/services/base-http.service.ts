@@ -1,15 +1,15 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 
 export type PathStrategy = 'admin-public' | 'admin-me' | 'admin-me-custom';
 
 export interface PathConfig {
-  strategy: PathStrategy;
-  endpoint: string;
-  customAdminEndpoint?: string;
+    strategy: PathStrategy;
+    endpoint: string;
+    customAdminEndpoint?: string;
 }
 
 export abstract class BaseHttpService<T> {
@@ -30,18 +30,18 @@ export abstract class BaseHttpService<T> {
         const { strategy, endpoint, customAdminEndpoint } = this.pathConfig;
 
         switch (strategy) {
-        case 'admin-public':
-            return isAdmin ? `/admin/${endpoint}` : `/public/${endpoint}`;
+            case 'admin-public':
+                return isAdmin ? `/admin/${endpoint}` : `/public/${endpoint}`;
 
-        case 'admin-me':
-            return isAdmin ? `/admin/${endpoint}` : `/me/${endpoint}`;
+            case 'admin-me':
+                return isAdmin ? `/admin/${endpoint}` : `/me/${endpoint}`;
 
-        case 'admin-me-custom':
-            const adminEndpoint = customAdminEndpoint || endpoint;
-            return isAdmin ? `/admin/${adminEndpoint}` : `/me/${endpoint}`;
+            case 'admin-me-custom':
+                const adminEndpoint = customAdminEndpoint || endpoint;
+                return isAdmin ? `/admin/${adminEndpoint}` : `/me/${endpoint}`;
 
-        default:
-            return `/${endpoint}`;
+            default:
+                return `/${endpoint}`;
         }
     }
 
@@ -95,20 +95,26 @@ export abstract class BaseHttpService<T> {
     }
 
     addOrUpdate(data: {
-      id_carrito: number;
-      id_vino: number;
-      cantidad: number;
+        id_carrito: number;
+        id_vino: number;
+        cantidad: number;
     }) {
-      return this.http.post<any>(`${this.fullUrl}/agregar`, data, {
-        withCredentials: true
-      });
+        return this.http.post<any>(`${this.fullUrl}/agregar`, data, {
+            withCredentials: true
+        });
 
     }
 
     getByCarrito(id_carrito: number) {
-      return this.http.get<any[]>(
-        `${this.fullUrl}/carrito/${id_carrito}`,
-        { withCredentials: true }
-      );
+        const user = this.authService.currentUser();
+
+        if (user?.tipo === 'A') {
+            return of([]);
+        }
+
+        return this.http.get<any[]>(
+            `${this.fullUrl}/carrito/${id_carrito}`,
+            { withCredentials: true }
+        );
     }
 }

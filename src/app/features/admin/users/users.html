@@ -135,11 +135,12 @@
                 <td class="px-6 py-4">
                   <div class="space-y-1">
                     <p class="text-sm text-admin-brown flex items-center gap-2">
+                      @let direccionPrincipal = usuario.direcciones?.find(d => d.principal);
                       <fa-icon [icon]="icons.faMapMarkerAlt" class="text-admin-pink opacity-50" />
-                      {{ formatValue(usuario.ciudad) }}
+                      {{ direccionPrincipal?.calle || 'Sin dirección' }}
                     </p>
-                    <p class="text-[11px] text-admin-brown-light pl-5 line-clamp-1" [title]="usuario.direccion">
-                      {{ usuario.direccion || 'Sin dirección' }}
+                    <p class="text-[11px] text-admin-brown-light pl-5 line-clamp-1" [title]="direccionPrincipal">
+                      {{ direccionPrincipal?.numero || '' }}
                     </p>
                   </div>
                 </td>
