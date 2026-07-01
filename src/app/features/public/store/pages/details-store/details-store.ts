@@ -1,18 +1,23 @@
 import { Component, signal, computed, effect, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 import { VinoService } from '../../../../../data/services/vino.service';
 import { ImagenAdicionalVinoService } from '../../../../../data/services/imagen-adicional-vino.service';
 import { CarritoProductoService } from '../../../../../data/services/carrito-producto.service';
 
-import { Vino, ImagenAdicionalVino } from '../../../../../data/models/api.models';
+import { Vino, ImagenAdicionalVino, Carrito } from '../../../../../data/models/api.models';
 import { CartItem, CartService } from '../../../../../core/services/cart.service';
 
 import { ToastService } from '../../../../../shared/components/toast/toast.service';
 import { AiButtonComponent } from "../../../../../shared/components/ai-button/ai-button";
 import { FabStackComponent } from "../../../../../shared/layouts/fab-stack/fab-stack";
 import { AiChatWidgetComponent } from "../../../../../shared/layouts/ai-chat-widget/ai-chat-widget";
+import { CarritoService as ApiCartService } from '../../../../../data/services/cart.service';
+import { of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { faBottleDroplet, faBoxesStacked, faBoxOpen, faCalendarCheck, faCartArrowDown, faWineBottle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 export interface InternalWine {
   id_vino: number;
@@ -38,29 +43,41 @@ export interface InternalWine {
 @Component({
   selector: 'app-details-store',
   standalone: true,
-  imports: [CommonModule, AiButtonComponent, FabStackComponent, AiChatWidgetComponent],
-  templateUrl: './details-store.html'
+  imports: [CommonModule, AiButtonComponent, FabStackComponent, AiChatWidgetComponent, FontAwesomeModule],
+  templateUrl: './details-store.html',
+  styles: `
+    .no-spinner::-webkit-inner-spin-button,
+    .no-spinner::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .no-spinner {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+  `,
 })
 
 export class DetailsStore implements OnInit {
 
-  private route                  = inject(ActivatedRoute);
-  private router                 = inject(Router);
-  private vinoService            = inject(VinoService);
+  private route = inject(ActivatedRoute);
+  private vinoService = inject(VinoService);
   private imagenAdicionalService = inject(ImagenAdicionalVinoService);
-  private cartService            = inject(CartService);
-  private apiProductos           = inject(CarritoProductoService);
-  private toastService           = inject(ToastService);
+  private cartService = inject(CartService);
+  private apiProductos = inject(CarritoProductoService);
+  private toastService = inject(ToastService);
+  private apiCartService = inject(ApiCartService);
 
   id: number = 0;
-  isLoading         = signal(true);
-  errorMessage      = signal<string | null>(null);
-  selectedQuantity  = signal<number>(1);
-  selectedBoxType   = signal<'boxes' | 'individual'>('individual');
-  selectedBoxes     = signal<number>(1);
+  isLoading = signal(true);
+  errorMessage = signal<string | null>(null);
+  selectedQuantity = signal<number>(1);
+  selectedBoxType = signal<'boxes' | 'individual'>('individual');
+  selectedBoxes = signal<number>(1);
   selectedMainImage = signal<string>('');
-  wineData          = signal<InternalWine | null>(null);
-  addingToCart      = signal(false);
+  wineData = signal<InternalWine | null>(null);
+  addingToCart = signal(false);
 
   isOutOfStock = computed(() => this.stockDisponible() <= 0);
   aiOpen = false;
@@ -170,7 +187,7 @@ export class DetailsStore implements OnInit {
     const preciosOrdenados = [...precios].sort((a, b) => a.cantidad_minima - b.cantidad_minima);
 
     const precioBaseObj = preciosOrdenados.find(p => p.cantidad_minima === 1);
-    const precioBase    = precioBaseObj ? parseFloat(precioBaseObj.precio as unknown as string) : 0;
+    const precioBase = precioBaseObj ? parseFloat(precioBaseObj.precio as unknown as string) : 0;
 
     const preciosPorCantidad = preciosOrdenados.map((p, index) => ({
       cantidad: index === 0
@@ -181,17 +198,17 @@ export class DetailsStore implements OnInit {
     }));
 
     return {
-      id_vino:              vino.id_vino,
-      nombre:               vino.nombre,
-      descripcion:          vino.descripcion || 'Sin descripción disponible',
-      url_img_principal:    vino.url_img_principal,
+      id_vino: vino.id_vino,
+      nombre: vino.nombre,
+      descripcion: vino.descripcion || 'Sin descripción disponible',
+      url_img_principal: vino.url_img_principal,
       imagenes_adicionales: imagenesAdicionales.map(img => img.url_img),
-      precio_base:          precioBase,
-      stock:                vino.stock,
-      dulzor:               vino.Dulzor?.nombre || 'Desconocido',
-      sabor:                vino.Sabor?.nombre  || 'Desconocido',
+      precio_base: precioBase,
+      stock: vino.stock,
+      dulzor: vino.Dulzor?.nombre || 'Desconocido',
+      sabor: vino.Sabor?.nombre || 'Desconocido',
       presentacion: {
-        volumen_ml:        vino.Presentacion?.volumen_ml        || 0,
+        volumen_ml: vino.Presentacion?.volumen_ml || 0,
         botellas_por_caja: vino.Presentacion?.botellas_por_caja || 12
       },
       precios_por_cantidad: preciosPorCantidad
@@ -255,6 +272,21 @@ export class DetailsStore implements OnInit {
     if (this.selectedQuantity() > 1) this.selectedQuantity.update(v => v - 1);
   }
 
+  onQuantityChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let value = Number(input.value);
+
+    if (isNaN(value) || value < 1) {
+      value = 1;
+    }
+
+    if (value > this.stockDisponible()) {
+      value = this.stockDisponible();
+    }
+
+    this.selectedQuantity.set(value);
+  }
+
   setBoxes(boxes: number): void {
     const wine = this.wineData();
     if (!wine) return;
@@ -278,6 +310,33 @@ export class DetailsStore implements OnInit {
 
   decrementBoxes(): void {
     if (this.selectedBoxes() > 1) this.selectedBoxes.update(v => v - 1);
+  }
+
+  maxBoxes(): number {
+    const wine = this.wineData();
+    if (!wine) {
+      return 0;
+    }
+    return Math.floor(
+      this.stockDisponible() / wine.presentacion.botellas_por_caja
+    );
+  }
+
+  onBoxesChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let value = Number(input.value);
+
+    if (isNaN(value) || value < 1) {
+      value = 1;
+    }
+
+    const max = this.maxBoxes();
+
+    if (value > max) {
+      value = max;
+    }
+
+    this.selectedBoxes.set(value);
   }
 
   setIndividualMode(): void {
@@ -316,18 +375,27 @@ export class DetailsStore implements OnInit {
     this.addingToCart.set(true);
 
     if (this.cartService.isLogged()) {
-      const carrito = this.cartService.getCarritoActivo();
 
-      if (!carrito) {
-        this.addingToCart.set(false);
-        return;
-      }
+      this.apiCartService.getAll().pipe(
+        switchMap((carritos: Carrito[]) => {
+          const carritoActivo = carritos.find(c => c.estado === 'E');
 
-      this.apiProductos.addOrUpdate({
-        id_carrito: carrito.id_carrito,
-        id_vino: wine.id_vino,
-        cantidad: totalBotellas
-      }).subscribe({
+          if (carritoActivo) {
+            return of(carritoActivo);
+          }
+
+          return this.apiCartService.create({
+            estado: 'E'
+          });
+        }),
+        switchMap((carrito: Carrito) =>
+          this.apiProductos.addOrUpdate({
+            id_carrito: carrito.id_carrito,
+            id_vino: wine.id_vino,
+            cantidad: totalBotellas
+          })
+        )
+      ).subscribe({
         next: () => {
           this.cartService.loadCart();
 
@@ -340,7 +408,6 @@ export class DetailsStore implements OnInit {
         },
         error: (err) => {
           console.error('addToCart API error', err);
-
           this.addingToCart.set(false);
         }
       });
@@ -349,17 +416,17 @@ export class DetailsStore implements OnInit {
     }
 
     const cartItem: CartItem = {
-      id_vino:            wine.id_vino,
-      nombre:             wine.nombre,
-      cantidad:           totalBotellas,
-      stock:              wine.stock,
-      presentacion:       presentationText,
-      volumen_ml:         wine.presentacion.volumen_ml,
-      url_img_principal:  wine.url_img_principal,
-      precio_base:        wine.precio_base,
+      id_vino: wine.id_vino,
+      nombre: wine.nombre,
+      cantidad: totalBotellas,
+      stock: wine.stock,
+      presentacion: presentationText,
+      volumen_ml: wine.presentacion.volumen_ml,
+      url_img_principal: wine.url_img_principal,
+      precio_base: wine.precio_base,
       precios_por_cantidad: wine.precios_por_cantidad.map(p => ({
         cantidad: p.cantidad,
-        precio:   p.precio
+        precio: p.precio
       })),
       botellas_por_caja: wine.presentacion.botellas_por_caja,
       esCaja: false
@@ -375,5 +442,64 @@ export class DetailsStore implements OnInit {
     setTimeout(() => {
       this.addingToCart.set(false);
     }, 400);
+  }
+
+  getDeliveryRange(): string {
+    const today = new Date();
+
+    const startDate = new Date(today);
+    startDate.setDate(today.getDate() + 5);
+
+    const endDate = new Date(today);
+    endDate.setDate(today.getDate() + 10);
+
+    const options: Intl.DateTimeFormatOptions = {
+      day: 'numeric',
+      month: 'long'
+    };
+
+    const start = this.capitalize(
+      startDate.toLocaleDateString('es-ES', options)
+    );
+
+    const end = this.capitalize(
+      endDate.toLocaleDateString('es-ES', options)
+    );
+
+    return `
+      Entrega entre el
+      <span class="font-semibold underline decoration-[#6B1F2A] underline-offset-2">${start}</span>
+      y
+      <span class="font-semibold underline decoration-[#6B1F2A] underline-offset-2">${end}</span>
+    `;
+  }
+
+  private capitalize(text: string): string {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
+  getCategoryIcon(category: string): string {
+    const lowerCat = category.toLowerCase();
+    if (lowerCat.includes('dulce')) return '/img/store/icons/droplet-fill.svg';
+    if (lowerCat.includes('semiseco')) return '/img/store/icons/droplet-half.svg';
+    if (lowerCat.includes('seco')) return '/img/store/icons/droplet.svg';
+    return '/img/store/icons/droplet.svg';
+  }
+
+  getFlavorIcon(flavor: string): string {
+    const lowerFlavor = flavor.toLowerCase();
+    if (lowerFlavor.includes('frambuesa')) return '/img/store/icons/baya.svg';
+    if (lowerFlavor.includes('zarzamora')) return '/img/store/icons/mora-de-los-pantanos.svg';
+    if (lowerFlavor.includes('arandano')) return '/img/store/icons/arandanos.svg';
+    return '/img/store/icons/baya.svg';
+  }
+
+  icons = {
+    faCartArrowDown,
+    faCalendarCheck,
+    faWineBottle,
+    faBottleDroplet,
+    faBoxesStacked,
+    faBoxOpen,
   }
 }

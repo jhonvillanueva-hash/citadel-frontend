@@ -24,7 +24,12 @@ import {
   faArrowUpRightFromSquare,
   faMapMarkerAlt,
   faPlus,
-  faStar
+  faStar,
+  faPen,
+  faAt,
+  faPhone,
+  faAddressCard,
+  faUserTag
 } from '@fortawesome/free-solid-svg-icons';
 import { UsuarioService } from '../../../../../data/services/usuario.service';
 import { DireccionService } from '../../../../../data/services/direccion.service';
@@ -800,5 +805,12 @@ export class ProfileStore implements OnInit {
       .replace(/\s+/g, '-')
       .replace(/[^\w\-]+/g, '')
       .replace(/\-\-+/g, '-');
+  }
+
+  icons = {
+    faUserTag,
+    faAt,
+    faPhone,
+    faAddressCard,
   }
 }
