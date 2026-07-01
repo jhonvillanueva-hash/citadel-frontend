@@ -64,7 +64,7 @@ export class CartModal {
         `${item.nombre} · ${item.cantidad + 1} ${item.cantidad + 1 === 1 ? 'botella' : 'botellas'}`
       );
     } else if (change < 0 && item.cantidad > 1) {
-      this.toastService.showWarning(
+      this.toastService.showSuccess(
         'Cantidad disminuida',
         `${item.nombre} · ${item.cantidad - 1} ${item.cantidad - 1 === 1 ? 'botella' : 'botellas'}`
       );

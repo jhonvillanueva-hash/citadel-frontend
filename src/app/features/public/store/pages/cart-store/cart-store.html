@@ -1,244 +1,391 @@
 <div class="min-h-screen bg-white">
-  <div class="p-4 md:p-6 lg:p-8">
+  <div class="px-4 py-6 md:px-6 md:py-10 lg:px-8 lg:py-12">
     <div class="w-full max-w-7xl mx-auto">
 
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
-        <h1 class="text-2xl md:text-3xl font-bold text-[#0e0d12] order-1 sm:order-2">Mi Carrito</h1>
-        <div class="w-24 hidden sm:block order-3"></div>
+      <div class="flex flex-col gap-3 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <h1 class="text-3xl md:text-4xl font-bold text-[#0e0d12]">Mi Carrito</h1>
+            <p class="mt-2 text-sm text-[#0e0d12]/70 max-w-2xl">Revisa los productos que añadiste a tu carrito y ajusta
+              cantidades antes de finalizar tu compra.</p>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-[#0e0d12]/60">
+            <span class="inline-flex items-center gap-2 bg-white px-3 py-2 border border-gray-200 shadow-sm">
+              <span class="h-2.5 w-2.5 bg-green-500"></span>
+              Artículos: {{ cartItems().length }}
+            </span>
+          </div>
+        </div>
       </div>
 
       @if (cartItems().length === 0) {
-      <!-- Carrito vacío -->
-      <div class="text-center py-16 md:py-24">
-        <p class="text-[#0e0d12]/70 text-lg mb-2">Tu carrito está vacío</p>
-        <p class="text-[#0e0d12]/50 text-sm mb-6">Explora nuestra selección de vinos</p>
+      <div class="border border-dashed border-gray-200 bg-white px-6 py-14 text-center shadow-sm">
+        <p class="text-[#0e0d12]/80 text-xl font-medium mb-2">Tu carrito está vacío</p>
+        <p class="text-[#0e0d12]/60 text-sm mb-6">Explora nuestra selección de vinos y agrega tus favoritos.</p>
         <button (click)="volverATienda()"
-          class="border border-[#0e0d12] px-8 py-3 text-[#0e0d12] font-medium hover:bg-[#0e0d12] hover:text-white transition">
+          class="inline-flex items-center justify-center border border-[#0e0d12] bg-white px-8 py-3 text-sm font-medium text-[#0e0d12] transition hover:bg-[#0e0d12] hover:text-white">
           Explorar Vinos
         </button>
       </div>
       } @else {
-      <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
+      <div class="grid gap-6 lg:grid-cols-[1.7fr_0.9fr]">
 
-        <div class="flex-1 min-w-0">
-          <div
-            class="hidden md:grid md:grid-cols-12 pb-4 mb-4 border-b border-gray-200 text-[#0e0d12]/50 text-xs font-medium">
-            <div class="col-span-5">PRODUCTO</div>
-            <div class="col-span-2 text-right">PRECIO</div>
-            <div class="col-span-3 text-center">CANTIDAD</div>
-            <div class="col-span-2 text-right">TOTAL</div>
-          </div>
+        <div class="space-y-4">
+          <div class="overflow-hidden border border-gray-200 bg-white shadow-sm">
 
-          <div class="divide-y divide-gray-200">
-            @for (item of cartItems(); track $index) {
-            <div class="py-6 md:py-8 first:pt-0">
-              <div class="flex gap-4 md:gap-6">
+            <div
+              class="hidden lg:grid lg:grid-cols-12 lg:gap-6 bg-[#f2f2f2] px-6 py-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#0e0d12]/60">
 
-                <div
-                  class="w-16 h-20 md:w-20 md:h-24 bg-gray-50 flex items-center justify-center shrink-0 border border-gray-100">
-                  <img [src]="item.url_img_principal" [alt]="item.nombre" class="w-full h-full object-cover">
-                </div>
+              <div class="col-span-5">
+                Producto
+              </div>
 
-                <div class="flex-1 min-w-0">
+              <div class="col-span-2 text-right">
+                Precio
+              </div>
 
-                  <!-- Vista Desktop -->
-                  <div class="hidden md:grid md:grid-cols-12 gap-4 items-center">
-                    <div class="col-span-5">
-                      <h3 class="font-medium text-[#0e0d12] text-base">{{ item.nombre }}</h3>
-                      <p class="text-[#0e0d12]/50 text-xs mt-1">{{ item.volumen_ml }}ml</p>
-                      <p class="text-[#0e0d12]/40 text-xs mt-1">{{ getQuantityText(item) }}</p>
+              <div class="col-span-3 text-center">
+                Cantidad
+              </div>
+
+              <div class="col-span-2 flex justify-end items-center gap-4">
+                <span>Total</span>
+                <div class="w-10 shrink-0"></div>
+              </div>
+
+            </div>
+
+            <div class="divide-y divide-gray-200">
+
+              @for (item of cartItems(); track $index) {
+
+              <div class="bg-[#f7f7f7] px-4 py-5 sm:px-6">
+
+                <div class="hidden lg:grid lg:grid-cols-12 lg:gap-6 lg:items-center">
+
+                  <div class="col-span-5 flex items-center gap-5 min-w-0">
+
+                    <div class="h-28 w-28 shrink-0 overflow-hidden border border-gray-200 bg-gray-50">
+
+                      <img [src]="item.url_img_principal" [alt]="item.nombre" class="h-full w-full object-cover">
+
                     </div>
 
-                    <div class="col-span-2 text-right">
-                      @if (tieneDescuento(item)) {
-                      <div>
-                        <span class="text-[#0e0d12]/40 line-through text-xs block">S/ {{ item.precio_base.toFixed(2)
-                          }}</span>
-                        <span class="text-[#0e0d12] font-medium text-sm">S/ {{ getPrecioUnitarioActual(item).toFixed(2)
-                          }}</span>
+                    <div class="min-w-0 flex-1">
+
+                      <a
+                        class="text-base font-semibold text-[#0e0d12] break-words underline"
+                        [routerLink]="['/store/products', generarSlug(item.nombre), item.id_vino]"
+                      >
+                        {{ item.nombre }}
+                        <fa-icon [icon]="icons.faArrowUpRightFromSquare"></fa-icon>
+                      </a>
+
+                      <div class="mt-3 flex flex-wrap gap-2">
+
+                        <span class="border border-gray-200 bg-[#f6f4ef] px-3 py-1 text-xs text-[#0e0d12]/70">
+                          {{ item.volumen_ml }} ml
+                        </span>
+
+                        <span class="border border-gray-200 bg-[#f6f4ef] px-3 py-1 text-xs text-[#0e0d12]/70">
+                          {{ getQuantityText(item) }}
+                        </span>
+
                       </div>
-                      } @else {
-                      <span class="text-[#0e0d12] text-sm">S/ {{ getPrecioUnitarioActual(item).toFixed(2) }}</span>
-                      }
+
                     </div>
 
-                    <div class="col-span-3">
-                      <div class="flex flex-col items-center gap-1">
-                        <div class="flex items-center justify-center gap-0 border border-gray-300 w-fit mx-auto">
-                          <button (click)="updateQuantity(item, -1)"
-                            [disabled]="item.cantidad <= 1 || cartService.isUpdatingItem(item.id_vino)"
-                            class="w-7 h-7 bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center text-[#0e0d12] text-sm disabled:opacity-40 disabled:cursor-not-allowed">
-                            -
-                          </button>
-                          <div class="quantity-wrapper" (animationend)="item.animationDirection = null">
-  
-  <!-- El número VIEJO que desaparece (solo existe mientras dura la animación) -->
-  <span 
-    *ngIf="item.animationDirection"
-    class="text-sm text-[#0e0d12] qty-old"
-    [ngClass]="item.animationDirection + '-out'">
-    {{ item.oldCantidad }}
-  </span>
-
-  <!-- El número NUEVO que aparece -->
-  <span 
-    class="text-sm text-[#0e0d12] qty-new"
-    [ngClass]="item.animationDirection ? item.animationDirection + '-in' : ''">
-    {{ item.cantidad }}
-  </span>
-
-</div>
-                          <div class="relative">
-                            <button
-                              (click)="updateQuantity(item, 1)"
-                              [disabled]="isAtStockLimit(item) || cartService.isUpdatingItem(item.id_vino)"
-                              class="w-7 h-7 bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center text-[#0e0d12] text-sm disabled:opacity-40 disabled:cursor-not-allowed">
-                              +
-                            </button>
-                            @if (isAtStockLimit(item)) {
-                              <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full pointer-events-none"></span>
-                            }
-                          </div>
-                        </div>
-                        @if (isAtStockLimit(item)) {
-                          <p class="text-red-500 text-[10px] mt-1.5">
-                            Stock máximo alcanzado
-                          </p>
-                        }
-                      </div>
-                    </div>
-
-                    <div class="col-span-2 text-right flex items-center justify-end gap-2">
-                      <span class="text-[#0e0d12] font-medium text-sm">S/ {{ getTotalItem(item).toFixed(2) }}</span>
-                      <button (click)="removeItem(item)" class="text-[#0e0d12]/30 hover:text-red-600 transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                          </path>
-                        </svg>
-                      </button>
-                    </div>
                   </div>
 
-                  @if (tieneDescuento(item)) {
-                  <div class="hidden md:block mt-2">
-                    <p class="text-green-700 text-xs">
-                      Ahorras S/ {{ ((item.precio_base - getPrecioUnitarioActual(item)) * (item.esCaja ? item.cantidad *
-                      item.botellas_por_caja : item.cantidad)).toFixed(2) }}
-                    </p>
-                  </div>
-                  }
-
-                  <!-- Vista Mobile -->
-                  <div class="md:hidden">
-                    <div class="flex justify-between items-start">
-                      <div>
-                        <h3 class="font-medium text-[#0e0d12] text-base">{{ item.nombre }}</h3>
-                        <p class="text-[#0e0d12]/50 text-xs mt-1">{{ item.volumen_ml }}ml</p>
-                        <p class="text-[#0e0d12]/40 text-xs mt-1">{{ getQuantityText(item) }}</p>
-                      </div>
-                      <button (click)="removeItem(item)"
-                        class="text-[#0e0d12]/30 hover:text-red-600 transition-colors text-sm">
-                        ✕
-                      </button>
-                    </div>
-
-                    <div class="flex justify-between items-center mt-3">
-                      <div>
-                        @if (tieneDescuento(item)) {
-                        <div>
-                          <span class="text-[#0e0d12]/40 line-through text-xs">S/ {{ item.precio_base.toFixed(2)
-                            }}</span>
-                          <span class="text-[#0e0d12] font-medium text-sm ml-2">S/ {{
-                            getPrecioUnitarioActual(item).toFixed(2) }}</span>
-                        </div>
-                        } @else {
-                        <span class="text-[#0e0d12] text-sm">S/ {{ getPrecioUnitarioActual(item).toFixed(2) }}</span>
-                        }
-                      </div>
-
-                      <div class="flex items-center gap-3">
-                        <div class="flex flex-col items-center gap-1">
-                          <div class="flex items-center border border-gray-300">
-                            <button (click)="updateQuantity(item, -1)"
-                              [disabled]="item.cantidad <= 1 || cartService.isUpdatingItem(item.id_vino)"
-                              class="w-7 h-7 bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center text-[#0e0d12] text-sm disabled:opacity-40 disabled:cursor-not-allowed">
-                              -
-                            </button>
-                            <span class="w-8 text-center text-[#0e0d12] text-sm">{{ item.cantidad }}</span>
-                            <div class="relative">
-                              <button
-                                (click)="updateQuantity(item, 1)"
-                                [disabled]="isAtStockLimit(item) || cartService.isUpdatingItem(item.id_vino)"
-                                class="w-7 h-7 bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center text-[#0e0d12] text-sm disabled:opacity-40 disabled:cursor-not-allowed">
-                                +
-                              </button>
-                              @if (isAtStockLimit(item)) {
-                                <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full pointer-events-none"></span>
-                              }
-                            </div>
-                          </div>
-                          @if (isAtStockLimit(item)) {
-                            <p class="text-red-500 text-[10px] mt-1.5">
-                              Stock máximo alcanzado
-                            </p>
-                          }
-                        </div>
-                        <span class="text-[#0e0d12] font-medium text-base">S/ {{ getTotalItem(item).toFixed(2) }}</span>
-                      </div>
-                    </div>
+                  <div class="col-span-2 text-right">
 
                     @if (tieneDescuento(item)) {
-                    <p class="text-green-700 text-xs mt-2">
-                      Ahorras S/ {{ ((item.precio_base - getPrecioUnitarioActual(item)) * (item.esCaja ? item.cantidad *
-                      item.botellas_por_caja : item.cantidad)).toFixed(2) }}
-                    </p>
+
+                    <div>
+
+                      <div class="text-xs text-[#0e0d12]/40 line-through">
+                        S/ {{ item.precio_base.toFixed(2) }}
+                      </div>
+
+                      <div class="font-semibold text-[#0e0d12]">
+                        S/ {{ getPrecioUnitarioActual(item).toFixed(2) }}
+                      </div>
+
+                    </div>
+
+                    } @else {
+
+                    <span class="font-semibold">
+                      S/ {{ getPrecioUnitarioActual(item).toFixed(2) }}
+                    </span>
+
                     }
+
+                  </div>
+
+                  <div class="col-span-3 flex justify-center">
+
+                    <div class="inline-flex items-center border border-gray-200 bg-[#faf9f6]">
+
+                      <button (click)="updateQuantity(item,-1)"
+                        [disabled]="item.cantidad<=1 || cartService.isUpdatingItem(item.id_vino)"
+                        class="h-10 w-10 bg-white hover:bg-gray-100 disabled:opacity-40">
+
+                        -
+
+                      </button>
+
+                      <div class="quantity-wrapper flex w-12 justify-center"
+                        (animationend)="item.animationDirection = null">
+
+                        @if(item.animationDirection){
+
+                        <span class="qty-old text-sm font-semibold" [ngClass]="item.animationDirection + '-out'">
+
+                          {{ item.oldCantidad }}
+
+                        </span>
+
+                        }
+
+                        <span class="qty-new text-sm font-semibold"
+                          [ngClass]="item.animationDirection ? item.animationDirection + '-in' : ''">
+
+                          {{ item.cantidad }}
+
+                        </span>
+
+                      </div>
+
+                      <button (click)="updateQuantity(item,1)"
+                        [disabled]="isAtStockLimit(item) || cartService.isUpdatingItem(item.id_vino)"
+                        class="h-10 w-10 bg-white hover:bg-gray-100 disabled:opacity-40">
+
+                        +
+
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                  <div class="col-span-2 flex justify-end items-center gap-4">
+
+                    <div class="text-right font-semibold whitespace-nowrap">
+                      S/ {{ getTotalItem(item).toFixed(2) }}
+                    </div>
+
+                    <button (click)="removeItem(item)"
+                      class="flex h-10 w-10 shrink-0 items-center justify-center border border-gray-200 text-[#0e0d12]/60 hover:border-red-300 hover:text-red-600">
+
+                      <fa-icon [icon]="icons.faTrashCan"></fa-icon>
+
+                    </button>
+
                   </div>
 
                 </div>
+
+                <div class="space-y-4 lg:hidden">
+
+                  <div class="flex gap-4">
+
+                    <div class="h-24 w-24 shrink-0 overflow-hidden border border-gray-200 bg-gray-50">
+
+                      <img [src]="item.url_img_principal" [alt]="item.nombre" class="h-full w-full object-cover">
+
+                    </div>
+
+                    <div class="flex-1 min-w-0">
+
+                      <h3 class="font-semibold break-words">
+                        {{ item.nombre }}
+                      </h3>
+
+                      <div class="mt-2 flex flex-wrap gap-2">
+
+                        <span class="border border-gray-200 bg-[#f6f4ef] px-2 py-1 text-xs">
+                          {{ item.volumen_ml }} ml
+                        </span>
+
+                        <span class="border border-gray-200 bg-[#f6f4ef] px-2 py-1 text-xs">
+                          {{ getQuantityText(item) }}
+                        </span>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4 text-sm">
+
+                    <div>
+                      <div class="text-xs uppercase text-[#0e0d12]/50">
+                        Precio
+                      </div>
+
+                      @if (tieneDescuento(item)) {
+
+                      <div class="line-through text-xs text-[#0e0d12]/40">
+                        S/ {{ item.precio_base.toFixed(2) }}
+                      </div>
+
+                      <div class="font-semibold">
+                        S/ {{ getPrecioUnitarioActual(item).toFixed(2) }}
+                      </div>
+
+                      } @else {
+
+                      <div class="font-semibold">
+                        S/ {{ getPrecioUnitarioActual(item).toFixed(2) }}
+                      </div>
+
+                      }
+
+                    </div>
+
+                    <div class="text-right">
+
+                      <div class="text-xs uppercase text-[#0e0d12]/50">
+                        Total
+                      </div>
+
+                      <div class="font-semibold">
+                        S/ {{ getTotalItem(item).toFixed(2) }}
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                  <div class="flex items-center justify-between">
+
+                    <div class="inline-flex items-center border border-gray-200 bg-[#faf9f6]">
+
+                      <button (click)="updateQuantity(item,-1)" class="h-10 w-10 bg-white">
+
+                        -
+
+                      </button>
+
+                      <div class="flex w-12 justify-center font-semibold">
+                        {{ item.cantidad }}
+                      </div>
+
+                      <button (click)="updateQuantity(item,1)" class="h-10 w-10 bg-white">
+
+                        +
+
+                      </button>
+
+                    </div>
+
+                    <button (click)="removeItem(item)"
+                      class="flex h-10 w-10 items-center justify-center border border-gray-200 text-[#0e0d12]/60 hover:border-red-300 hover:text-red-600">
+
+                      <fa-icon [icon]="icons.faTrashCan"></fa-icon>
+
+                    </button>
+
+                  </div>
+
+                </div>
+
+                @if (isAtStockLimit(item)) {
+
+                <p class="mt-3 text-[11px] text-red-500">
+                  Stock máximo alcanzado
+                </p>
+
+                }
+
+                @if (tieneDescuento(item)) {
+
+                <div class="mt-4 border border-green-100 bg-green-50 px-4 py-3 text-sm text-green-700">
+
+                  Ahorras S/
+                  {{
+                  (
+                  (item.precio_base-getPrecioUnitarioActual(item)) *
+                  (item.esCaja ? item.cantidad * item.botellas_por_caja : item.cantidad)
+                  ).toFixed(2)
+                  }}
+
+                </div>
+
+                }
+
               </div>
+
+              }
+
             </div>
-            }
+
           </div>
         </div>
 
-        <div class="lg:w-80 shrink-0">
-          <div class="bg-gray-50 p-5 md:p-6 sticky top-8">
-            <h2 class="text-lg font-bold text-[#0e0d12] mb-5">Resumen del pedido</h2>
+        <div class="space-y-4">
+          <div class="border border-gray-200 bg-white p-6 shadow-sm sticky top-6">
+            <h2 class="text-xl font-bold text-[#0e0d12] mb-4">Resumen del pedido</h2>
 
-            <div class="space-y-2 mb-4">
-              <div class="flex justify-between text-[#0e0d12]/70 text-sm">
+            <div class="space-y-3 text-sm text-[#0e0d12]/80 mb-5">
+              <div class="flex justify-between">
                 <span>Subtotal</span>
                 <span>S/ {{ subtotal().toFixed(2) }}</span>
               </div>
-
               @if (getTotalAhorro() > 0) {
-              <div class="flex justify-between text-green-700 text-sm">
+              <div class="flex justify-between text-green-700">
                 <span>Ahorro total</span>
                 <span>-S/ {{ getTotalAhorro().toFixed(2) }}</span>
               </div>
               }
             </div>
 
-            <div class="border-t border-gray-200 pt-3 mb-5">
-              <div class="flex justify-between items-center">
-                <span class="text-[#0e0d12] font-medium">Total</span>
-                <span class="text-xl font-bold text-[#0e0d12]">S/ {{ getTotal().toFixed(2) }}</span>
+            <div class="border-t border-gray-200 pt-4 mb-5">
+              <div class="flex justify-between items-center text-lg font-semibold text-[#0e0d12]">
+                <span>Total</span>
+                <span>S/ {{ getTotal().toFixed(2) }}</span>
               </div>
             </div>
 
-            <button routerLink="/store/cart/checkout"
-              class="w-full py-2.5 bg-[#0e0d12] text-white font-medium hover:bg-[#1c1a24] transition text-sm">
-              Proceder al pago
-            </button>
+            <div class="flex gap-3">
+              <button routerLink="/store/cart/checkout"
+                class="flex-1 flex items-center justify-center gap-2 bg-[#0e0d12] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1c1a24]">
+                <fa-icon [icon]="icons.faWallet" />
+                Ir a pagar
+              </button>
 
-            <button (click)="volverATienda()"
-              class="w-full mt-2 py-2.5 border border-gray-300 text-[#0e0d12] font-medium hover:bg-gray-100 transition text-sm">
-              Seguir comprando
-            </button>
+              <button (click)="volverATienda()"
+                class="flex-1 flex items-center justify-center border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-[#0e0d12] transition hover:bg-gray-50">
+                Seguir comprando
+              </button>
+            </div>
+          </div>
+
+          <div class="border border-gray-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center gap-3 text-sm text-[#0e0d12]">
+              <fa-icon [icon]="icons.faLock"
+                class="inline-flex h-10 w-10 shrink-0 items-center justify-center bg-[#f7f5ee] text-[#0e0d12]/90" />
+              <div>
+                <p class="font-semibold text-[#0e0d12]">Compra 100% segura</p>
+                <p class="text-[#0e0d12]/60">Protegemos tus datos en cada compra.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="border border-gray-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center gap-3 text-sm text-[#0e0d12]">
+              <fa-icon [icon]="icons.faTruckFast"
+                class="inline-flex h-10 w-10 shrink-0 items-center justify-center bg-[#f7f5ee] text-[#0e0d12]/90" />
+              <div>
+                <p class="font-semibold text-[#0e0d12]">Entrega asegurada</p>
+                <p class="text-[#0e0d12]/60">Tu pedido llegará en un plazo de 5 días.</p>
+              </div>
+            </div>
           </div>
         </div>
+
       </div>
       }
     </div>

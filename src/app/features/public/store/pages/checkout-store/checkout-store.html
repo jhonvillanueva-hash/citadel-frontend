@@ -3,271 +3,291 @@
     <div class="w-full max-w-7xl mx-auto">
       <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
         <div class="flex-1 lg:flex-[2] min-w-0">
-          <h1 class="text-2xl md:text-3xl font-bold text-[#0e0d12] mb-8">Finalizar compra</h1>
-          <p>Revisa algunos datos antes de realizar el pago.</p>
+          <h1 class="text-2xl md:text-3xl font-bold text-[#0e0d12]">Finalizar compra</h1>
+          @if (!step1Completed() || !step2Completed()) {
+            <p class="text-sm text-red-600 my-4">
+              Revisa algunos datos antes de realizar el pago.
+            </p>
+          } @else {
+            <p class="text-sm text-green-600 my-4">
+              ¡Tenemos tus datos, todo listo para que pagues!
+            </p>
+          }
 
           <div class="space-y-6">
-            <div class="border bg-white"
-              [class.border-red-500]="!step1Completed()"
-              [class.border-gray-200]="step1Completed()"
-              [class.border-pulse]="!step1Completed()">
+            <div class="border bg-white" [class.border-red-500]="!step1Completed()"
+              [class.border-gray-200]="step1Completed()" [class.border-pulse]="!step1Completed()">
               <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 bg-[#0e0d12] text-white flex items-center justify-center text-sm font-medium">1</div>
+                  <div class="w-8 h-8 bg-[#0e0d12] text-white flex items-center justify-center text-sm font-medium">1
+                  </div>
                   <span class="font-medium text-[#0e0d12]">Información personal</span>
                 </div>
                 @if (!isEditingStep1() && step1Completed()) {
-                  <button 
-                    (click)="enableEditingStep1()" 
-                    class="h-8 px-3 bg-[#0e0d12] text-white font-medium flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[#2a2932] hover:shadow-sm active:scale-[0.98]">
-                      Habilitar edición
-                  </button>
+                <button (click)="enableEditingStep1()"
+                  class="h-8 px-3 bg-[#0e0d12] text-white font-medium flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[#2a2932] hover:shadow-sm active:scale-[0.98]">
+                  Habilitar edición
+                </button>
                 }
               </div>
               <div class="p-6">
-                <div class="space-y-5">
-                  <div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+
+                  <div class="md:col-span-2">
                     <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
                       Email *
                     </label>
-                    <input type="email" [ngModel]="email()" (ngModelChange)="onEmailChange($event)" [disabled]="step1Completed() && !isEditingStep1()"
+                    <input type="email" [ngModel]="email()" (ngModelChange)="onEmailChange($event)"
+                      [disabled]="step1Completed() && !isEditingStep1()"
                       class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
                       placeholder="cliente@ejemplo.com">
                   </div>
-              
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                      <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
-                        Nombres *
-                      </label>
-                      <input type="text" [ngModel]="nombres()" (ngModelChange)="onNombresChange($event)" [disabled]="step1Completed() && !isEditingStep1()"
-                        class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
-                        placeholder="Juan">
-                    </div>
-              
-                    <div>
-                      <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
-                        Apellidos *
-                      </label>
-                      <input type="text" [ngModel]="apellidos()" (ngModelChange)="onApellidosChange($event)"
-                        [disabled]="step1Completed() && !isEditingStep1()"
-                        class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
-                        placeholder="Pérez">
-                    </div>
+
+                  <div class="md:col-span-1">
+                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
+                      Nombres *
+                    </label>
+                    <input type="text" [ngModel]="nombres()" (ngModelChange)="onNombresChange($event)"
+                      [disabled]="step1Completed() && !isEditingStep1()"
+                      class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
+                      placeholder="Juan">
                   </div>
-              
-                  <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
-                    <div class="md:col-span-1">
-                      <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
-                        DNI *
-                      </label>
-                      <input type="text" maxlength="8" [ngModel]="dni()" (ngModelChange)="onDniChange($event)"
-                        [disabled]="step1Completed() && !isEditingStep1()"
-                        class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
-                        placeholder="87654321">
-                    </div>
-              
-                    <div class="md:col-span-1">
-                      <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
-                        Teléfono *
-                      </label>
-                      <input type="tel" maxlength="9" [ngModel]="telefono()" (ngModelChange)="onTelefonoChange($event)"
-                        [disabled]="step1Completed() && !isEditingStep1()"
-                        class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
-                        placeholder="987654321">
-                    </div>
+
+                  <div class="md:col-span-1">
+                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
+                      Apellidos *
+                    </label>
+                    <input type="text" [ngModel]="apellidos()" (ngModelChange)="onApellidosChange($event)"
+                      [disabled]="step1Completed() && !isEditingStep1()"
+                      class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
+                      placeholder="Pérez">
                   </div>
-              
-                  <div class="flex gap-3">
+
+                  <div class="md:col-span-1">
+                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
+                      DNI *
+                    </label>
+                    <input type="text" maxlength="8" [ngModel]="dni()" (ngModelChange)="onDniChange($event)"
+                      [disabled]="step1Completed() && !isEditingStep1()"
+                      class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
+                      placeholder="87654321">
+                  </div>
+
+                  <div class="md:col-span-1">
+                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
+                      Teléfono *
+                    </label>
+                    <input type="tel" maxlength="9" [ngModel]="telefono()" (ngModelChange)="onTelefonoChange($event)"
+                      [disabled]="step1Completed() && !isEditingStep1()"
+                      class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
+                      placeholder="987654321">
+                  </div>
+
+                  <div class="md:col-span-2 flex justify-end items-end gap-3">
                     @if (!isEditingStep1() || !step1Completed()) {
-                      <button (click)="completeStep1()" [disabled]="
-                        !email() ||
-                        !nombres() ||
-                        !apellidos() ||
-                        !dni() ||
-                        !telefono() ||
-                        !email().includes('@') ||
-                        !email().includes('.') ||
-                        step1Completed()
-                      "
-                        class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
-                        Continuar
-                      </button>
+                    <button (click)="completeStep1()" [disabled]="
+                      !email() ||
+                      !nombres() ||
+                      !apellidos() ||
+                      !dni() ||
+                      !telefono() ||
+                      !email().includes('@') ||
+                      !email().includes('.') ||
+                      step1Completed()
+                    " class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
+                                  Continuar
+                    </button>
                     } @else if (isEditingStep1() && step1Completed()) {
-                      <button (click)="cancelEditingStep1()" class="px-6 py-2 border border-gray-300 text-[#0e0d12] hover:bg-gray-50 transition text-sm font-medium">
-                        Cancelar
-                      </button>
-                      <button (click)="completeStep1()" [disabled]="
-                        !email() ||
-                        !nombres() ||
-                        !apellidos() ||
-                        !dni() ||
-                        !telefono() ||
-                        !email().includes('@') ||
-                        !email().includes('.')
-                      "
-                        class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
-                        Guardar
-                      </button>
+                    <button (click)="cancelEditingStep1()"
+                      class="px-6 py-2 border border-gray-300 text-[#0e0d12] hover:bg-gray-50 transition text-sm font-medium">
+                      Cancelar
+                    </button>
+
+                    <button (click)="completeStep1()" [disabled]="
+                      !email() ||
+                      !nombres() ||
+                      !apellidos() ||
+                      !dni() ||
+                      !telefono() ||
+                      !email().includes('@') ||
+                      !email().includes('.')
+                    " class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
+                      Guardar
+                    </button>
                     }
                   </div>
+
                 </div>
               </div>
             </div>
 
-            <div
-            class="border bg-white"
-            [class.border-red-500]="step2Enabled() && !step2Completed()"
-            [class.border-gray-200]="!step2Enabled() || step2Completed()"
-            [class.border-pulse]="step2Enabled() && !step2Completed()">
+            <div class="border bg-white" [class.border-red-500]="step2Enabled() && !step2Completed()"
+              [class.border-gray-200]="!step2Enabled() || step2Completed()"
+              [class.border-pulse]="step2Enabled() && !step2Completed()">
               <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 flex items-center justify-center text-sm font-medium" [class.bg-[#0e0d12]]="step2Enabled()" [class.text-white]="step2Enabled()" [class.bg-gray-200]="!step2Enabled()" [class.text-gray-500]="!step2Enabled()">2</div>
-                  <span class="font-medium" [class.text-[#0e0d12]]="step2Enabled()" [class.text-gray-400]="!step2Enabled()">Envío y dirección</span>
+                  <div class="w-8 h-8 flex items-center justify-center text-sm font-medium"
+                    [class.bg-[#0e0d12]]="step2Enabled()" [class.text-white]="step2Enabled()"
+                    [class.bg-gray-200]="!step2Enabled()" [class.text-gray-500]="!step2Enabled()">2</div>
+                  <span class="font-medium" [class.text-[#0e0d12]]="step2Enabled()"
+                    [class.text-gray-400]="!step2Enabled()">Envío y dirección</span>
                 </div>
                 @if (!isEditingStep2() && step2Completed() && step2Enabled()) {
-                  <button
-                    (click)="enableEditingStep2()"
-                    class="h-8 px-3 bg-[#0e0d12] text-white font-medium flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[#2a2932] hover:shadow-sm active:scale-[0.98]">
-                      Habilitar edición
-                  </button>
+                <button (click)="enableEditingStep2()"
+                  class="h-8 px-3 bg-[#0e0d12] text-white font-medium flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[#2a2932] hover:shadow-sm active:scale-[0.98]">
+                  Habilitar edición
+                </button>
                 }
               </div>
               <div class="p-6">
                 <div class="space-y-5">
                   <div class="grid grid-cols-2 gap-4">
-                    <button (click)="onDeliveryTypeChange('home')" [disabled]="(!step2Enabled() || step2Completed()) && !isEditingStep2()" [class.bg-[#0e0d12]]="deliveryType() === 'home' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())" [class.text-white]="deliveryType() === 'home' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())" [class.border-[#0e0d12]]="deliveryType() === 'home' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())" [class.border-gray-300]="deliveryType() !== 'home' || (!step2Enabled() && !isEditingStep2()) || (step2Completed() && !isEditingStep2())" [class.opacity-50]="(!step2Enabled() && !isEditingStep2()) || (step2Completed() && !isEditingStep2())" class="py-3 px-4 border text-center font-medium disabled:cursor-not-allowed text-sm transition-all">
+                    <button (click)="onDeliveryTypeChange('home')"
+                      [disabled]="(!step2Enabled() || step2Completed()) && !isEditingStep2()"
+                      [class.bg-[#0e0d12]]="deliveryType() === 'home' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())"
+                      [class.text-white]="deliveryType() === 'home' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())"
+                      [class.border-[#0e0d12]]="deliveryType() === 'home' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())"
+                      [class.border-gray-300]="deliveryType() !== 'home' || (!step2Enabled() && !isEditingStep2()) || (step2Completed() && !isEditingStep2())"
+                      [class.opacity-50]="(!step2Enabled() && !isEditingStep2()) || (step2Completed() && !isEditingStep2())"
+                      class="py-3 px-4 border text-center font-medium disabled:cursor-not-allowed text-sm transition-all">
                       Recibir en casa
                     </button>
-                    <button (click)="onDeliveryTypeChange('pickup')" [disabled]="(!step2Enabled() || step2Completed()) && !isEditingStep2()" [class.bg-[#0e0d12]]="deliveryType() === 'pickup' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())" [class.text-white]="deliveryType() === 'pickup' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())" [class.border-[#0e0d12]]="deliveryType() === 'pickup' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())" [class.border-gray-300]="deliveryType() !== 'pickup' || (!step2Enabled() && !isEditingStep2()) || (step2Completed() && !isEditingStep2())" [class.opacity-50]="(!step2Enabled() && !isEditingStep2()) || (step2Completed() && !isEditingStep2())" class="py-3 px-4 border text-center font-medium disabled:cursor-not-allowed text-sm transition-all">
+                    <button (click)="onDeliveryTypeChange('pickup')"
+                      [disabled]="(!step2Enabled() || step2Completed()) && !isEditingStep2()"
+                      [class.bg-[#0e0d12]]="deliveryType() === 'pickup' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())"
+                      [class.text-white]="deliveryType() === 'pickup' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())"
+                      [class.border-[#0e0d12]]="deliveryType() === 'pickup' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())"
+                      [class.border-gray-300]="deliveryType() !== 'pickup' || (!step2Enabled() && !isEditingStep2()) || (step2Completed() && !isEditingStep2())"
+                      [class.opacity-50]="(!step2Enabled() && !isEditingStep2()) || (step2Completed() && !isEditingStep2())"
+                      class="py-3 px-4 border text-center font-medium disabled:cursor-not-allowed text-sm transition-all">
                       Recoger en tienda
                     </button>
                   </div>
 
                   @if (deliveryType() === 'home') {
-                    <div class="space-y-4">
+                  <div class="space-y-4">
 
-                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                          <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Departamento *</label>
-                          <select
-                            [ngModel]="departamento()"
-                            (ngModelChange)="onDepartamentoChange($event)"
-                            [disabled]="(!step2Enabled() || step2Completed()) && !isEditingStep2()"
-                            class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
-                            <option value="" disabled selected>Seleccionar departamento</option>
-                            @for (dep of departamentos; track dep.id) {
-                              <option [value]="dep.id">{{ dep.departamento }}</option>
-                            }
-                          </select>
-                        </div>
-
-                        <div>
-                          <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Provincia *</label>
-                          <select
-                            [ngModel]="provincia()"
-                            (ngModelChange)="onProvinciaChange($event)"
-                            [disabled]="((!step2Enabled() || step2Completed()) && !isEditingStep2()) || !departamento()"
-                            class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
-                            <option value="" disabled selected>Seleccionar provincia</option>
-                            @for (prov of filteredProvincias; track prov.id) {
-                              <option [value]="prov.id">{{ prov.provincia }}</option>
-                            }
-                          </select>
-                        </div>
-
-                        <div>
-                          <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Distrito *</label>
-                          <select
-                            [ngModel]="distrito()"
-                            (ngModelChange)="onDistritoChange($event)"
-                            [disabled]="((!step2Enabled() || step2Completed()) && !isEditingStep2()) || !provincia()"
-                            class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
-                            <option value="" disabled selected>Seleccionar distrito</option>
-                            @for (dist of filteredDistritos; track dist.id) {
-                              <option [value]="dist.id">{{ dist.distrito }}</option>
-                            }
-                          </select>
-                        </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Departamento *</label>
+                        <select [ngModel]="departamento()" (ngModelChange)="onDepartamentoChange($event)"
+                          [disabled]="(!step2Enabled() || step2Completed()) && !isEditingStep2()"
+                          class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
+                          <option value="" disabled selected>Seleccionar departamento</option>
+                          @for (dep of departamentos; track dep.id) {
+                          <option [value]="dep.id">{{ dep.departamento }}</option>
+                          }
+                        </select>
                       </div>
 
-                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Provincia *</label>
+                        <select [ngModel]="provincia()" (ngModelChange)="onProvinciaChange($event)"
+                          [disabled]="((!step2Enabled() || step2Completed()) && !isEditingStep2()) || !departamento()"
+                          class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
+                          <option value="" disabled selected>Seleccionar provincia</option>
+                          @for (prov of filteredProvincias; track prov.id) {
+                          <option [value]="prov.id">{{ prov.provincia }}</option>
+                          }
+                        </select>
+                      </div>
+
+                      <div>
+                        <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Distrito *</label>
+                        <select [ngModel]="distrito()" (ngModelChange)="onDistritoChange($event)"
+                          [disabled]="((!step2Enabled() || step2Completed()) && !isEditingStep2()) || !provincia()"
+                          class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
+                          <option value="" disabled selected>Seleccionar distrito</option>
+                          @for (dist of filteredDistritos; track dist.id) {
+                          <option [value]="dist.id">{{ dist.distrito }}</option>
+                          }
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:col-span-2">
+                    
                         <div>
                           <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
                             Avenida / Calle / Jirón *
                           </label>
-                          <input
-                            type="text"
-                            [ngModel]="direccion()"
-                            (ngModelChange)="onDireccionChange($event)"
+                          <input type="text" [ngModel]="direccion()" (ngModelChange)="onDireccionChange($event)"
                             [disabled]="(!step2Enabled() || step2Completed()) && !isEditingStep2()"
                             class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
                             placeholder="Av. José Pardo">
                         </div>
-
+                    
                         <div>
-                          <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Número *</label>
-                          <input
-                            type="text"
-                            [ngModel]="numeroCasa()"
-                            (ngModelChange)="onNumeroCasaChange($event)"
+                          <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
+                            Número *
+                          </label>
+                          <input type="text" [ngModel]="numeroCasa()" (ngModelChange)="onNumeroCasaChange($event)"
                             [disabled]="(!step2Enabled() || step2Completed()) && !isEditingStep2()"
                             class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
                             placeholder="123">
                         </div>
-
+                    
                         <div>
-                          <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Código Postal</label>
-                          <input
-                            type="text"
-                            [ngModel]="codigoPostal()"
-                            (ngModelChange)="onCodigoPostalChange($event)"
+                          <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">
+                            Código Postal
+                          </label>
+                          <input type="text" [ngModel]="codigoPostal()" (ngModelChange)="onCodigoPostalChange($event)"
                             [disabled]="(!step2Enabled() || step2Completed()) && !isEditingStep2()"
                             class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
                             placeholder="15001">
                         </div>
+                    
                       </div>
-
-                      @if (mapUrl()) {
-                        <iframe
-                          [src]="mapUrl()"
-                          width="100%"
-                          height="300"
-                          style="border:0"
-                          loading="lazy"
-                          allowfullscreen>
-                        </iframe>
-                      }
-
+                    
+                      <div class="flex items-end justify-end gap-3 lg:col-span-1">
+                    
+                        @if (!isEditingStep2() || !step2Completed()) {
+                          <button (click)="goBackToStep1()" [disabled]="!step2Enabled() || step2Completed()"
+                            class="px-6 py-2 border border-gray-300 text-[#0e0d12] hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium">
+                            Regresar
+                          </button>
+                      
+                          <button (click)="completeStep2()"
+                            [disabled]="!step2Enabled() || step2Completed() || (deliveryType() === 'home' && (!direccion() || !departamento() || !provincia() || !distrito() || !numeroCasa()))"
+                            class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
+                            Continuar
+                          </button>
+                        } @else if (isEditingStep2() && step2Completed()) {                    
+                          <button (click)="cancelEditingStep2()"
+                            class="px-6 py-2 border border-gray-300 text-[#0e0d12] hover:bg-gray-50 transition text-sm font-medium">
+                            Cancelar
+                          </button>
+                      
+                          <button (click)="completeStep2()"
+                            [disabled]="deliveryType() === 'home' && (!direccion() || !departamento() || !provincia() || !distrito() || !numeroCasa())"
+                            class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
+                            Guardar
+                          </button>
+                        }
+                    
+                      </div>
+                    
                     </div>
+
+                    @if (mapUrl()) {
+                      <iframe [src]="mapUrl()" width="100%" height="300" style="border:0" loading="lazy" allowfullscreen>
+                      </iframe>
+                    }
+
+                  </div>
                   }
 
                   @if (deliveryType() === 'pickup') {
-                    <div class="bg-gray-50 p-5 border border-gray-200">
-                      <p class="font-medium text-[#0e0d12] mb-2 text-sm">Punto de recogida</p>
-                      <p class="text-[#0e0d12]/70 mb-1 text-sm">{{ pickupAddress() }}</p>
-                      <p class="text-xs text-[#0e0d12]/50">{{ pickupDetails() }}</p>
-                      <iframe [src]="storeMapUrl" width="100%" height="300" style="border:0" loading="lazy" allowfullscreen></iframe>
-                    </div>
-                  }
-
-                  <div class="flex gap-3">
-                    @if (!isEditingStep2() || !step2Completed()) {
-                      <button (click)="goBackToStep1()" [disabled]="!step2Enabled() || step2Completed()" class="px-6 py-2 border border-gray-300 text-[#0e0d12] hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium">
-                        Regresar
-                      </button>
-                      <button (click)="completeStep2()" [disabled]="!step2Enabled() || step2Completed() || (deliveryType() === 'home' && (!direccion() || !departamento() || !provincia() || !distrito() || !numeroCasa()))" class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
-                        Continuar
-                      </button>
-                    } @else if (isEditingStep2() && step2Completed()) {
-                      <button (click)="cancelEditingStep2()" class="px-6 py-2 border border-gray-300 text-[#0e0d12] hover:bg-gray-50 transition text-sm font-medium">
-                        Cancelar
-                      </button>
-                      <button (click)="completeStep2()" [disabled]="deliveryType() === 'home' && (!direccion() || !departamento() || !provincia() || !distrito() || !numeroCasa())" class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
-                        Guardar
-                      </button>
-                    }
+                  <div class="bg-gray-50 p-5 border border-gray-200">
+                    <p class="font-medium text-[#0e0d12] mb-2 text-sm">Punto de recogida</p>
+                    <p class="text-[#0e0d12]/70 mb-1 text-sm">{{ pickupAddress() }}</p>
+                    <p class="text-xs text-[#0e0d12]/50">{{ pickupDetails() }}</p>
+                    <iframe [src]="storeMapUrl" width="100%" height="300" style="border:0" loading="lazy"
+                      allowfullscreen></iframe>
                   </div>
+                  }
                 </div>
               </div>
             </div>
@@ -294,35 +314,27 @@
                 @if (!couponApplied()) {
                   <div class="border-t border-gray-200 mt-2 pt-3">
                     @if (!showCouponInput()) {
-                      <button (click)="activateCoupon()" class="text-xs text-[#0e0d12]/60 hover:text-[#0e0d12] transition font-medium">
+                      <button (click)="activateCoupon()"
+                        class="text-xs text-[#0e0d12]/60 hover:text-[#0e0d12] transition font-medium">
                         + Activar cupón
                       </button>
                     } @else {
                       <div class="w-full overflow-hidden">
                         <form (submit)="applyCoupon(); $event.preventDefault()" class="space-y-2">
-                          <input
-                            type="text"
-                            name="coupon"
-                            [ngModel]="couponCode()"
-                            (ngModelChange)="couponCode.set($event); couponError.set('')"
-                            maxlength="6"
+                          <input type="text" name="coupon" [ngModel]="couponCode()"
+                            (ngModelChange)="couponCode.set($event); couponError.set('')" maxlength="6"
                             placeholder="Ingrese código de 6 dígitos"
                             class="w-full min-w-0 px-3 py-1.5 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] text-sm"
-                            [class.border-red-400]="couponError()"
-                          />
+                            [class.border-red-400]="couponError()" />
                           @if (couponError()) {
-                            <p class="text-xs text-red-500">{{ couponError() }}</p>
+                          <p class="text-xs text-red-500">{{ couponError() }}</p>
                           }
                           <div class="flex flex-col sm:flex-row gap-2">
-                            <button
-                              type="submit"
-                              [disabled]="couponCode().length !== 6 || !/^\d+$/.test(couponCode())"
+                            <button type="submit" [disabled]="couponCode().length !== 6 || !/^\d+$/.test(couponCode())"
                               class="w-full sm:w-auto px-3 py-1.5 bg-[#0e0d12] text-white text-xs font-medium hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition">
                               Aplicar
                             </button>
-                            <button
-                              type="button"
-                              (click)="cancelCoupon()"
+                            <button type="button" (click)="cancelCoupon()"
                               class="w-full sm:w-auto px-3 py-1.5 border border-gray-300 text-[#0e0d12] text-xs font-medium hover:bg-gray-50 transition">
                               Cancelar
                             </button>
@@ -353,9 +365,7 @@
                 </div>
               </div>
 
-              <button
-                (click)="handleReservar()"
-                [disabled]="!step1Completed() || !step2Completed()"
+              <button (click)="handleReservar()" [disabled]="!step1Completed() || !step2Completed()"
                 class="w-full py-2.5 bg-[#0e0d12] text-white font-medium text-sm
                     transition-all duration-200
                     hover:bg-[#2a2932] hover:shadow-sm
@@ -375,7 +385,14 @@
                   <div class="flex items-center gap-2 text-sm">
                     <img [src]="item.url_img_principal" alt="{{ item.nombre }}" class="w-10 h-10 object-cover rounded flex-shrink-0">
                     <div class="flex-1 min-w-0">
-                      <p class="text-[#0e0d12]/80 truncate">{{ item.nombre }} x{{ item.cantidad }}</p>
+                      <a
+                        class="text-xs font-semibold text-[#0e0d12] break-words underline"
+                        [routerLink]="['/store/products', generarSlug(item.nombre), item.id_vino]"
+                      >
+                        {{ item.nombre }}
+                        <fa-icon [icon]="icons.faArrowUpRightFromSquare"></fa-icon>
+                      </a>
+                      x{{ item.cantidad }}
                     </div>
                     <span class="font-medium text-[#0e0d12] whitespace-nowrap">
                       S/ {{ cartService.getTotalItem(item).toFixed(2) }}

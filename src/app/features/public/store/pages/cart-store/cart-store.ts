@@ -5,70 +5,67 @@ import { RouterLink, Router } from '@angular/router';
 
 import { CartService, CartItem } from '../../../../../core/services/cart.service';
 import { ToastService } from '../../../../../shared/components/toast/toast.service';
+import { faArrowUpRightFromSquare, faLock, faTrashCan, faTruckFast, faWallet } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-cart-store',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, FontAwesomeModule],
   templateUrl: './cart-store.html',
-styles: `
-  /* Contenedor que oculta los números cuando salen de su área */
-  .quantity-wrapper {
-    position: relative;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    height: 24px;     /* Ajusta según el tamaño de tu fuente */
-    min-width: 20px;  /* Evita que el contenedor cambie de ancho */
-  }
+  styles: `
+    .quantity-wrapper {
+      position: relative;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      height: 24px;
+      min-width: 20px;
+    }
 
-  /* El número viejo se superpone para salir */
-  .qty-old {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+    .qty-old {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-  .qty-new {
-    display: inline-flex;
-  }
+    .qty-new {
+      display: inline-flex;
+    }
 
-  /* CLASES DINÁMICAS - SUBIR */
-  .up-out { animation: slideUpOut 200ms ease-out forwards; }
-  .up-in  { animation: slideUpIn 200ms ease-out forwards; }
+    .up-out { animation: slideUpOut 200ms ease-out forwards; }
+    .up-in  { animation: slideUpIn 200ms ease-out forwards; }
 
-  /* CLASES DINÁMICAS - BAJAR */
-  .down-out { animation: slideDownOut 200ms ease-out forwards; }
-  .down-in  { animation: slideDownIn 200ms ease-out forwards; }
+    .down-out { animation: slideDownOut 200ms ease-out forwards; }
+    .down-in  { animation: slideDownIn 200ms ease-out forwards; }
 
-  /* KEYFRAMES */
-  @keyframes slideUpOut {
-    0% { transform: translateY(0); opacity: 1; }
-    100% { transform: translateY(-100%); opacity: 0; }
-  }
-  @keyframes slideUpIn {
-    0% { transform: translateY(100%); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
-  }
+    @keyframes slideUpOut {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-100%); opacity: 0; }
+    }
+    @keyframes slideUpIn {
+      0% { transform: translateY(100%); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
 
-  @keyframes slideDownOut {
-    0% { transform: translateY(0); opacity: 1; }
-    100% { transform: translateY(100%); opacity: 0; }
-  }
-  @keyframes slideDownIn {
-    0% { transform: translateY(-100%); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
-  }
-`
+    @keyframes slideDownOut {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(100%); opacity: 0; }
+    }
+    @keyframes slideDownIn {
+      0% { transform: translateY(-100%); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+  `
 })
 export class CartStore {
   cartService = inject(CartService);
 
-  cartItems  = this.cartService.cartItems;
-  subtotal   = this.cartService.subtotal;
+  cartItems = this.cartService.cartItems;
+  subtotal = this.cartService.subtotal;
 
   private router = inject(Router);
   private toastService = inject(ToastService);
@@ -128,7 +125,7 @@ export class CartStore {
         `${item.nombre} · ${item.cantidad + 1} ${item.cantidad + 1 === 1 ? 'botella' : 'botellas'}`
       );
     } else if (change < 0 && item.cantidad > 1) {
-      this.toastService.showWarning(
+      this.toastService.showSuccess(
         'Cantidad disminuida',
         `${item.nombre} · ${item.cantidad - 1} ${item.cantidad - 1 === 1 ? 'botella' : 'botellas'}`
       );
@@ -156,5 +153,22 @@ export class CartStore {
 
   volverATienda(): void {
     this.router.navigate(['/']);
+  }
+
+  generarSlug(texto: string): string {
+    return texto
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-');
+  }
+
+  icons = {
+    faTrashCan,
+    faWallet,
+    faLock,
+    faTruckFast,
+    faArrowUpRightFromSquare,
   }
 }

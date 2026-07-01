@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CartService } from '../../../../../core/services/cart.service';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { CuponService } from '../../../../../data/services/cupon.service';
 import { Cupon } from '../../../../../data/models/api.models';
@@ -13,11 +13,14 @@ import { CulqiService } from '../../../../../core/services/culqi.service';
 import { ToastService } from '../../../../../shared/components/toast/toast.service';
 import { UsuarioService } from '../../../../../data/services/usuario.service';
 import { DireccionService } from '../../../../../data/services/direccion.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-checkout-store',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule, RouterModule],
   templateUrl: './checkout-store.html',
   styles: `
     @keyframes borderPulse {
@@ -272,17 +275,20 @@ export class CheckoutStore implements OnInit {
   }
 
   ngOnInit(): void {
-    this.http.get<any>('assets/1_ubigeo_departamentos.json')
-      .subscribe(res => this.departamentos = res.ubigeo_departamentos);
+    forkJoin({
+      departamentos: this.http.get<any>('assets/1_ubigeo_departamentos.json'),
+      provincias: this.http.get<any>('assets/2_ubigeo_provincias.json'),
+      distritos: this.http.get<any>('assets/3_ubigeo_distritos.json')
+    }).subscribe({
+      next: (res) => {
+        this.departamentos = res.departamentos.ubigeo_departamentos;
+        this.provincias = res.provincias.ubigeo_provincias;
+        this.distritos = res.distritos.ubigeo_distritos;
 
-    this.http.get<any>('assets/2_ubigeo_provincias.json')
-      .subscribe(res => this.provincias = res.ubigeo_provincias);
-
-    this.http.get<any>('assets/3_ubigeo_distritos.json')
-      .subscribe(res => {
-        this.distritos = res.ubigeo_distritos;
         this.restoreFromProfile();
-      });
+      },
+      error: (err) => console.error('Error cargando Ubigeo:', err)
+    });
   }
 
   private restoreFromProfile(): void {
@@ -676,5 +682,18 @@ export class CheckoutStore implements OnInit {
     this.filteredDistritos = this.distritos.filter(
       d => d.provincia_id == Number(this.provincia())
     );
+  }
+
+  generarSlug(texto: string): string {
+    return texto
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-');
+  }
+
+  icons = {
+    faArrowUpRightFromSquare,
   }
 }

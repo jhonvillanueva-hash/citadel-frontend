@@ -139,129 +139,158 @@
     <div class="py-8 px-6 md:py-10 md:px-8 lg:py-12 lg:px-10">
 
       @if (activeTab() === 'profile') {
-        <div class="max-w-6xl mx-auto">
-          <div class="flex flex-col lg:flex-row gap-12 mb-8 pb-8 border-gray-200">
-
-            <div class="">
-              <div class="flex justify-between items-start mb-6">
-                <div>
-                  <h2 class="text-2xl font-bold text-[#0e0d12] mb-1">Información personal</h2>
-                  <p class="text-sm text-[#0e0d12]/50">Actualiza tus datos personales</p>
-                </div>
-                @if (!isEditingProfile()) {
-                  <button
-                    (click)="enableEditing()"
-                    class="px-5 py-2 text-sm font-medium text-[#0e0d12] border border-gray-300 hover:bg-[#0e0d12] hover:text-white transition-all duration-200 flex items-center gap-2"
-                  >
-                    <fa-icon [icon]="faEdit"></fa-icon>
-                    <span>Habilitar edición</span>
-                  </button>
-                }
-                @if (isEditingProfile()) {
-                  <div class="flex gap-2">
-                    <button
-                      (click)="cancelEditing()"
-                      [disabled]="isSaving()"
-                      class="px-5 py-2 text-sm font-medium text-[#0e0d12] border border-gray-300 hover:bg-gray-50 transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <fa-icon [icon]="faTimes"></fa-icon>
-                      <span>Cancelar</span>
-                    </button>
-                    <button
-                      (click)="saveProfile()"
-                      [disabled]="!isProfileValid() || isSaving()"
-                      class="px-5 py-2 text-sm font-medium text-white bg-[#0e0d12] hover:bg-[#1c1a24] transition-all duration-200 flex items-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                    >
-                      <fa-icon [icon]="faSave"></fa-icon>
-                      <span>{{ isSaving() ? 'Guardando...' : 'Guardar' }}</span>
-                    </button>
-                  </div>
-                }
+        <div class="max-w-4xl mx-auto p-8 rounded-none border border-gray-200 bg-white shadow-none">
+          <div class="flex-1">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-6 mb-10 pb-6 border-b border-gray-200">
+  
+              <div class="flex-1">
+                <h2 class="text-2xl md:text-3xl font-extrabold text-[#0e0d12] tracking-tighter mb-1.5">
+                  Información personal
+                </h2>
+                <p class="text-sm text-[#0e0d12]/60">
+                  Puedes actualizar tus datos personales y de contacto
+                </p>
               </div>
 
-              <div class="space-y-5">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Nombres</label>
-                    <input
-                      type="text"
-                      [disabled]="isInputDisabled()"
-                      [ngModel]="userDataProfile().firstName"
-                      (ngModelChange)="updateField('firstName', $event)"
-                      [class]="getInputClasses('firstName')"
-                    >
-                    @if (fieldErrors()['firstName']) {
-                      <p class="mt-1 text-xs text-red-600">{{ fieldErrors()['firstName'] }}</p>
-                    }
-                  </div>
-                  <div>
-                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Apellidos</label>
-                    <input
-                      type="text"
-                      [disabled]="isInputDisabled()"
-                      [ngModel]="userDataProfile().lastName"
-                      (ngModelChange)="updateField('lastName', $event)"
-                      [class]="getInputClasses('lastName')"
-                    >
-                    @if (fieldErrors()['lastName']) {
-                      <p class="mt-1 text-xs text-red-600">{{ fieldErrors()['lastName'] }}</p>
-                    }
-                  </div>
-                </div>
+              @if (!isEditingProfile()) {
+              <button
+                (click)="enableEditing()"
+                class="w-full md:w-auto px-6 py-2.5 text-sm font-semibold text-[#0e0d12] border border-[#0e0d12] rounded-none hover:bg-[#0e0d12] hover:text-white transition-all duration-150 flex items-center justify-center gap-2.5">
+                <fa-icon [icon]="faEdit" class="w-4 h-4"></fa-icon>
+                <span>Habilitar edición</span>
+              </button>
+              }
+
+              @if (isEditingProfile()) {
+              <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                
+                <button
+                  (click)="cancelEditing()"
+                  [disabled]="isSaving()"
+                  class="w-full sm:w-auto px-6 py-2.5 text-sm font-semibold text-gray-700 border border-gray-300 rounded-none hover:bg-gray-50 transition-all duration-150 flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed">
+                  <fa-icon [icon]="faTimes" class="w-4 h-4"></fa-icon>
+                  <span>Cancelar</span>
+                </button>
+
+                <button
+                  (click)="saveProfile()"
+                  [disabled]="!isProfileValid() || isSaving()"
+                  class="w-full sm:w-auto px-6 py-2.5 text-sm font-semibold text-white bg-[#0e0d12] border border-[#0e0d12] rounded-none hover:bg-[#1c1a24] transition-all duration-150 flex items-center justify-center gap-2.5 disabled:bg-gray-300 disabled:border-gray-300 disabled:cursor-not-allowed">
+                  <fa-icon [icon]="faSave" class="w-4 h-4"></fa-icon>
+                  <span>{{ isSaving() ? 'Guardando...' : 'Guardar' }}</span>
+                </button>
+
+              </div>
+              }
+
+            </div>
+        
+            <div class="space-y-8">
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-x-8 gap-y-6">
 
                 <div>
-                  <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Email</label>
+                  <div class="flex items-center gap-2 mb-2">
+                    <fa-icon [icon]="icons.faUserTag" class="text-lg text-[#0e0d12]"></fa-icon>
+                    <label class="block text-sm font-medium text-[#0e0d12]">Nombres</label>
+                  </div>
                   <input
-                    type="email"
-                    disabled
-                    [value]="maskedEmail()"
-                    class="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 text-[#0e0d12]/50 text-sm cursor-not-allowed"
-                  >
+                    type="text"
+                    [disabled]="isInputDisabled()"
+                    [ngModel]="userDataProfile().firstName"
+                    (ngModelChange)="updateField('firstName', $event)"
+                    class="w-full px-4 py-2.5 rounded-none border border-gray-300 text-sm text-[#0e0d12] bg-white placeholder:text-gray-400 focus:ring-0 focus:border-[#0e0d12] disabled:bg-gray-100 disabled:cursor-not-allowed disabled:border-gray-200 transition-all duration-150">
+                  @if (fieldErrors()['firstName']) {
+                  <p class="mt-1.5 text-xs text-red-600 font-medium">
+                    {{ fieldErrors()['firstName'] }}
+                  </p>
+                  }
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Teléfono</label>
-                    <input
-                      type="tel"
-                      maxlength="9"
-                      [disabled]="isInputDisabled()"
-                      [ngModel]="userDataProfile().phone"
-                      (ngModelChange)="updateField('phone', $event)"
-                      (keypress)="onlyNumbers($event)"
-                      [class]="getInputClasses('phone')"
-                    >
-                    @if (fieldErrors()['phone']) {
-                      <p class="mt-1 text-xs text-red-600">{{ fieldErrors()['phone'] }}</p>
-                    }
+                <div>
+                  <div class="flex items-center gap-2 mb-2">
+                    <fa-icon [icon]="icons.faUserTag" class="text-lg text-[#0e0d12]"></fa-icon>
+                    <label class="block text-sm font-medium text-[#0e0d12]">Apellidos</label>
                   </div>
-                  <div>
-                    <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">DNI</label>
-                    <input
-                      type="text"
-                      maxlength="8"
-                      [disabled]="isInputDisabled()"
-                      [ngModel]="userDataProfile().dni"
-                      (ngModelChange)="updateField('dni', $event)"
-                      (keypress)="onlyNumbers($event)"
-                      [class]="getInputClasses('dni')"
-                    >
-                    @if (fieldErrors()['dni']) {
-                      <p class="mt-1 text-xs text-red-600">{{ fieldErrors()['dni'] }}</p>
-                    }
-                  </div>
+                  <input
+                    type="text"
+                    [disabled]="isInputDisabled()"
+                    [ngModel]="userDataProfile().lastName"
+                    (ngModelChange)="updateField('lastName', $event)"
+                    class="w-full px-4 py-2.5 rounded-none border border-gray-300 text-sm text-[#0e0d12] bg-white placeholder:text-gray-400 focus:ring-0 focus:border-[#0e0d12] disabled:bg-gray-100 disabled:cursor-not-allowed disabled:border-gray-200 transition-all duration-150">
+                  @if (fieldErrors()['lastName']) {
+                  <p class="mt-1.5 text-xs text-red-600 font-medium">
+                    {{ fieldErrors()['lastName'] }}
+                  </p>
+                  }
                 </div>
+
+                <div>
+                  <div class="flex items-center gap-2 mb-2">
+                    <fa-icon [icon]="icons.faPhone" class="text-lg text-[#0e0d12]"></fa-icon>
+                    <label class="block text-sm font-medium text-[#0e0d12]">Teléfono</label>
+                  </div>
+                  <input
+                    type="tel"
+                    maxlength="9"
+                    [disabled]="isInputDisabled()"
+                    [ngModel]="userDataProfile().phone"
+                    (ngModelChange)="updateField('phone', $event)"
+                    (keypress)="onlyNumbers($event)"
+                    class="w-full px-4 py-2.5 rounded-none border border-gray-300 text-sm text-[#0e0d12] bg-white placeholder:text-gray-400 focus:ring-0 focus:border-[#0e0d12] disabled:bg-gray-100 disabled:cursor-not-allowed disabled:border-gray-200 transition-all duration-150">
+                  @if (fieldErrors()['phone']) {
+                  <p class="mt-1.5 text-xs text-red-600 font-medium">
+                    {{ fieldErrors()['phone'] }}
+                  </p>
+                  }
+                </div>
+
+                <div>
+                  <div class="flex items-center gap-2 mb-2">
+                    <fa-icon [icon]="icons.faAddressCard" class="text-lg text-[#0e0d12]"></fa-icon>
+                    <label class="block text-sm font-medium text-[#0e0d12]">DNI</label>
+                  </div>
+                  <input
+                    type="text"
+                    maxlength="8"
+                    [disabled]="isInputDisabled()"
+                    [ngModel]="userDataProfile().dni"
+                    (ngModelChange)="updateField('dni', $event)"
+                    (keypress)="onlyNumbers($event)"
+                    class="w-full px-4 py-2.5 rounded-none border border-gray-300 text-sm text-[#0e0d12] bg-white placeholder:text-gray-400 focus:ring-0 focus:border-[#0e0d12] disabled:bg-gray-100 disabled:cursor-not-allowed disabled:border-gray-200 transition-all duration-150">
+                  @if (fieldErrors()['dni']) {
+                  <p class="mt-1.5 text-xs text-red-600 font-medium">
+                    {{ fieldErrors()['dni'] }}
+                  </p>
+                  }
+                </div>
+
               </div>
+
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <fa-icon [icon]="icons.faAt" class="text-lg text-[#0e0d12]"></fa-icon>
+                  <label class="block text-sm font-medium text-[#0e0d12]">Email</label>
+                </div>
+                <input
+                  type="email"
+                  disabled
+                  [value]="maskedEmail()"
+                  class="w-full px-4 py-2.5 rounded-none border border-gray-200 bg-gray-100 text-sm text-[#0e0d12]/60 cursor-not-allowed">
+              </div>
+
             </div>
           </div>
         </div>
       }
 
       @if (activeTab() === 'orders') {
-        <div class="max-w-4xl mx-auto">
-          <div class="mb-8">
-            <h2 class="text-2xl font-bold text-[#0e0d12]">Mis pedidos</h2>
-            <p class="text-sm text-[#0e0d12]/50">Historial detallado de tus compras</p>
+        <div class="max-w-4xl mx-auto p-8 rounded-none border border-gray-200 bg-white shadow-none">
+          <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-6 mb-10 pb-6 border-b border-gray-200">
+            <div class="flex-1">
+              <h2 class="text-2xl md:text-3xl font-extrabold text-[#0e0d12] tracking-tighter mb-1.5">Mis pedidos</h2>
+              <p class="text-sm text-[#0e0d12]/60">Historial detallado de tus compras</p>
+            </div>
           </div>
 
           @if (isLoadingOrders()) {
@@ -287,12 +316,10 @@
             <div class="space-y-4">
               @for (order of orders(); track order.id) {
                 <div class="border border-gray-200 overflow-hidden bg-white hover:border-gray-300 transition-colors">
-                  <!-- Header del Pedido -->
                   <div
                     (click)="toggleOrderExpansion(order.id)"
                     class="p-4 md:p-6 cursor-pointer flex flex-wrap md:flex-nowrap items-center gap-4 md:gap-6"
                   >
-                    <!-- Imagen Principal -->
                     <div class="w-20 h-20 bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-100">
                       @if (order.products[0]?.imageUrl) {
                         <img [src]="order.products[0].imageUrl" class="w-full h-full object-contain p-1">
@@ -303,7 +330,6 @@
                       }
                     </div>
 
-                    <!-- Info Principal -->
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-2 mb-1">
                         <span class="text-xs font-bold text-[#0e0d12]/40 uppercase tracking-wider">Pedido #{{ order.id }}</span>
@@ -340,7 +366,6 @@
                       }
                     </div>
 
-                    <!-- Precio y Acciones -->
                     <div class="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-2">
                       <div class="text-right">
                         <p class="text-xs text-[#0e0d12]/40 font-medium">Total pagado</p>
@@ -377,22 +402,38 @@
                             <div class="relative pl-8 space-y-10 before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-gray-100">
                               @for (event of order.history; track event.id; let first = $first) {
                                 <div class="relative">
-                                  <div 
+                                  <div
                                     class="absolute -left-[27px] top-1 w-4 h-4 rounded-full border-4 transition-all duration-500"
-                                    [class]="first ? 'bg-[#0e0d12] border-white shadow-[0_0_0_4px_rgba(14,13,18,0.1)] scale-110' : 'bg-gray-200 border-white'"
+                                    [class]="first
+                                      ? 'bg-[#0e0d12] border-white shadow-[0_0_0_4px_rgba(14,13,18,0.1)] scale-110'
+                                      : 'bg-gray-400 border-white'"
                                   ></div>
-                                  
+
                                   <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-2">
                                     <div class="flex-1">
-                                      <p class="text-sm font-bold transition-colors" [class.text-[#0e0d12]]="first" [class.text-[#0e0d12]/40]="!first">
+                                      <p
+                                        class="text-sm font-bold transition-colors"
+                                        [class.text-[#0e0d12]]="first"
+                                        [class.text-[#0e0d12]/60]="!first"
+                                      >
                                         {{ getStatusText(event.estado) }}
                                       </p>
-                                      <p class="text-xs mt-1.5 leading-relaxed transition-colors" [class.text-[#0e0d12]/70]="first" [class.text-[#0e0d12]/30]="!first">
+
+                                      <p
+                                        class="text-xs mt-1.5 leading-relaxed transition-colors"
+                                        [class.text-[#0e0d12]/70]="first"
+                                        [class.text-[#0e0d12]/45]="!first"
+                                      >
                                         {{ getStatusDescription(event.estado) }}
                                       </p>
                                     </div>
-                                    <div class="text-[10px] font-bold font-mono tracking-tighter uppercase transition-colors" [class.text-[#0e0d12]/40]="first" [class.text-[#0e0d12]/20]="!first">
-                                      {{ event.fecha| date:'dd MMM, yyyy · HH:mm' }}
+
+                                    <div
+                                      class="text-[10px] font-bold font-mono tracking-tighter uppercase transition-colors"
+                                      [class.text-[#0e0d12]/40]="first"
+                                      [class.text-[#0e0d12]/35]="!first"
+                                    >
+                                      {{ event.fecha | date:'dd MMM, yyyy · HH:mm' }}
                                     </div>
                                   </div>
                                 </div>
@@ -433,10 +474,13 @@
                                   class="underline inline-flex items-center gap-1"
                                   [routerLink]="['/store/products', generarSlug(product.name), product.id]"
                                 >
-                                  <span class="text-sm font-bold text-[#0e0d12] truncate">
+                                  <span class="text-sm font-bold text-[#0e0d12] break-words">
                                     {{ product.name }}
                                   </span>
-                                  <fa-icon [icon]="faArrowUpRightFromSquare" class="text-xs"></fa-icon>
+                                  <fa-icon
+                                    [icon]="faArrowUpRightFromSquare"
+                                    class="hidden md:inline text-xs">
+                                  </fa-icon>
                                 </a>
                                 <p class="text-xs text-[#0e0d12]/50">Cantidad: {{ product.quantity }}</p>
                               </div>
@@ -452,7 +496,6 @@
                           }
                         </div>
 
-                        <!-- Resumen de Costos -->
                         <div class="max-w-sm ml-auto bg-white border border-gray-200 p-4 shadow-sm">
                           <h5 class="text-xs font-bold text-[#0e0d12]/40 uppercase tracking-widest mb-4">Resumen de pago</h5>
                           <div class="space-y-2.5">
@@ -497,16 +540,16 @@
       }
 
       @if (activeTab() === 'addresses') {
-        <div class="max-w-4xl mx-auto">
-          <div class="flex justify-between items-start mb-8">
-            <div>
-              <h2 class="text-2xl font-bold text-[#0e0d12]">Mis Direcciones</h2>
-              <p class="text-sm text-[#0e0d12]/50">Gestiona tus direcciones de envío y recojo</p>
+        <div class="max-w-4xl mx-auto p-8 rounded-none border border-gray-200 bg-white shadow-none">
+          <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-6 mb-10 pb-6 border-b border-gray-200">
+            <div class="flex-1">
+              <h2 class="text-2xl md:text-3xl font-extrabold text-[#0e0d12] tracking-tighter mb-1.5">Mis Direcciones</h2>
+              <p class="text-sm text-[#0e0d12]/60">Gestiona tus direcciones de envío y recojo</p>
             </div>
             @if (!isEditingAddressForm()) {
               <button
                 (click)="openNewAddressForm()"
-                class="px-5 py-2 text-sm font-medium text-white bg-[#0e0d12] hover:bg-[#1c1a24] transition-all duration-200 flex items-center gap-2"
+                class="w-full md:w-auto px-6 py-2.5 text-sm font-semibold text-white bg-[#0e0d12] border border-[#0e0d12] rounded-none hover:bg-[#1c1a24] transition-all duration-150 flex items-center justify-center gap-2.5"
               >
                 <fa-icon [icon]="faPlus"></fa-icon>
                 <span>Nueva Dirección</span>
@@ -515,7 +558,7 @@
           </div>
 
           @if (isEditingAddressForm()) {
-            <div class="bg-white border border-gray-200 p-6 mb-8 shadow-sm">
+            <div class="bg-white border border-gray-200 p-6 mb-8 shadow-none rounded-none">
               <h3 class="text-lg font-bold text-[#0e0d12] mb-6">
                 {{ currentAddressId() ? 'Editar Dirección' : 'Nueva Dirección' }}
               </h3>
