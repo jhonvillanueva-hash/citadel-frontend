@@ -42,7 +42,7 @@ export class FlavorStore {
 
   pageTitle = computed(() => {
     const name = this.params()?.get('name');
-
+    if (name === 'arndanos') return 'Vinos de Arándanos';
     if (!name || name === 'todos') return 'Todos los Vinos';
     if (name === 'mixtos') return 'Vinos Mixtos';
     if (name === 'promociones') return 'Vinos en Promoción';

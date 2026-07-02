@@ -75,9 +75,13 @@
         @for (nav of internalNavs(); track trackById($index, nav)) {
           <li>
             <a
-              [routerLink]="nav.id
-                ? ['/store/products/flavors', generarSlug(nav.name), nav.id]
-                : ['/store/products/flavors', generarSlug(nav.name)]"
+              [routerLink]="
+                nav.name === 'Todos'
+                  ? ['/']
+                  : nav.id
+                    ? ['/store/products/flavors', generarSlug(nav.name), nav.id]
+                    : ['/store/products/flavors', generarSlug(nav.name)]
+              "
               [class.text-[#c35b64]]="isActive(nav)"
               [class.border-b-2]="isActive(nav)"
               [class.border-[#c35b64]]="isActive(nav)"

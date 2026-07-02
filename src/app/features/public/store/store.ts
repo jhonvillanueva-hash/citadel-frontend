@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeroStore } from './components/hero-store/hero-store';
-import { Category } from './components/category/category';
 import { ProductStore } from './components/product-store/product-store';
 
 @Component({

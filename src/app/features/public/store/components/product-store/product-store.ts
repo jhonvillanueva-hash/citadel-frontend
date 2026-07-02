@@ -10,9 +10,9 @@ import { AuthService } from '../../../../../core/services/auth.service';
 
 import { Precio, Vino, Carrito } from '../../../../../data/models/api.models';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faCartShopping, faEye } from '@fortawesome/free-solid-svg-icons';
+import { faCartShopping, faEye, faFilter, faWineBottle } from '@fortawesome/free-solid-svg-icons';
 
-import { signal, computed } from '@angular/core';
+import { signal, computed, effect, untracked } from '@angular/core';
 import { input } from '@angular/core';
 
 import { CartItem, CartService } from '../../../../../core/services/cart.service';
@@ -72,7 +72,7 @@ export class ProductStore implements OnInit {
   private carritoProductoService = inject(CarritoProductoService);
   private authService = inject(AuthService);
 
-  icons = { faEye, faCartShopping };
+  icons = { faEye, faCartShopping, faFilter, faWineBottle };
 
   private vinoService = inject(VinoService);
   private precioService = inject(PrecioService);
@@ -80,6 +80,124 @@ export class ProductStore implements OnInit {
   private toastService = inject(ToastService);
 
   allProducts = signal<InternalProduct[]>([]);
+  imageStates = signal<Record<number, 'loading' | 'loaded' | 'error'>>({});
+
+  selectedFlavors = signal<Set<string>>(new Set());
+  selectedCategories = signal<Set<string>>(new Set());
+  selectedPresentations = signal<Set<string>>(new Set());
+  minPrice = signal<number>(0);
+  maxPrice = signal<number>(10000);
+  mobileFilterOpen = signal<boolean>(false);
+
+  availableFlavors = computed(() => {
+    const products = this.allProducts();
+    const flavors = new Set(products.map(p => p.flavor).filter(f => f && f !== 'Desconocido'));
+    return Array.from(flavors).sort();
+  });
+
+  availableCategories = computed(() => {
+    const products = this.allProducts();
+    const categories = new Set(products.map(p => p.category).filter(c => c && c !== 'Desconocido'));
+    return Array.from(categories).sort();
+  });
+
+  availablePresentations = computed(() => {
+    const products = this.allProducts();
+    const presentations = new Set(products.map(p => p.volumen).filter(v => v));
+    return Array.from(presentations).sort((a, b) => {
+      const volA = parseInt(a) || 0;
+      const volB = parseInt(b) || 0;
+      return volA - volB;
+    });
+  });
+
+  maxPriceAllowed = computed(() => {
+    const products = this.allProducts();
+    let max = 0;
+    products.forEach(p => {
+      const price = this.getMainPrice(p.prices)?.precio || 0;
+      if (Number(price) > max) max = Number(price);
+    });
+    return Math.ceil(max) || 1000;
+  });
+
+  toggleFilter(type: 'flavor' | 'category' | 'presentation', value: string) {
+    const signalRef = type === 'flavor' ? this.selectedFlavors :
+      type === 'category' ? this.selectedCategories :
+        this.selectedPresentations;
+
+    const current = new Set(signalRef());
+    if (current.has(value)) {
+      current.delete(value);
+    } else {
+      current.add(value);
+    }
+    signalRef.set(current);
+  }
+
+  isFilterSelected(type: 'flavor' | 'category' | 'presentation', value: string): boolean {
+    const signalRef = type === 'flavor' ? this.selectedFlavors :
+      type === 'category' ? this.selectedCategories :
+        this.selectedPresentations;
+    return signalRef().has(value);
+  }
+
+  clearFilters() {
+    this.selectedFlavors.set(new Set());
+    this.selectedCategories.set(new Set());
+    this.selectedPresentations.set(new Set());
+    this.minPrice.set(0);
+    this.maxPrice.set(this.maxPriceAllowed());
+  }
+
+  updatePriceRange(event: Event, type: 'min' | 'max') {
+    const input = event.target as HTMLInputElement;
+    const value = parseInt(input.value);
+    if (type === 'min') {
+      this.minPrice.set(Math.min(value, this.maxPrice()));
+    } else {
+      this.maxPrice.set(Math.max(value, this.minPrice()));
+    }
+  }
+
+  toggleMobileFilter() {
+    this.mobileFilterOpen.set(!this.mobileFilterOpen());
+  }
+
+  constructor() {
+    effect(() => {
+      const type = this.filterType();
+      const saborId = this.filterSaborId();
+      const dulzorId = this.filterDulzorId();
+      const products = this.allProducts();
+
+      if (products.length > 0) {
+        untracked(() => {
+          if (type === 'sabor' && saborId !== undefined) {
+            const flavor = products.find(p => p.flavorId === saborId)?.flavor;
+            if (flavor) {
+              this.selectedFlavors.set(new Set([flavor]));
+              this.selectedCategories.set(new Set());
+              this.selectedPresentations.set(new Set());
+              this.minPrice.set(0);
+              this.maxPrice.set(this.maxPriceAllowed());
+            }
+          } else if (type === 'dulzor' && dulzorId !== undefined) {
+            const cat = products.find(p => p.categoryId === dulzorId)?.category;
+            if (cat) {
+              this.selectedCategories.set(new Set([cat]));
+              this.selectedFlavors.set(new Set());
+              this.selectedPresentations.set(new Set());
+              this.minPrice.set(0);
+              this.maxPrice.set(this.maxPriceAllowed());
+            }
+          } else if (type === 'todos' || (type === 'sabor' && saborId === undefined) || (type === 'dulzor' && dulzorId === undefined)) {
+            this.clearFilters();
+          }
+        });
+      }
+    });
+  }
 
   filteredProducts = computed(() => {
 
@@ -97,17 +215,31 @@ export class ProductStore implements OnInit {
       product.estado === 'D'
     );
 
-    if (type === 'sabor' && saborId !== undefined) {
-      result = result.filter(p => p.flavorId === saborId);
+    const flavors = this.selectedFlavors();
+    if (flavors.size > 0) {
+      result = result.filter(p => flavors.has(p.flavor));
     }
 
-    if (type === 'dulzor' && dulzorId !== undefined) {
-      result = result.filter(p => p.categoryId === dulzorId);
+    const categories = this.selectedCategories();
+    if (categories.size > 0) {
+      result = result.filter(p => categories.has(p.category));
     }
+
+    const presentations = this.selectedPresentations();
+    if (presentations.size > 0) {
+      result = result.filter(p => presentations.has(p.volumen));
+    }
+
+    const minP = this.minPrice();
+    const maxP = this.maxPrice();
+
+    result = result.filter(p => {
+      const price = Number(this.getMainPrice(p.prices)?.precio || 0);
+      return price >= minP && price <= maxP;
+    });
 
     return result;
   });
-
   ngOnInit(): void {
     this.loadVinosYPrecios();
   }
@@ -118,6 +250,7 @@ export class ProductStore implements OnInit {
         this.precioService.getAll().subscribe({
           next: (precios: Precio[]) => {
             this.allProducts.set(this.mapProducts(vinos, precios));
+            this.maxPrice.set(this.maxPriceAllowed());
           }
         });
       }
@@ -184,6 +317,20 @@ export class ProductStore implements OnInit {
     if (!prices || prices.length === 0) return null;
     const unitPrice = prices.find(p => p.cantidad_minima === 1);
     return unitPrice || prices[0];
+  }
+
+  getImageDisplayState(product: InternalProduct): 'loading' | 'loaded' | 'error' {
+    const state = this.imageStates()[product.id];
+    if (state) return state;
+    return product.image ? 'loading' : 'error';
+  }
+
+  onImageLoaded(productId: number): void {
+    this.imageStates.update(state => ({ ...state, [productId]: 'loaded' }));
+  }
+
+  onImageError(productId: number): void {
+    this.imageStates.update(state => ({ ...state, [productId]: 'error' }));
   }
 
   aiOpen = false;
