@@ -7,7 +7,7 @@ import { ProductStore } from './components/product-store/product-store';
 @Component({
   selector: 'app-store',
   standalone: true,
-  imports: [CommonModule, HeroStore, Category, ProductStore],
+  imports: [CommonModule, HeroStore, ProductStore],
   templateUrl: './store.html',
   styles: ``,
 })

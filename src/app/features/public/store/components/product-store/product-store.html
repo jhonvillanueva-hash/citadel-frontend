@@ -82,25 +82,25 @@
               <fa-icon [icon]="icons.faEye" class="text-[#515255] text-[18px]" />
             </button>
 
-            <button (click)="addToCart(wine); $event.stopPropagation()"
+            <button
+              (click)="addToCart(wine); $event.stopPropagation()"
               [disabled]="isLoading(wine.id) || isOutOfStock(wine)"
-              class="bg-transparent border-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+              class="flex items-center gap-2 bg-transparent border-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-[#515255] text-sm font-medium hover:text-black transition-colors"
+            >
+              <span>Añadir al carrito</span>
 
               @if (isLoading(wine.id)) {
-                <svg class="animate-spin h-[18px] w-[18px] text-[#515255]" xmlns="http://www.w3.org/2000/svg" fill="none"
-                  viewBox="0 0 24 24">
-
+                <svg class="animate-spin h-[18px] w-[18px]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
                   </circle>
 
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z">
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" >
                   </path>
 
                 </svg>
               } @else {
-                <fa-icon [icon]="icons.faCartShopping" class="text-[#515255] text-[18px]" />
+                <fa-icon [icon]="icons.faCartShopping" class="text-[18px]" />
               }
-
             </button>
           </div>
 

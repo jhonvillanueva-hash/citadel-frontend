@@ -9,7 +9,6 @@ import { provideAppInitializer, inject } from '@angular/core';
 import { AuthService } from './core/services/auth.service';
 import { UsuarioLoggedService } from './data/services/usuarioLogged.service';
 import { catchError, of, switchMap } from 'rxjs';
-import { debugInterceptor } from './utils/debug.interceptor';
 
 function initializeApp() {
   const authService = inject(AuthService);
@@ -39,7 +38,7 @@ export const appConfig: ApplicationConfig = {
       })
     ),
     provideHttpClient(
-      withInterceptors([errorInterceptor, authInterceptor, debugInterceptor]),
+      withInterceptors([errorInterceptor, authInterceptor]),
       withNoXsrfProtection(),
       withFetch(),
     ),

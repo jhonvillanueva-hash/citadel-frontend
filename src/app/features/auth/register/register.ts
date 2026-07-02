@@ -77,8 +77,12 @@ export class RegisterComponent implements AfterViewInit {
         const url = this.authService.getRedirectUrl();
         this.router.navigate([url]);
       },
-      error: () => {
-        this.errorMessage.set('Error en el proceso de registro o inicio de sesión.');
+      error: (err) => {
+        if (err.status === 409 && err.error?.code === 'EMAIL_EXISTS') {
+          this.errorMessage.set('Este correo electrónico ya está registrado.');
+          return;
+        }
+        this.errorMessage.set('Error al registrar usuario.');
       }
     });
   }

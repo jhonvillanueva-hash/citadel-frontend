@@ -10,7 +10,7 @@
             </p>
           } @else {
             <p class="text-sm text-green-600 my-4">
-              ¡Tenemos tus datos, todo listo para que pagues!
+              ¡Tenemos tus datos, solo confirma que los datos sean correctos y procede a pagar!
             </p>
           }
 
@@ -23,7 +23,7 @@
                   </div>
                   <span class="font-medium text-[#0e0d12]">Información personal</span>
                 </div>
-                @if (!isEditingStep1() && step1Completed()) {
+                @if (step1Locked()) {
                 <button (click)="enableEditingStep1()"
                   class="h-8 px-3 bg-[#0e0d12] text-white font-medium flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[#2a2932] hover:shadow-sm active:scale-[0.98]">
                   Habilitar edición
@@ -38,7 +38,7 @@
                       Email *
                     </label>
                     <input type="email" [ngModel]="email()" (ngModelChange)="onEmailChange($event)"
-                      [disabled]="step1Completed() && !isEditingStep1()"
+                      [disabled]="true"
                       class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
                       placeholder="cliente@ejemplo.com">
                   </div>
@@ -48,7 +48,7 @@
                       Nombres *
                     </label>
                     <input type="text" [ngModel]="nombres()" (ngModelChange)="onNombresChange($event)"
-                      [disabled]="step1Completed() && !isEditingStep1()"
+                      [disabled]="step1Locked()"
                       class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
                       placeholder="Juan">
                   </div>
@@ -58,7 +58,7 @@
                       Apellidos *
                     </label>
                     <input type="text" [ngModel]="apellidos()" (ngModelChange)="onApellidosChange($event)"
-                      [disabled]="step1Completed() && !isEditingStep1()"
+                      [disabled]="step1Locked()"
                       class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
                       placeholder="Pérez">
                   </div>
@@ -68,7 +68,7 @@
                       DNI *
                     </label>
                     <input type="text" maxlength="8" [ngModel]="dni()" (ngModelChange)="onDniChange($event)"
-                      [disabled]="step1Completed() && !isEditingStep1()"
+                      [disabled]="step1Locked()"
                       class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
                       placeholder="87654321">
                   </div>
@@ -78,23 +78,16 @@
                       Teléfono *
                     </label>
                     <input type="tel" maxlength="9" [ngModel]="telefono()" (ngModelChange)="onTelefonoChange($event)"
-                      [disabled]="step1Completed() && !isEditingStep1()"
+                      [disabled]="step1Locked()"
                       class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
                       placeholder="987654321">
                   </div>
 
                   <div class="md:col-span-2 flex justify-end items-end gap-3">
                     @if (!isEditingStep1() || !step1Completed()) {
-                    <button (click)="completeStep1()" [disabled]="
-                      !email() ||
-                      !nombres() ||
-                      !apellidos() ||
-                      !dni() ||
-                      !telefono() ||
-                      !email().includes('@') ||
-                      !email().includes('.') ||
-                      step1Completed()
-                    " class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
+                    <button (click)="completeStep1()" 
+                      [disabled]="step1Locked()"
+                      class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
                                   Continuar
                     </button>
                     } @else if (isEditingStep1() && step1Completed()) {
@@ -132,7 +125,7 @@
                   <span class="font-medium" [class.text-[#0e0d12]]="step2Enabled()"
                     [class.text-gray-400]="!step2Enabled()">Envío y dirección</span>
                 </div>
-                @if (!isEditingStep2() && step2Completed() && step2Enabled()) {
+                @if (step2Locked()) {
                 <button (click)="enableEditingStep2()"
                   class="h-8 px-3 bg-[#0e0d12] text-white font-medium flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[#2a2932] hover:shadow-sm active:scale-[0.98]">
                   Habilitar edición
@@ -142,24 +135,13 @@
               <div class="p-6">
                 <div class="space-y-5">
                   <div class="grid grid-cols-2 gap-4">
-                    <button (click)="onDeliveryTypeChange('home')"
-                      [disabled]="(!step2Enabled() || step2Completed()) && !isEditingStep2()"
-                      [class.bg-[#0e0d12]]="deliveryType() === 'home' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())"
-                      [class.text-white]="deliveryType() === 'home' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())"
-                      [class.border-[#0e0d12]]="deliveryType() === 'home' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())"
-                      [class.border-gray-300]="deliveryType() !== 'home' || (!step2Enabled() && !isEditingStep2()) || (step2Completed() && !isEditingStep2())"
-                      [class.opacity-50]="(!step2Enabled() && !isEditingStep2()) || (step2Completed() && !isEditingStep2())"
-                      class="py-3 px-4 border text-center font-medium disabled:cursor-not-allowed text-sm transition-all">
+                    <button type="button" (click)="onDeliveryTypeChange('home')" [disabled]="!step2Active()"
+                      [class]="'appearance-none py-3 px-4 border text-center font-medium text-sm transition-all ' + deliveryButtonClasses('home')">
                       Recibir en casa
                     </button>
-                    <button (click)="onDeliveryTypeChange('pickup')"
-                      [disabled]="(!step2Enabled() || step2Completed()) && !isEditingStep2()"
-                      [class.bg-[#0e0d12]]="deliveryType() === 'pickup' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())"
-                      [class.text-white]="deliveryType() === 'pickup' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())"
-                      [class.border-[#0e0d12]]="deliveryType() === 'pickup' && (step2Enabled() || isEditingStep2()) && (!step2Completed() || isEditingStep2())"
-                      [class.border-gray-300]="deliveryType() !== 'pickup' || (!step2Enabled() && !isEditingStep2()) || (step2Completed() && !isEditingStep2())"
-                      [class.opacity-50]="(!step2Enabled() && !isEditingStep2()) || (step2Completed() && !isEditingStep2())"
-                      class="py-3 px-4 border text-center font-medium disabled:cursor-not-allowed text-sm transition-all">
+                  
+                    <button type="button" (click)="onDeliveryTypeChange('pickup')" [disabled]="!step2Active()"
+                      [class]="'appearance-none py-3 px-4 border text-center font-medium text-sm transition-all ' + deliveryButtonClasses('pickup')">
                       Recoger en tienda
                     </button>
                   </div>
@@ -171,7 +153,7 @@
                       <div>
                         <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Departamento *</label>
                         <select [ngModel]="departamento()" (ngModelChange)="onDepartamentoChange($event)"
-                          [disabled]="(!step2Enabled() || step2Completed()) && !isEditingStep2()"
+                          [disabled]="!step2Enabled() || step2Locked()"
                           class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
                           <option value="" disabled selected>Seleccionar departamento</option>
                           @for (dep of departamentos; track dep.id) {
@@ -183,7 +165,7 @@
                       <div>
                         <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Provincia *</label>
                         <select [ngModel]="provincia()" (ngModelChange)="onProvinciaChange($event)"
-                          [disabled]="((!step2Enabled() || step2Completed()) && !isEditingStep2()) || !departamento()"
+                          [disabled]="(!step2Enabled() || step2Locked()) || !departamento()"
                           class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
                           <option value="" disabled selected>Seleccionar provincia</option>
                           @for (prov of filteredProvincias; track prov.id) {
@@ -195,7 +177,7 @@
                       <div>
                         <label class="block text-xs font-medium text-[#0e0d12] mb-1.5">Distrito *</label>
                         <select [ngModel]="distrito()" (ngModelChange)="onDistritoChange($event)"
-                          [disabled]="((!step2Enabled() || step2Completed()) && !isEditingStep2()) || !provincia()"
+                          [disabled]="(!step2Enabled() || step2Locked()) || !provincia()"
                           class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm">
                           <option value="" disabled selected>Seleccionar distrito</option>
                           @for (dist of filteredDistritos; track dist.id) {
@@ -214,7 +196,7 @@
                             Avenida / Calle / Jirón *
                           </label>
                           <input type="text" [ngModel]="direccion()" (ngModelChange)="onDireccionChange($event)"
-                            [disabled]="(!step2Enabled() || step2Completed()) && !isEditingStep2()"
+                            [disabled]="!step2Enabled() || step2Locked()"
                             class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
                             placeholder="Av. José Pardo">
                         </div>
@@ -224,7 +206,7 @@
                             Número *
                           </label>
                           <input type="text" [ngModel]="numeroCasa()" (ngModelChange)="onNumeroCasaChange($event)"
-                            [disabled]="(!step2Enabled() || step2Completed()) && !isEditingStep2()"
+                            [disabled]="!step2Enabled() || step2Locked()"
                             class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
                             placeholder="123">
                         </div>
@@ -234,38 +216,10 @@
                             Código Postal
                           </label>
                           <input type="text" [ngModel]="codigoPostal()" (ngModelChange)="onCodigoPostalChange($event)"
-                            [disabled]="(!step2Enabled() || step2Completed()) && !isEditingStep2()"
+                            [disabled]="!step2Enabled() || step2Locked()"
                             class="w-full px-4 py-2 border border-gray-300 bg-white focus:outline-none focus:border-[#0e0d12] disabled:bg-gray-100 text-sm"
                             placeholder="15001">
                         </div>
-                    
-                      </div>
-                    
-                      <div class="flex items-end justify-end gap-3 lg:col-span-1">
-                    
-                        @if (!isEditingStep2() || !step2Completed()) {
-                          <button (click)="goBackToStep1()" [disabled]="!step2Enabled() || step2Completed()"
-                            class="px-6 py-2 border border-gray-300 text-[#0e0d12] hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium">
-                            Regresar
-                          </button>
-                      
-                          <button (click)="completeStep2()"
-                            [disabled]="!step2Enabled() || step2Completed() || (deliveryType() === 'home' && (!direccion() || !departamento() || !provincia() || !distrito() || !numeroCasa()))"
-                            class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
-                            Continuar
-                          </button>
-                        } @else if (isEditingStep2() && step2Completed()) {                    
-                          <button (click)="cancelEditingStep2()"
-                            class="px-6 py-2 border border-gray-300 text-[#0e0d12] hover:bg-gray-50 transition text-sm font-medium">
-                            Cancelar
-                          </button>
-                      
-                          <button (click)="completeStep2()"
-                            [disabled]="deliveryType() === 'home' && (!direccion() || !departamento() || !provincia() || !distrito() || !numeroCasa())"
-                            class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
-                            Guardar
-                          </button>
-                        }
                     
                       </div>
                     
@@ -281,11 +235,25 @@
 
                   @if (deliveryType() === 'pickup') {
                   <div class="bg-gray-50 p-5 border border-gray-200">
-                    <p class="font-medium text-[#0e0d12] mb-2 text-sm">Punto de recogida</p>
+                    <p class="font-medium text-[#0e0d12] mb-2 text-sm">Punto de recojo</p>
                     <p class="text-[#0e0d12]/70 mb-1 text-sm">{{ pickupAddress() }}</p>
                     <p class="text-xs text-[#0e0d12]/50">{{ pickupDetails() }}</p>
                     <iframe [src]="storeMapUrl" width="100%" height="300" style="border:0" loading="lazy"
                       allowfullscreen></iframe>
+                  </div>
+                  }
+                  @if (!step2Locked()) {
+                  <div class="flex items-end justify-end gap-3 lg:col-span-1">
+                    <button (click)="cancelEditingStep2()"
+                      class="px-6 py-2 border border-gray-300 text-[#0e0d12] hover:bg-gray-50 transition text-sm font-medium">
+                      Cancelar
+                    </button>
+                  
+                    <button (click)="completeStep2()"
+                      [disabled]="deliveryType() === 'home' && (!direccion() || !departamento() || !provincia() || !distrito() || !numeroCasa())"
+                      class="px-6 py-2 bg-[#0e0d12] text-white hover:bg-[#1c1a24] disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm font-medium">
+                      {{ step2Completed() ? 'Guardar' : 'Continuar' }}
+                    </button>
                   </div>
                   }
                 </div>
@@ -306,7 +274,7 @@
                 </div>
                 <div class="flex justify-between text-[#0e0d12]/70 text-sm">
                   <span>
-                    {{ deliveryType() === 'home' ? 'Envío' : 'Recogida en tienda' }}
+                    {{ deliveryType() === 'home' ? 'Envío' : 'Recojo en tienda' }}
                   </span>
                   <span>S/ {{ shippingCost.toFixed(2) }}</span>
                 </div>
@@ -365,7 +333,7 @@
                 </div>
               </div>
 
-              <button (click)="handleReservar()" [disabled]="!step1Completed() || !step2Completed()"
+              <button (click)="handleReservar()"  [disabled]="!(step1Completed() && step2Completed())"
                 class="w-full py-2.5 bg-[#0e0d12] text-white font-medium text-sm
                     transition-all duration-200
                     hover:bg-[#2a2932] hover:shadow-sm
