@@ -72,15 +72,19 @@ export class CheckoutStore implements OnInit {
   codigoPostal = signal('');
 
   pickupAddress = signal('Av. Carlos Valderrama 491, Trujillo 13001, La Libertad, Perú');
-  pickupDetails = signal('Punto de recogida oficial - Lunes a Sábado 10:00 AM - 8:00 PM');
+  pickupDetails = signal('Punto de recojo oficial - Lunes a Sábado 10:00 AM - 8:00 PM');
 
   paymentMethod = signal<string | null>(null);
   yapeAvailable = signal(true);
 
   step1Completed = signal(false);
-  step2Completed = signal(false);
   step1Enabled = signal(true);
+  step1Locked = signal(false);
+  step1Confirmed = signal(false);
+
   step2Enabled = signal(false);
+  step2Locked = signal(true);
+  step2Completed = signal(false);
 
   mapUrl = signal<SafeResourceUrl | null>(null);
 
@@ -217,7 +221,8 @@ export class CheckoutStore implements OnInit {
       const response: any = await this.culqiService.pagar(this.email());
 
       if (response.success) {
-        this.router.navigate(['/store/profile']);
+        this.toastService.showSuccess('¡Pedido pagado exitósamente!');
+        this.router.navigate(['/store/profile/orders']);
         return;
       }
 
@@ -381,22 +386,9 @@ export class CheckoutStore implements OnInit {
   }
 
   private updateStepState(): void {
-    if (this.isStep1Valid()) {
-      this.step1Completed.set(true);
-      this.step2Enabled.set(true);
-    } else {
-      this.step1Completed.set(false);
-      this.step2Enabled.set(false);
-    }
-
-    this.syncStep2Snapshot();
-
-    if (this.step1Completed() && this.isStep2Valid()) {
-      this.step2Completed.set(true);
-    } else {
-      this.step2Completed.set(false);
-    }
-  }
+  this.step2Enabled.set(this.step1Completed());
+  this.syncStep2Snapshot();
+}
 
   private syncStep2Snapshot(): void {
     this.initialStep2Values = {
@@ -460,6 +452,8 @@ export class CheckoutStore implements OnInit {
       const user = this.authService.currentUser();
       if (user) {
         this.userService.patch(user.id_usuario, {
+          nombres: this.nombres(),
+          apellidos: this.apellidos(),
           dni: this.dni(),
           telefono: this.telefono()
         }).subscribe({
@@ -472,6 +466,14 @@ export class CheckoutStore implements OnInit {
         });
         this.step1Completed.set(true);
         this.step2Enabled.set(true);
+        this.step1Locked.set(true);
+        this.step1Confirmed.set(true);
+        this.isEditingStep1.set(false);
+        this.step2Enabled.set(true);
+        this.step2Locked.set(false);
+      } else {
+        this.toastService.showError('Debes iniciar sesión');
+        this.router.navigate(['/login']);
       }
     }
   }
@@ -500,6 +502,8 @@ export class CheckoutStore implements OnInit {
       }
 
       this.step2Completed.set(true);
+      this.step2Locked.set(true);
+      this.isEditingStep2.set(false);
     }
   }
 
@@ -637,6 +641,7 @@ export class CheckoutStore implements OnInit {
 
   enableEditingStep1(): void {
     this.isEditingStep1.set(true);
+    this.step1Locked.set(false);
     this.step1DataBackup = {
       email: this.email(),
       nombres: this.nombres(),
@@ -648,6 +653,7 @@ export class CheckoutStore implements OnInit {
 
   cancelEditingStep1(): void {
     this.isEditingStep1.set(false);
+    this.step1Locked.set(true);
     this.email.set(this.step1DataBackup.email);
     this.nombres.set(this.step1DataBackup.nombres);
     this.apellidos.set(this.step1DataBackup.apellidos);
@@ -656,6 +662,7 @@ export class CheckoutStore implements OnInit {
   }
 
   enableEditingStep2(): void {
+    this.step2Locked.set(false);
     this.isEditingStep2.set(true);
     this.step2DataBackup = {
       departamento: this.departamento(),
@@ -668,6 +675,7 @@ export class CheckoutStore implements OnInit {
   }
 
   cancelEditingStep2(): void {
+    this.step2Locked.set(true);
     this.isEditingStep2.set(false);
     this.departamento.set(this.step2DataBackup.departamento);
     this.provincia.set(this.step2DataBackup.provincia);
@@ -682,6 +690,22 @@ export class CheckoutStore implements OnInit {
     this.filteredDistritos = this.distritos.filter(
       d => d.provincia_id == Number(this.provincia())
     );
+  }
+
+  step2Active(): boolean {
+    return this.step2Enabled() && !this.step2Locked();
+  }
+  deliveryButtonClasses(type: 'home' | 'pickup'): string {
+    const isSelected = this.deliveryType() === type;
+    const isActive = this.step2Active();
+
+    if (isSelected && isActive) {
+      return 'bg-[#0e0d12] text-white border-[#0e0d12]';
+    }
+    if (isSelected && !isActive) {
+      return 'bg-[#0e0d12]/60 text-white border-[#0e0d12]/60';
+    }
+    return 'bg-gray-100 text-gray-500 border-gray-100';
   }
 
   generarSlug(texto: string): string {

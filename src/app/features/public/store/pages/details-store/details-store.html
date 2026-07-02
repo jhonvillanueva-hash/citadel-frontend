@@ -90,12 +90,12 @@
               <div class="flex items-baseline gap-2">
                 
                 <h4 class="text-[#0e0d12] text-2xl sm:text-3xl font-bold">
-                  S/ {{ getCurrentPrice() }}
+                  S/ {{ getCurrentPrice() | number:'1.2-2' }}
                 </h4>
 
                 @if (getCurrentPrice() < wine.precio_base) {
                   <p class="text-[#0e0d12]/40 text-base line-through">
-                    S/ {{ wine.precio_base }}
+                    S/ {{ wine.precio_base | number:'1.2-2' }}
                   </p>
                 }
 
@@ -103,7 +103,7 @@
 
               @if (getSavingsPerBottle() > 0) {
                 <div class="bg-green-100 text-green-700 px-2 py-0.5 text-xs font-medium">
-                  Ahorras S/ {{ getSavingsPerBottle() }} por botella
+                  Ahorras S/ {{ getSavingsPerBottle() | number:'1.2-2' }} por botella
                 </div>
               }
             </div>
@@ -270,12 +270,12 @@
                 <div>
                   <p class="text-xs text-gray-500">Total a pagar</p>
                   <p class="text-2xl font-bold text-[#0e0d12]">
-                    S/ {{ getTotal() }}
+                    S/ {{ getTotal() | number:'1.2-2' }}
                   </p>
 
                   @if (getTotalSavings() > 0) {
                     <p class="text-xs text-green-600">
-                      Ahorras S/ {{ getTotalSavings() }}
+                      Ahorras S/ {{ getTotalSavings() | number:'1.2-2' }}
                     </p>
                   }
                 </div>
@@ -391,8 +391,8 @@
                             {{ price.cantidad }} botellas
                           }
                         </td>
-                        <td class="px-3 py-1.5 text-[#0e0d12]/70">S/ {{ price.precio }}</td>
-                        <td class="px-3 py-1.5 text-green-600">S/ {{ price.ahorro }}</td>
+                        <td class="px-3 py-1.5 text-[#0e0d12]/70">S/ {{ price.precio | number:'1.2-2' }}</td>
+                        <td class="px-3 py-1.5 text-green-600">S/ {{ price.ahorro | number:'1.2-2' }}</td>
                       </tr>
                     }
                   </tbody>

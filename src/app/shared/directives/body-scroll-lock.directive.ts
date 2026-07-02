@@ -31,7 +31,9 @@ export class BodyScrollLockDirective implements OnChanges, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.enableScroll();
+    if (this.isBrowser) {
+      this.enableScroll();
+    }
   }
 
   private disableScroll() {
